@@ -36,6 +36,8 @@ export interface MealStore {
   findById(id: string, userId: string): Promise<MealRow | null>;
   /** 列出指定日期(YYYY-MM-DD)的所有餐食,按 ate_at 升序 */
   listByDate(userId: string, date: string): Promise<MealRow[]>;
+  /** U13b 30 天档案:列出 [sinceDate, untilDate] 之间的全部餐食(按 ate_at 升序) */
+  listInRange(userId: string, sinceDate: string, untilDate: string): Promise<MealRow[]>;
   appendFeedback(mealId: string, userId: string, entry: MealRow['feedback'][number]): Promise<void>;
 }
 
@@ -118,6 +120,42 @@ export class PgMealStore implements MealStore {
           WHERE user_id = $1 AND ate_at::date = $2
           ORDER BY ate_at ASC`,
         [userId, date]
+      );
+      return r.rows.map((row) => ({
+        id: row.id,
+        userId: row.user_id,
+        ateAt: row.ate_at,
+        photoOssKey: row.photo_oss_key,
+        recognizedItemsCiphertext: row.recognized_items_ciphertext,
+        tcmLabelsSummary: row.tcm_labels_summary,
+        westernNutritionSummary: row.western_nutrition_summary,
+        fireScore: row.fire_score === null ? null : Number(row.fire_score),
+        feedback: row.feedback,
+        createdAt: row.created_at
+      }));
+    });
+  }
+
+  async listInRange(userId: string, sinceDate: string, untilDate: string): Promise<MealRow[]> {
+    return await withClient(async (client) => {
+      const r = await client.query<{
+        id: string;
+        user_id: string;
+        ate_at: Date;
+        photo_oss_key: string | null;
+        recognized_items_ciphertext: string;
+        tcm_labels_summary: MealRow['tcmLabelsSummary'];
+        western_nutrition_summary: Record<string, unknown>;
+        fire_score: string | null;
+        feedback: MealRow['feedback'];
+        created_at: Date;
+      }>(
+        `SELECT id, user_id, ate_at, photo_oss_key, recognized_items_ciphertext,
+                tcm_labels_summary, western_nutrition_summary, fire_score, feedback, created_at
+           FROM meals
+          WHERE user_id = $1 AND ate_at::date >= $2 AND ate_at::date <= $3
+          ORDER BY ate_at ASC`,
+        [userId, sinceDate, untilDate]
       );
       return r.rows.map((row) => ({
         id: row.id,

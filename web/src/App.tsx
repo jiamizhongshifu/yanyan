@@ -14,6 +14,7 @@ import { MealResult } from './pages/MealResult';
 import { Step1Blind } from './pages/MorningCheckin/Step1Blind';
 import { Step2Compare } from './pages/MorningCheckin/Step2Compare';
 import { Step3Reveal } from './pages/MorningCheckin/Step3Reveal';
+import { ProfilePdf } from './pages/ProfilePdf';
 import { RequireAuth } from './components/RequireAuth';
 import { BottomTabs } from './components/BottomTabs';
 
@@ -92,6 +93,11 @@ export function App() {
         <Route path="/findings">
           <RequireAuth>
             <Findings />
+          </RequireAuth>
+        </Route>
+        <Route path="/profile-pdf">
+          <RequireAuth>
+            <ProfilePdf />
           </RequireAuth>
         </Route>
         <Route path="/me">

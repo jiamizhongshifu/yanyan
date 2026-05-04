@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { Link } from 'wouter';
 import { fetchProgress, type UserProgress } from '../services/home';
 import { track } from '../services/tracker';
 
@@ -60,6 +61,15 @@ export function Findings() {
             ? '已超过 14 天:Phase 2 上线后,这里会渐进展示候选发物 + 置信度。'
             : '未到 14 天:发物候选规律需要更多数据。'}
         </p>
+        {eligible && (
+          <Link
+            href="/profile-pdf"
+            className="mt-5 block w-full text-center rounded-full bg-ink text-white py-3 text-sm font-medium"
+            data-testid="btn-open-profile"
+          >
+            查看 / 下载体质档案
+          </Link>
+        )}
       </section>
     </main>
   );

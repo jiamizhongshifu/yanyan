@@ -75,6 +75,12 @@ class FakeMealStore implements MealStore {
       (r) => r.userId === uid && r.ateAt.toISOString().slice(0, 10) === date
     );
   }
+  async listInRange(uid: string, since: string, until: string) {
+    return this.rows.filter((r) => {
+      const k = r.ateAt.toISOString().slice(0, 10);
+      return r.userId === uid && k >= since && k <= until;
+    });
+  }
   async appendFeedback() {
     /* noop */
   }

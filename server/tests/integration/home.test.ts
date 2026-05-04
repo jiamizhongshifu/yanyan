@@ -49,6 +49,14 @@ class FakeMealStore implements MealStore {
       .filter((r) => r.userId === userId && r.ateAt.toISOString().slice(0, 10) === date)
       .sort((a, b) => a.ateAt.getTime() - b.ateAt.getTime());
   }
+  async listInRange(userId: string, since: string, until: string): Promise<MealRow[]> {
+    return [...this.rows.values()]
+      .filter((r) => {
+        const k = r.ateAt.toISOString().slice(0, 10);
+        return r.userId === userId && k >= since && k <= until;
+      })
+      .sort((a, b) => a.ateAt.getTime() - b.ateAt.getTime());
+  }
   async appendFeedback(): Promise<void> {
     /* noop */
   }
