@@ -35,6 +35,8 @@ export interface SymptomStore {
   findByDate(userId: string, date: string, source?: CheckinSource): Promise<SymptomRow | null>;
   /** 找昨日打卡 */
   findYesterday(userId: string, today: string, source?: CheckinSource): Promise<SymptomRow | null>;
+  /** 累计 next_morning 打卡天数(progress / Day X/30 用) */
+  countDistinctCheckinDates(userId: string): Promise<number>;
 }
 
 function rowToSymptom(r: {
@@ -103,6 +105,18 @@ export class PgSymptomStore implements SymptomStore {
     const yesterday = new Date(today);
     yesterday.setUTCDate(yesterday.getUTCDate() - 1);
     return await this.findByDate(userId, yesterday.toISOString().slice(0, 10), source);
+  }
+
+  async countDistinctCheckinDates(userId: string): Promise<number> {
+    return await withClient(async (c) => {
+      const r = await c.query<{ count: string }>(
+        `SELECT COUNT(DISTINCT recorded_for_date)::text AS count
+           FROM symptoms
+          WHERE user_id = $1 AND source = 'next_morning'`,
+        [userId]
+      );
+      return Number(r.rows[0]?.count ?? 0);
+    });
   }
 }
 

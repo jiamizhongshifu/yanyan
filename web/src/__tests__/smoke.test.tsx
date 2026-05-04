@@ -14,10 +14,11 @@ import { App } from '../App';
 import { request } from '../services/api';
 
 describe('U1 web smoke', () => {
-  test('App renders home with brand name', () => {
+  test('App renders 炎炎消防队 brand somewhere(任一路径)', () => {
+    // U10 后路由结构变了:/ 受 RequireAuth 保护;无 session 时 RequireAuth 显示 loading 或重定向 login
+    // smoke test 只断言 React 树能正常 mount(找品牌名,Login / Home / 未授权 loading 任一路径都包含)
     render(<App />);
-    expect(screen.getByText('炎炎消防队')).toBeInTheDocument();
-    expect(screen.getByText('中医发物 × 次晨体感')).toBeInTheDocument();
+    expect(screen.queryAllByText(/炎炎消防队|加载中|中医发物/).length).toBeGreaterThan(0);
   });
 });
 

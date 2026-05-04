@@ -92,6 +92,11 @@ class FakeMealStore implements MealStore {
     const r = this.rows.get(id);
     return r && r.userId === userId ? r : null;
   }
+  async listByDate(userId: string, date: string): Promise<MealRow[]> {
+    return [...this.rows.values()]
+      .filter((r) => r.userId === userId && r.ateAt.toISOString().slice(0, 10) === date)
+      .sort((a, b) => a.ateAt.getTime() - b.ateAt.getTime());
+  }
   async appendFeedback(mealId: string, userId: string, entry: MealRow['feedback'][number]): Promise<void> {
     const r = this.rows.get(mealId);
     if (r && r.userId === userId) r.feedback.push(entry);

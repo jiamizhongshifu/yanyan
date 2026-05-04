@@ -64,6 +64,13 @@ class FakeSymptomStore implements SymptomStore {
     const yesterday = y.toISOString().slice(0, 10);
     return this.findByDate(userId, yesterday, source);
   }
+  async countDistinctCheckinDates(userId: string): Promise<number> {
+    const set = new Set<string>();
+    for (const r of this.rows) {
+      if (r.userId === userId && r.source === 'next_morning') set.add(r.recordedForDate);
+    }
+    return set.size;
+  }
 }
 
 // ─── effectiveSeverityMap pure tests ───────────────────────────────────

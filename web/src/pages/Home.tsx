@@ -1,13 +1,58 @@
 /**
- * 首页(占位)— U10 主屏由后续单元实现
+ * 主屏(plan U10)
+ *
+ * 并行拉取:
+ *   - GET /yan-score/today   (火分卡片)
+ *   - GET /home/today        (今日餐食列表)
+ *   - GET /users/me/progress (累计天数 + 趋势阈值)
+ *
+ * UI:
+ *   - TodayFireCard
+ *   - MealHistoryList
+ *   - 跳转 CTA(打卡 / 拍照)
  */
 
+import { useEffect, useState } from 'react';
+import { TodayFireCard } from '../components/TodayFireCard';
+import { MealHistoryList } from '../components/MealHistoryList';
+import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
+import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
+
 export function Home() {
+  const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
+  const [meals, setMeals] = useState<TodayMealItem[] | null>(null);
+  const [progress, setProgress] = useState<UserProgress | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    void Promise.all([fetchYanScoreToday(), fetchHomeToday(), fetchProgress()]).then(
+      ([y, h, p]) => {
+        if (!mounted) return;
+        setYanScore(y);
+        setMeals(h?.meals ?? []);
+        setProgress(p);
+      }
+    );
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
-    <main className="min-h-screen p-8 flex flex-col items-center justify-center">
-      <div className="text-2xl font-semibold text-ink">炎炎消防队</div>
-      <div className="text-sm text-ink/60 mt-2">中医发物 × 次晨体感</div>
-      <div className="text-xs text-ink/40 mt-12">等待 U10 主屏实现</div>
+    <main className="min-h-screen bg-paper px-5 pt-12 pb-24" data-testid="home">
+      <header className="mb-5">
+        <p className="text-xs text-ink/40">炎炎消防队</p>
+      </header>
+
+      <TodayFireCard
+        yanScore={yanScore}
+        canDrawTrend={progress?.flags.canDrawTrend ?? false}
+        cumulativeDays={progress?.cumulativeCheckinDays ?? 0}
+      />
+
+      <div className="h-3" />
+
+      <MealHistoryList meals={meals ?? []} />
     </main>
   );
 }

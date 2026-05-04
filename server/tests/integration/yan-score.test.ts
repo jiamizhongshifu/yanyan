@@ -60,6 +60,13 @@ class FakeSymptomStore implements SymptomStore {
   async findYesterday(): Promise<SymptomRow | null> {
     return null;
   }
+  async countDistinctCheckinDates(userId: string): Promise<number> {
+    const set = new Set<string>();
+    for (const r of this.rows.values()) {
+      if (r.userId === userId && r.source === 'next_morning') set.add(r.recordedForDate);
+    }
+    return set.size;
+  }
 }
 
 describe('U8 yan-score HTTP — 4 Part 集成', () => {
