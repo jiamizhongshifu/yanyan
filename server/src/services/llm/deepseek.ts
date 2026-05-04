@@ -67,7 +67,7 @@ interface AnthropicMessage {
 }
 
 interface AnthropicResponse {
-  content: Array<{ type: string; text: string }>;
+  content: Array<{ type: string; text?: string; thinking?: string }>;
   model: string;
   usage: { input_tokens: number; output_tokens: number };
 }
@@ -124,8 +124,13 @@ export class DeepSeekTextClient implements LlmTextClient {
           outputTokens: res.usage.output_tokens
         };
         recordTokenUsage(usage);
+        // content array 可能含 thinking + text 块;只拼 type=text 的内容
+        const text = res.content
+          .filter((c) => c.type === 'text' && typeof c.text === 'string')
+          .map((c) => c.text)
+          .join('\n');
         return {
-          content: res.content[0]?.text ?? '',
+          content: text,
           modelVersion: res.model || this.modelVersion,
           latencyMs
         };

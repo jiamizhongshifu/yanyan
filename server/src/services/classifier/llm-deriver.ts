@@ -50,18 +50,34 @@ export class DevLlmDeriver implements LlmDeriver {
  *   - 至少 1 条 citation(典籍引用 — source/reference)
  *   - 不确定时低 confidence,U5 流程会进人工 review 不直接入库(R33)
  */
-const DERIVE_SYSTEM_PROMPT = `你是中医食物分类专家。给定一个食物的中文名,你输出严格 JSON,字段如下:
+const DERIVE_SYSTEM_PROMPT = `你是中医食物分类专家。给定一个食物的中文名,你必须输出严格 JSON。
+
+输出 JSON schema(每个字段值必须严格在指定 enum 内):
 {
-  "tcmLabel": "发" | "温和" | "平",
-  "tcmProperty": "寒" | "凉" | "平" | "温" | "热",
-  "citations": [{"source": "canon" | "paper" | "modern_nutrition", "reference": "典籍/文献名"}],
-  "confidence": 0.0-1.0
+  "tcmLabel": "发" | "温和" | "平",   // 必须是这三个汉字之一
+  "tcmProperty": "寒" | "凉" | "平" | "温" | "热",  // 必须是这五个汉字之一,**单个汉字**,不带任何修饰词
+  "citations": [{"source": "canon", "reference": "典籍名"}],  // source 只能是 canon/paper/modern_nutrition;reference 是简短名称
+  "confidence": 0.0-1.0   // 数字
 }
+
+字段定义:
+- tcmLabel = 发物分类。"发"=刺激性 / 海鲜 / 辣 / 油炸;"温和"=辛温补益;"平"=主食 / 平和清淡。**必须从这三个值中选一个**,不能写"凉"或"寒"等寒热属性词。
+- tcmProperty = 寒热属性。**必须只写一个汉字**(寒/凉/平/温/热),不要写"性凉"也不要写"味甘性凉"或"归肺经"等长描述。
+
+正例(原样照写):
+食物:海带
+{"tcmLabel":"平","tcmProperty":"凉","citations":[{"source":"canon","reference":"《本草纲目》海菜部"}],"confidence":0.85}
+
+食物:饺子
+{"tcmLabel":"平","tcmProperty":"温","citations":[{"source":"canon","reference":"《饮膳正要》"}],"confidence":0.75}
+
+食物:虾
+{"tcmLabel":"发","tcmProperty":"温","citations":[{"source":"canon","reference":"《本草纲目》"}],"confidence":0.9}
+
 要求:
-1. tcmLabel 三档:常见过敏 / 海鲜 / 辣 / 油炸 = 发;辛温补益 / 偏温 = 温和;主食 / 平和清淡 = 平
-2. citations 至少 1 条(《本草纲目》/《饮膳正要》/《伤寒论》/《黄帝内经》/学术论文等)
-3. 如果不确定该食物归类,confidence < 0.6,允许多个解读时低估
-4. 只输出 JSON,不要 markdown 代码块,不要解释`;
+1. citations 至少 1 条
+2. 不确定时 confidence < 0.6
+3. 只输出 JSON,无任何文字 / markdown / 解释 / 代码块`;
 
 const TCM_LABELS_SET = new Set(['发', '温和', '平']);
 const TCM_PROPS_SET = new Set(['寒', '凉', '平', '温', '热']);
@@ -114,10 +130,14 @@ export class RealLlmDeriver implements LlmDeriver {
       const json = tryParseJson(res.content);
       if (!json) return null;
 
-      const tcmLabel = json.tcmLabel as TcmLabel;
-      const tcmProperty = json.tcmProperty as TcmProperty;
-      if (!TCM_LABELS_SET.has(tcmLabel)) return null;
-      if (!TCM_PROPS_SET.has(tcmProperty)) return null;
+      // 严格匹配,不行再做包含子串的宽容匹配(LLM 偶尔加修饰词)
+      const tcmLabel = (TCM_LABELS_SET.has(json.tcmLabel as string)
+        ? (json.tcmLabel as TcmLabel)
+        : extractEnumSubstring(json.tcmLabel, ['发', '温和', '平'])) as TcmLabel | null;
+      const tcmProperty = (TCM_PROPS_SET.has(json.tcmProperty as string)
+        ? (json.tcmProperty as TcmProperty)
+        : extractEnumSubstring(json.tcmProperty, ['寒', '凉', '平', '温', '热'])) as TcmProperty | null;
+      if (!tcmLabel || !tcmProperty) return null;
 
       const citations: Citation[] = (json.citations ?? [])
         .filter((c) => c && typeof c.reference === 'string' && c.reference.length > 0)
@@ -153,6 +173,17 @@ export class RealLlmDeriver implements LlmDeriver {
 function clamp01(n: number): number {
   if (Number.isNaN(n)) return 0;
   return Math.max(0, Math.min(1, n));
+}
+
+/** LLM 偶尔写"性凉"/"味甘性凉"等,从字符串里抓到 enum 之一 */
+function extractEnumSubstring(value: unknown, candidates: string[]): string | null {
+  if (typeof value !== 'string') return null;
+  // 优先匹配 多字符 enum(避免"温和"被先匹到"温")
+  const sorted = [...candidates].sort((a, b) => b.length - a.length);
+  for (const c of sorted) {
+    if (value.includes(c)) return c;
+  }
+  return null;
 }
 
 /** 占位 — Qwen-VL 文本端 fallback,key 未配齐前抛出 */
