@@ -5,10 +5,11 @@
  */
 
 import Fastify, { FastifyInstance } from 'fastify';
-import { registerV1 } from './api/v1';
+import { registerV1, type V1Options } from './api/v1';
 
 export interface BuildAppOptions {
   logger?: boolean;
+  v1?: V1Options;
 }
 
 export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInstance> {
@@ -37,7 +38,10 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
     });
   });
 
-  await app.register(registerV1, { prefix: '/api/v1' });
+  const v1Opts = opts.v1 ?? {};
+  await app.register(async (scoped) => {
+    await registerV1(scoped, v1Opts);
+  }, { prefix: '/api/v1' });
 
   return app;
 }

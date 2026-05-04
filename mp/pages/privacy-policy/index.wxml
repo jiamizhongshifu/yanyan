@@ -1,0 +1,4 @@
+<view class="container">
+  <text class="body" selectable="{{true}}">{{body}}</text>
+  <button class="copy-btn" bindtap="onCopyTap" size="mini">复制全文</button>
+</view>
