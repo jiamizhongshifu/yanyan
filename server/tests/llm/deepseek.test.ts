@@ -18,11 +18,17 @@ describe('U7 LLM — DeepSeek client', () => {
     expect(() => new DeepSeekTextClient('', 'https://api.deepseek.com/anthropic', 'm')).toThrow();
   });
 
-  test('DeepSeekTextClient.complete v1 占位 throw(待 ce-work 接入 SDK)', async () => {
-    const c = new DeepSeekTextClient('fake-key', 'https://api.deepseek.com/anthropic', 'deepseek-v4-pro');
-    await expect(
-      c.complete({ messages: [{ role: 'user', content: 'hi' }] })
-    ).rejects.toThrow(/待 ce-work 阶段接入/);
+  test('DeepSeekTextClient.complete 401 → unauthorized + 不重试', async () => {
+    let calls = 0;
+    const fakeFetch = (async () => {
+      calls++;
+      return new Response('unauthorized', { status: 401 });
+    }) as unknown as typeof fetch;
+    const c = new DeepSeekTextClient('bad-key', 'https://api.deepseek.com/anthropic', 'deepseek-v4-pro', fakeFetch);
+    await expect(c.complete({ messages: [{ role: 'user', content: 'hi' }] })).rejects.toMatchObject({
+      kind: 'unauthorized'
+    });
+    expect(calls).toBe(1);
   });
 
   test('DevTextClient fixture 命中', async () => {

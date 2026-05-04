@@ -10,6 +10,8 @@
  */
 
 import type { Citation, TcmLabel, TcmProperty } from './types';
+import type { LlmTextClient } from '../llm/deepseek';
+import { LlmCallError } from '../llm/deepseek';
 
 export interface LlmDerivation {
   tcmLabel: TcmLabel;
@@ -41,20 +43,129 @@ export class DevLlmDeriver implements LlmDeriver {
 }
 
 /**
- * 占位 — 生产 ce-work 阶段实现:
- * - 调豆包多模态 SDK / Qwen-VL,prompt 包含典籍 RAG 上下文(canon-excerpts)
- * - 输出强约束 schema(JSON mode)
- * - 重试 + rate limit + 日志归档
+ * Phase 2 U8 真实派生器 — 用 DeepSeek(或任意 LlmTextClient)派生食物分类
+ *
+ * Prompt 设计要求:
+ *   - 输出 strict JSON,只含约束字段:tcmLabel / tcmProperty / citations / confidence
+ *   - 至少 1 条 citation(典籍引用 — source/reference)
+ *   - 不确定时低 confidence,U5 流程会进人工 review 不直接入库(R33)
  */
-export class DoubaoLlmDeriver implements LlmDeriver {
-  async derive(_foodName: string): Promise<LlmDerivation | null> {
-    throw new Error('DoubaoLlmDeriver 待 ce-work 阶段接入豆包多模态文本端 SDK');
+const DERIVE_SYSTEM_PROMPT = `你是中医食物分类专家。给定一个食物的中文名,你输出严格 JSON,字段如下:
+{
+  "tcmLabel": "发" | "温和" | "平",
+  "tcmProperty": "寒" | "凉" | "平" | "温" | "热",
+  "citations": [{"source": "canon" | "paper" | "modern_nutrition", "reference": "典籍/文献名"}],
+  "confidence": 0.0-1.0
+}
+要求:
+1. tcmLabel 三档:常见过敏 / 海鲜 / 辣 / 油炸 = 发;辛温补益 / 偏温 = 温和;主食 / 平和清淡 = 平
+2. citations 至少 1 条(《本草纲目》/《饮膳正要》/《伤寒论》/《黄帝内经》/学术论文等)
+3. 如果不确定该食物归类,confidence < 0.6,允许多个解读时低估
+4. 只输出 JSON,不要 markdown 代码块,不要解释`;
+
+const TCM_LABELS_SET = new Set(['发', '温和', '平']);
+const TCM_PROPS_SET = new Set(['寒', '凉', '平', '温', '热']);
+
+interface DeriveJsonShape {
+  tcmLabel?: string;
+  tcmProperty?: string;
+  citations?: Array<{ source?: string; reference?: string; excerpt?: string }>;
+  confidence?: number;
+}
+
+function tryParseJson(content: string): DeriveJsonShape | null {
+  // 先剥 markdown code fence(LLM 偶尔不听话)
+  const stripped = content
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim();
+  try {
+    return JSON.parse(stripped) as DeriveJsonShape;
+  } catch {
+    // 尝试找第一个 { ... } 块
+    const m = stripped.match(/\{[\s\S]*\}/);
+    if (m) {
+      try {
+        return JSON.parse(m[0]) as DeriveJsonShape;
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 }
 
+/**
+ * 真实派生器:接受 LlmTextClient 注入,任何 Anthropic 兼容 client 都能用
+ */
+export class RealLlmDeriver implements LlmDeriver {
+  constructor(private client: LlmTextClient) {}
+
+  async derive(foodName: string): Promise<LlmDerivation | null> {
+    const trimmed = foodName.trim();
+    if (!trimmed) return null;
+    try {
+      const res = await this.client.complete({
+        system: DERIVE_SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: `请为下列食物输出 JSON:${trimmed}` }],
+        temperature: 0.1,
+        maxTokens: 512
+      });
+      const json = tryParseJson(res.content);
+      if (!json) return null;
+
+      const tcmLabel = json.tcmLabel as TcmLabel;
+      const tcmProperty = json.tcmProperty as TcmProperty;
+      if (!TCM_LABELS_SET.has(tcmLabel)) return null;
+      if (!TCM_PROPS_SET.has(tcmProperty)) return null;
+
+      const citations: Citation[] = (json.citations ?? [])
+        .filter((c) => c && typeof c.reference === 'string' && c.reference.length > 0)
+        .map((c) => ({
+          source: (c.source ?? 'canon') as Citation['source'],
+          reference: c.reference!,
+          ...(c.excerpt ? { excerpt: c.excerpt } : {})
+        }));
+      if (citations.length === 0) {
+        // 缺典籍引用 → 强制进人工 review(置信度封顶 0.5)
+        return {
+          tcmLabel,
+          tcmProperty,
+          citations: [],
+          confidence: Math.min(0.5, json.confidence ?? 0.4),
+          modelVersion: this.client.modelVersion
+        };
+      }
+
+      const confidence = clamp01(json.confidence ?? 0.7);
+      return { tcmLabel, tcmProperty, citations, confidence, modelVersion: this.client.modelVersion };
+    } catch (err) {
+      // LlmCallError 或其他 — 统一返回 null,上层走 backfill 队列
+      if (err instanceof LlmCallError) {
+        // eslint-disable-next-line no-console
+        console.warn(`[llm-deriver] ${err.kind}: ${err.message}`);
+      }
+      return null;
+    }
+  }
+}
+
+function clamp01(n: number): number {
+  if (Number.isNaN(n)) return 0;
+  return Math.max(0, Math.min(1, n));
+}
+
+/** 占位 — Qwen-VL 文本端 fallback,key 未配齐前抛出 */
 export class QwenVLLlmDeriver implements LlmDeriver {
   async derive(_foodName: string): Promise<LlmDerivation | null> {
-    throw new Error('QwenVLLlmDeriver 待 ce-work 阶段接入阿里通义千问 VL SDK');
+    throw new Error('QwenVLLlmDeriver 待 QWEN_VL_API_KEY 配齐后接入');
+  }
+}
+
+/** 历史名 — 保留向后兼容,内部不实现(豆包文本端不开放) */
+export class DoubaoLlmDeriver implements LlmDeriver {
+  async derive(_foodName: string): Promise<LlmDerivation | null> {
+    throw new Error('DoubaoLlmDeriver 已废弃 — 食物分类派生统一走 RealLlmDeriver(DeepSeek)');
   }
 }
 

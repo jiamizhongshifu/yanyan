@@ -1,22 +1,23 @@
 /**
- * DeepSeek 客户端 — 项目核心 LLM 文本接入
+ * DeepSeek 客户端 — 项目核心 LLM 文本接入(Phase 2 U8 真实实现)
  *
  * 用途:
- *   - 食物分类派生(U5 LlmDeriver 的真实实现)
- *   - 推荐生成(U13a 今日避开 X、Y、Z + 推荐 3 餐)
- *   - PDF 摘要 / 发物清单的自然语言解释(U13b)
- *   - 用户意图理解 / 文案优化(后续)
+ *   - 食物分类派生(LlmDeriver 真实实现走 RealDeepSeekDeriver)
+ *   - 推荐生成 / PDF 摘要 / 发物清单解释 / 用户意图理解
  *
- * 不用于:
- *   - 食物拍照识别(视觉模型,走豆包/Qwen-VL)
+ * 不用于:食物拍照识别(视觉模型,走豆包 / Qwen-VL)
  *
- * 接入点:DeepSeek 暴露 Anthropic 兼容 API(BASE_URL=https://api.deepseek.com/anthropic)
- * 真实调用在 ce-work 阶段补 SDK 集成;此文件仅提供单例 client 工厂 + interface 占位。
+ * 接入:DeepSeek 暴露 Anthropic 兼容 API(POST {base}/v1/messages)
+ * 安全:API key 仅 process.env,**绝不进 git**
  *
- * 安全:API key 仅从 process.env 读取,**永远不写入代码或 git**
+ * Phase 2 U8 升级:
+ *   - DeepSeekTextClient.complete() 真实 fetch + 重试 + 超时
+ *   - 每次调用回调 cost-monitor 累计 token
+ *   - 失败抛 LlmCallError(分类:rate_limit / timeout / unauthorized / server / unknown)
  */
 
 import { getConfig } from '../../config';
+import { recordTokenUsage, type TokenUsage } from './cost-monitor';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -45,28 +46,135 @@ export interface LlmTextClient {
   readonly modelVersion: string;
 }
 
+export type LlmErrorKind =
+  | 'rate_limit'
+  | 'timeout'
+  | 'unauthorized'
+  | 'server'
+  | 'budget_exceeded'
+  | 'unknown';
+
+export class LlmCallError extends Error {
+  constructor(public kind: LlmErrorKind, message: string, public httpStatus?: number) {
+    super(message);
+    this.name = 'LlmCallError';
+  }
+}
+
+interface AnthropicMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+interface AnthropicResponse {
+  content: Array<{ type: string; text: string }>;
+  model: string;
+  usage: { input_tokens: number; output_tokens: number };
+}
+
+const DEFAULT_TIMEOUT_MS = 30_000;
+const RETRY_BACKOFF_MS = [500, 1500];
+
 /**
- * 真实 DeepSeek 客户端 — ce-work 阶段实施
- *
- * 实现要点:
- *   - fetch BASE_URL/v1/messages 走 Anthropic 兼容 schema
- *   - header: x-api-key + anthropic-version
- *   - timeout 30s + 一次重试
- *   - 解析 content[0].text → string
+ * 真实 DeepSeek 文本 client — Anthropic 兼容 API
  */
 export class DeepSeekTextClient implements LlmTextClient {
   readonly modelVersion: string;
 
-  constructor(private apiKey: string, private baseUrl: string, model: string) {
+  constructor(
+    private apiKey: string,
+    private baseUrl: string,
+    model: string,
+    private fetchImpl: typeof fetch = fetch
+  ) {
     if (!apiKey) throw new Error('DeepSeek apiKey 缺失');
     this.modelVersion = model;
   }
 
-  async complete(_req: ChatCompletionRequest): Promise<ChatCompletionResponse> {
-    throw new Error(
-      'DeepSeekTextClient.complete 待 ce-work 阶段接入 — Anthropic compatible SDK 调用 ' +
-        this.baseUrl
-    );
+  async complete(req: ChatCompletionRequest): Promise<ChatCompletionResponse> {
+    const start = Date.now();
+    const url = `${this.baseUrl.replace(/\/$/, '')}/v1/messages`;
+
+    // 转 Anthropic schema:role=system 提取到顶层 system 字段;只保留 user/assistant
+    const messages: AnthropicMessage[] = req.messages
+      .filter((m) => m.role !== 'system')
+      .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+    const system = req.system ?? req.messages.find((m) => m.role === 'system')?.content;
+
+    const body = {
+      model: this.modelVersion,
+      max_tokens: req.maxTokens ?? 2048,
+      temperature: req.temperature ?? 0.2,
+      ...(system ? { system } : {}),
+      messages
+    };
+
+    let lastErr: LlmCallError | null = null;
+    // 1 次主调 + 2 次重试(rate_limit / 5xx 才重试)
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) {
+        await new Promise((r) => setTimeout(r, RETRY_BACKOFF_MS[attempt - 1]));
+      }
+      try {
+        const res = await this.callOnce(url, body);
+        const latencyMs = Date.now() - start;
+        const usage: TokenUsage = {
+          model: this.modelVersion,
+          inputTokens: res.usage.input_tokens,
+          outputTokens: res.usage.output_tokens
+        };
+        recordTokenUsage(usage);
+        return {
+          content: res.content[0]?.text ?? '',
+          modelVersion: res.model || this.modelVersion,
+          latencyMs
+        };
+      } catch (err) {
+        lastErr = err instanceof LlmCallError ? err : new LlmCallError('unknown', String(err));
+        // 不重试的错误
+        if (lastErr.kind === 'unauthorized' || lastErr.kind === 'budget_exceeded') break;
+        if (lastErr.kind !== 'rate_limit' && lastErr.kind !== 'server' && lastErr.kind !== 'timeout') break;
+      }
+    }
+    throw lastErr ?? new LlmCallError('unknown', 'DeepSeek 调用失败');
+  }
+
+  private async callOnce(url: string, body: unknown): Promise<AnthropicResponse> {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), DEFAULT_TIMEOUT_MS);
+    try {
+      const res = await this.fetchImpl(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify(body),
+        signal: ctrl.signal
+      });
+      if (res.status === 401 || res.status === 403) {
+        throw new LlmCallError('unauthorized', 'DeepSeek 鉴权失败,检查 API key', res.status);
+      }
+      if (res.status === 429) {
+        throw new LlmCallError('rate_limit', 'DeepSeek rate limit', res.status);
+      }
+      if (res.status >= 500) {
+        throw new LlmCallError('server', `DeepSeek 5xx ${res.status}`, res.status);
+      }
+      if (!res.ok) {
+        throw new LlmCallError('unknown', `DeepSeek HTTP ${res.status}`, res.status);
+      }
+      return (await res.json()) as AnthropicResponse;
+    } catch (err) {
+      if (err instanceof LlmCallError) throw err;
+      if ((err as Error).name === 'AbortError') {
+        throw new LlmCallError('timeout', `DeepSeek timeout > ${DEFAULT_TIMEOUT_MS}ms`);
+      }
+      throw new LlmCallError('unknown', String(err));
+    } finally {
+      clearTimeout(timer);
+    }
   }
 }
 

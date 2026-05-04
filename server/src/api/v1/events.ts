@@ -18,6 +18,8 @@ import {
   shouldAlertWeightLoss,
   type AnalyticsStore
 } from '../../services/analytics';
+import { sendFeishuAlert } from '../../services/alerting/feishu';
+import { getCostSnapshot } from '../../services/llm/cost-monitor';
 
 const EventSchema = z.object({
   eventName: z.enum(EVENT_NAMES),
@@ -56,11 +58,29 @@ export async function registerEventsRoutes(app: FastifyInstance, opts: RegisterE
     const user = requireUser(req, reply);
     if (!user) return;
     const summary = await buildDashboardSummary(store, now());
+    const weightLossExceedsThreshold = shouldAlertWeightLoss(summary);
+    if (weightLossExceedsThreshold) {
+      // fire-and-forget(失败不阻塞 dashboard 返回)
+      void sendFeishuAlert({
+        level: 'warning',
+        title: '反向定位告警:减肥目标占比 > 30%',
+        body: `近 30 天 onboarding 反向定位中减肥占比 ${(summary.weightLossTargetRate * 100).toFixed(1)}%(阈值 30%)。投放素材可能漂到错误人群,需 review。`,
+        context: { wau: summary.wau, dau: summary.dau }
+      });
+    }
+    const cost = getCostSnapshot();
     return {
       ok: true,
       summary,
+      llmCost: {
+        dailyUsd: cost.dailyCostUsd,
+        monthlyUsd: cost.monthlyCostUsd,
+        dailyBudgetUsd: cost.dailyBudgetUsd,
+        monthlyBudgetUsd: cost.monthlyBudgetUsd
+      },
       alerts: {
-        weightLossExceedsThreshold: shouldAlertWeightLoss(summary)
+        weightLossExceedsThreshold,
+        llmBudgetDegraded: cost.shouldDegrade
       }
     };
   });
