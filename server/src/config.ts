@@ -42,7 +42,8 @@ const ConfigSchema = z.object({
 
   // 视觉端(阿里云百炼 DashScope = Qwen-VL;Phase 2 U8 真实接入)
   DASHSCOPE_API_KEY: z.string().optional(),
-  DASHSCOPE_VISION_MODEL: z.string().default('qwen-vl-max-latest'),
+  // qwen3.6-plus 是阿里云百炼最新统一多模态(支持文本 + 视觉)
+  DASHSCOPE_VISION_MODEL: z.string().default('qwen3.6-plus'),
   // 豆包(火山引擎)key 未配齐时走 stub
   DOUBAO_VISION_API_KEY: z.string().optional(),
   DOUBAO_VISION_ENDPOINT: z.string().url().default('https://ark.cn-beijing.volces.com/api/v3/chat/completions'),
