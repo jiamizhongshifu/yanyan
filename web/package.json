@@ -2,7 +2,6 @@
   "name": "yanyan",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "description": "Yanyan H5/PWA + Server — 单 Vercel 项目,前端 Vite SPA + 后端 Fastify Serverless Functions",
   "scripts": {
     "dev": "vite",
