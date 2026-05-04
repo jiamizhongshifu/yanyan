@@ -24,6 +24,7 @@ import {
   DevLlmFoodRecognizer,
   type LlmFoodRecognizer
 } from '../../services/recognition';
+import { buildQwenVisionFromEnv } from '../../services/llm/qwen-vision';
 
 const CreateMealBody = z.object({
   storageKey: z.string().min(1),
@@ -46,6 +47,15 @@ export interface RegisterMealsOptions {
   };
 }
 
+function buildDefaultRecognizer(): LlmFoodRecognizer {
+  const qwen = buildQwenVisionFromEnv();
+  if (qwen) {
+    // hedged 包住,即使 Qwen 失败也走 dev fixture(Beta 期 robustness;DEV fixture key 命中即兜底)
+    return new HedgedFoodRecognizer([qwen, new DevLlmFoodRecognizer()]);
+  }
+  return new HedgedFoodRecognizer([new DevLlmFoodRecognizer()]);
+}
+
 async function defaultGetUserDek(userId: string): Promise<string | null> {
   return await withClient(async (client) => {
     const r = await client.query<{ dek_ciphertext_b64: string }>(
@@ -60,8 +70,9 @@ async function defaultGetUserDek(userId: string): Promise<string | null> {
 export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMealsOptions = {}): Promise<void> {
   const mealStore = opts.deps?.mealStore ?? new PgMealStore();
   const classifierStore = opts.deps?.classifierStore ?? new PgFoodClassifierStore();
+  // 默认 recognizer:有 DASHSCOPE_API_KEY 就用 Qwen-VL,否则 fallback Dev fixture
   const recognizer =
-    opts.deps?.recognizer ?? new HedgedFoodRecognizer([new DevLlmFoodRecognizer()]);
+    opts.deps?.recognizer ?? buildDefaultRecognizer();
   const onMissingFood = opts.deps?.onMissingFood;
   const getUserDek = opts.deps?.getUserDek ?? defaultGetUserDek;
 

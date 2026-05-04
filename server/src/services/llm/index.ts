@@ -1,5 +1,6 @@
 export * from './deepseek';
 export * from './doubao-vision';
+export * from './qwen-vision';
 export {
   recordTokenUsage,
   getCostSnapshot,

@@ -40,11 +40,13 @@ const ConfigSchema = z.object({
   LLM_MONTHLY_BUDGET_USD: z.coerce.number().nonnegative().default(1000),
   FEISHU_WEBHOOK_URL: z.string().url().optional(),
 
-  // 视觉端(豆包 / Qwen-VL,Phase 2 U8 接入,key 未配齐时走 stub)
+  // 视觉端(阿里云百炼 DashScope = Qwen-VL;Phase 2 U8 真实接入)
+  DASHSCOPE_API_KEY: z.string().optional(),
+  DASHSCOPE_VISION_MODEL: z.string().default('qwen-vl-max-latest'),
+  // 豆包(火山引擎)key 未配齐时走 stub
   DOUBAO_VISION_API_KEY: z.string().optional(),
   DOUBAO_VISION_ENDPOINT: z.string().url().default('https://ark.cn-beijing.volces.com/api/v3/chat/completions'),
   DOUBAO_VISION_MODEL: z.string().default('doubao-vision-pro-32k'),
-  QWEN_VL_API_KEY: z.string().optional(),
 
   // KMS:本地 dev/test 用 LocalKmsStub;生产 PMF 后迁阿里云 KMS
   KMS_MODE: z.enum(['local', 'vault', 'aliyun']).default('local'),

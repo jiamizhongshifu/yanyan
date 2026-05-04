@@ -41,13 +41,4 @@ export class DoubaoVisionClient implements LlmFoodRecognizer {
   }
 }
 
-/** Qwen-VL fallback 同样占位 */
-export class QwenVisionClient implements LlmFoodRecognizer {
-  readonly modelVersion = 'qwen-vl-max-2026';
-  async recognize(_storageKey: string): Promise<RecognitionResult | null> {
-    throw new LlmCallError(
-      'unknown',
-      'QwenVisionClient 待 QWEN_VL_API_KEY 配齐 + DashScope endpoint 锁定后实施'
-    );
-  }
-}
+// Qwen-VL 真实实现移到 ./qwen-vision.ts(Phase 2 U8 vision 端真实接入)
