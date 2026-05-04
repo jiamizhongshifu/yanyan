@@ -1,0 +1,141 @@
+/**
+ * MealStore — 餐食表读写
+ *
+ * recognized_items_ciphertext 走 envelope encryption(用户隐私 — 吃了什么);
+ * tcm_labels_summary / western_nutrition_summary 是去敏聚合(Yan-Score 算法读取),不加密
+ */
+
+import { withClient } from '../../db/client';
+import type { TcmLabel } from '../classifier';
+
+export interface MealRow {
+  id: string;
+  userId: string;
+  ateAt: Date;
+  photoOssKey: string | null;
+  recognizedItemsCiphertext: string;
+  tcmLabelsSummary: { 发: number; 温和: number; 平: number; unknown: number };
+  westernNutritionSummary: Record<string, unknown>;
+  fireScore: number | null;
+  feedback: Array<{ itemName: string; kind: 'misrecognized' | 'no_reaction'; at: string }>;
+  createdAt: Date;
+}
+
+export interface CreateMealParams {
+  userId: string;
+  ateAt: Date;
+  photoOssKey: string;
+  recognizedItemsCiphertext: string;
+  tcmLabelsSummary: MealRow['tcmLabelsSummary'];
+  westernNutritionSummary: Record<string, unknown>;
+  fireScore: number;
+}
+
+export interface MealStore {
+  create(params: CreateMealParams): Promise<string>;
+  findById(id: string, userId: string): Promise<MealRow | null>;
+  appendFeedback(mealId: string, userId: string, entry: MealRow['feedback'][number]): Promise<void>;
+}
+
+export class PgMealStore implements MealStore {
+  async create(params: CreateMealParams): Promise<string> {
+    return await withClient(async (client) => {
+      const r = await client.query<{ id: string }>(
+        `INSERT INTO meals
+           (user_id, ate_at, photo_oss_key, recognized_items_ciphertext,
+            tcm_labels_summary, western_nutrition_summary, fire_score)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+        [
+          params.userId,
+          params.ateAt,
+          params.photoOssKey,
+          params.recognizedItemsCiphertext,
+          JSON.stringify(params.tcmLabelsSummary),
+          JSON.stringify(params.westernNutritionSummary),
+          params.fireScore
+        ]
+      );
+      return r.rows[0].id;
+    });
+  }
+
+  async findById(id: string, userId: string): Promise<MealRow | null> {
+    return await withClient(async (client) => {
+      const r = await client.query<{
+        id: string;
+        user_id: string;
+        ate_at: Date;
+        photo_oss_key: string | null;
+        recognized_items_ciphertext: string;
+        tcm_labels_summary: MealRow['tcmLabelsSummary'];
+        western_nutrition_summary: Record<string, unknown>;
+        fire_score: string | null;
+        feedback: MealRow['feedback'];
+        created_at: Date;
+      }>(
+        `SELECT id, user_id, ate_at, photo_oss_key, recognized_items_ciphertext,
+                tcm_labels_summary, western_nutrition_summary, fire_score, feedback, created_at
+           FROM meals
+          WHERE id = $1 AND user_id = $2`,
+        [id, userId]
+      );
+      if (r.rowCount === 0) return null;
+      const row = r.rows[0];
+      return {
+        id: row.id,
+        userId: row.user_id,
+        ateAt: row.ate_at,
+        photoOssKey: row.photo_oss_key,
+        recognizedItemsCiphertext: row.recognized_items_ciphertext,
+        tcmLabelsSummary: row.tcm_labels_summary,
+        westernNutritionSummary: row.western_nutrition_summary,
+        fireScore: row.fire_score === null ? null : Number(row.fire_score),
+        feedback: row.feedback,
+        createdAt: row.created_at
+      };
+    });
+  }
+
+  async appendFeedback(mealId: string, userId: string, entry: MealRow['feedback'][number]): Promise<void> {
+    await withClient((c) =>
+      c.query(
+        `UPDATE meals
+            SET feedback = feedback || $3::jsonb
+          WHERE id = $1 AND user_id = $2`,
+        [mealId, userId, JSON.stringify([entry])]
+      )
+    );
+  }
+}
+
+/** 把 TcmLabel 计数转成 jsonb summary,for U8 Yan-Score 消费 */
+export function summaryFromCounts(counts: { 发: number; 温和: number; 平: number; unknown: number }): MealRow['tcmLabelsSummary'] {
+  return { 发: counts.发, 温和: counts.温和, 平: counts.平, unknown: counts.unknown };
+}
+
+/** 同样,把 classification 列表压成 western 聚合(平均 DII / AGEs / GI) */
+export function westernSummary(classifications: Array<{ diiScore: number | null; agesScore: number | null; gi: number | null } | null>): Record<string, number | null> {
+  let n = 0;
+  let dii = 0;
+  let ages = 0;
+  let gi = 0;
+  let giN = 0;
+  for (const c of classifications) {
+    if (!c) continue;
+    n++;
+    if (c.diiScore !== null) dii += c.diiScore;
+    if (c.agesScore !== null) ages += c.agesScore;
+    if (c.gi !== null) {
+      gi += c.gi;
+      giN++;
+    }
+  }
+  return {
+    avgDII: n === 0 ? null : Number((dii / n).toFixed(3)),
+    avgAGEs: n === 0 ? null : Number((ages / n).toFixed(2)),
+    avgGI: giN === 0 ? null : Number((gi / giN).toFixed(2)),
+    n
+  };
+}
+
+export type Tcm = TcmLabel;

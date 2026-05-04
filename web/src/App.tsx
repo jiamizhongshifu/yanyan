@@ -7,6 +7,8 @@ import { Step1ReverseFilter } from './pages/Onboarding/Step1ReverseFilter';
 import { Step2SymptomsGrid } from './pages/Onboarding/Step2SymptomsGrid';
 import { Step3BaselineConsent } from './pages/Onboarding/Step3BaselineConsent';
 import { Step4Welcome } from './pages/Onboarding/Step4Welcome';
+import { Camera } from './pages/Camera';
+import { MealResult } from './pages/MealResult';
 import { RequireAuth } from './components/RequireAuth';
 
 export function App() {
@@ -39,6 +41,17 @@ export function App() {
       <Route path="/consent">
         <RequireAuth>
           <Consent />
+        </RequireAuth>
+      </Route>
+
+      <Route path="/camera">
+        <RequireAuth>
+          <Camera />
+        </RequireAuth>
+      </Route>
+      <Route path="/meals/:id">
+        <RequireAuth>
+          <MealResult />
         </RequireAuth>
       </Route>
 

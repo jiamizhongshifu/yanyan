@@ -18,11 +18,13 @@ import { registerHealthRoutes } from './health';
 import { registerConsentsRoutes, type RegisterConsentsOptions } from './consents';
 import { registerOnboardingRoutes, type RegisterOnboardingOptions } from './onboarding';
 import { registerFoodsRoutes, type RegisterFoodsOptions } from './foods';
+import { registerMealsRoutes, type RegisterMealsOptions } from './meals';
 
 export interface V1Options {
   consents?: RegisterConsentsOptions;
   onboarding?: RegisterOnboardingOptions;
   foods?: RegisterFoodsOptions;
+  meals?: RegisterMealsOptions;
 }
 
 export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Promise<void> {
@@ -30,4 +32,5 @@ export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Pr
   await registerConsentsRoutes(app, opts.consents);
   await registerOnboardingRoutes(app, opts.onboarding);
   await registerFoodsRoutes(app, opts.foods);
+  await registerMealsRoutes(app, opts.meals);
 }
