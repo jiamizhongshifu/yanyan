@@ -32,7 +32,7 @@ export function Step4Welcome() {
         </p>
         <button
           type="button"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/app')}
           className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
         >
           完成,稍后我会拍第一张

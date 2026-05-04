@@ -1,4 +1,9 @@
 import { Route, Switch, useLocation } from 'wouter';
+import { Landing } from './pages/Landing';
+import { QuizStep1Goal } from './pages/Quiz/Step1Goal';
+import { QuizStep2Symptoms } from './pages/Quiz/Step2Symptoms';
+import { QuizStep3Lifestyle } from './pages/Quiz/Step3Lifestyle';
+import { QuizResult } from './pages/Quiz/Result';
 import { Home } from './pages/Home';
 import { Findings } from './pages/Findings';
 import { Me } from './pages/Me';
@@ -18,14 +23,12 @@ import { ProfilePdf } from './pages/ProfilePdf';
 import { RequireAuth } from './components/RequireAuth';
 import { BottomTabs } from './components/BottomTabs';
 
-/** 在以下路由显示底部 tab 栏 */
-const TAB_VISIBLE_PREFIXES = ['/', '/findings', '/me'];
+/** 登录后主屏 + 4 tab 在以下前缀显示 */
+const TAB_VISIBLE_PREFIXES = ['/app', '/findings', '/me'];
 
 function MaybeBottomTabs() {
   const [location] = useLocation();
-  const visible = TAB_VISIBLE_PREFIXES.some((p) =>
-    p === '/' ? location === '/' : location.startsWith(p)
-  );
+  const visible = TAB_VISIBLE_PREFIXES.some((p) => location === p || location.startsWith(p + '/') || location === p);
   return visible ? <BottomTabs /> : null;
 }
 
@@ -33,9 +36,25 @@ export function App() {
   return (
     <>
       <Switch>
+        {/* 公开 — 落地页 + 公开 quiz(无 RequireAuth) */}
+        <Route path="/" component={Landing} />
+        <Route path="/quiz/step1" component={QuizStep1Goal} />
+        <Route path="/quiz/step2" component={QuizStep2Symptoms} />
+        <Route path="/quiz/step3" component={QuizStep3Lifestyle} />
+        <Route path="/quiz/result" component={QuizResult} />
+
+        {/* 登录 / 隐私政策 — 公开 */}
         <Route path="/login" component={Login} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
 
+        {/* 受保护 — 登录后主屏 */}
+        <Route path="/app">
+          <RequireAuth>
+            <Home />
+          </RequireAuth>
+        </Route>
+
+        {/* 受保护 — onboarding 4 屏 */}
         <Route path="/onboarding/step1">
           <RequireAuth>
             <Step1ReverseFilter />
@@ -103,12 +122,6 @@ export function App() {
         <Route path="/me">
           <RequireAuth>
             <Me />
-          </RequireAuth>
-        </Route>
-
-        <Route path="/">
-          <RequireAuth>
-            <Home />
           </RequireAuth>
         </Route>
 

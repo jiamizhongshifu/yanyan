@@ -147,7 +147,7 @@ describe('U10 TodayFireCard', () => {
 describe('U10 MealHistoryList', () => {
   test('0 餐 → 显示拍这一餐 CTA', () => {
     render(
-      <Router hook={memoryLocation({ path: '/' }).hook}>
+      <Router hook={memoryLocation({ path: '/app' }).hook}>
         <MealHistoryList meals={[]} />
       </Router>
     );
@@ -157,7 +157,7 @@ describe('U10 MealHistoryList', () => {
 
   test('N 餐 → 时间 + 火分徽章 + tcm 计数', () => {
     render(
-      <Router hook={memoryLocation({ path: '/' }).hook}>
+      <Router hook={memoryLocation({ path: '/app' }).hook}>
         <MealHistoryList
           meals={[
             {
@@ -248,7 +248,7 @@ describe('U10 Home 主屏', () => {
     });
 
     render(
-      <Router hook={memoryLocation({ path: '/' }).hook}>
+      <Router hook={memoryLocation({ path: '/app' }).hook}>
         <Home />
       </Router>
     );
@@ -271,7 +271,7 @@ describe('U10 Home 主屏', () => {
       flags: { canDrawTrend: false, eligibleForProfilePdf: false }
     });
     render(
-      <Router hook={memoryLocation({ path: '/' }).hook}>
+      <Router hook={memoryLocation({ path: '/app' }).hook}>
         <Home />
       </Router>
     );
@@ -285,7 +285,7 @@ describe('U10 Home 主屏', () => {
 describe('U10 BottomTabs', () => {
   test('home 路径 → home tab active', () => {
     render(
-      <Router hook={memoryLocation({ path: '/' }).hook}>
+      <Router hook={memoryLocation({ path: '/app' }).hook}>
         <BottomTabs />
       </Router>
     );
@@ -305,7 +305,7 @@ describe('U10 BottomTabs', () => {
 
   test('点 me tab 不抛错(链接基本可点)', () => {
     render(
-      <Router hook={memoryLocation({ path: '/' }).hook}>
+      <Router hook={memoryLocation({ path: '/app' }).hook}>
         <BottomTabs />
       </Router>
     );

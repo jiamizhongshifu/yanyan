@@ -202,7 +202,7 @@ describe('U4 redo Step 4', () => {
     render(<Step4Welcome />);
     expect(screen.getByText(/中火/)).toBeInTheDocument();
     fireEvent.click(screen.getByText(/完成,稍后我会拍第一张/));
-    expect(navigateMock).toHaveBeenCalledWith('/');
+    expect(navigateMock).toHaveBeenCalledWith('/app');
   });
 });
 

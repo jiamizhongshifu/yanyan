@@ -7,7 +7,7 @@
 import { Link, useLocation } from 'wouter';
 
 const TABS: Array<{ key: string; label: string; href: string; icon: string; matchPrefix: string }> = [
-  { key: 'home', label: '首页', href: '/', icon: '·', matchPrefix: '/' },
+  { key: 'home', label: '首页', href: '/app', icon: '·', matchPrefix: '/app' },
   { key: 'camera', label: '拍照', href: '/camera', icon: '○', matchPrefix: '/camera' },
   { key: 'findings', label: '发物', href: '/findings', icon: '⚆', matchPrefix: '/findings' },
   { key: 'me', label: '我的', href: '/me', icon: '◆', matchPrefix: '/me' }
@@ -20,7 +20,9 @@ export function BottomTabs() {
       <ul className="flex max-w-3xl mx-auto">
         {TABS.map((t) => {
           const active =
-            t.matchPrefix === '/' ? location === '/' : location.startsWith(t.matchPrefix);
+            t.matchPrefix === '/app'
+              ? location === '/app' || location.startsWith('/app/')
+              : location.startsWith(t.matchPrefix);
           return (
             <li key={t.key} className="flex-1">
               <Link
