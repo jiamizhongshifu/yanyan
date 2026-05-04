@@ -1,0 +1,12 @@
+.container { padding: 48rpx 32rpx; }
+.block { background: #FFFFFF; border-radius: 16rpx; padding: 32rpx; margin-bottom: 32rpx; }
+.block-title { font-size: 32rpx; font-weight: 600; color: #2A2A2A; }
+.block-desc { font-size: 26rpx; color: #5A5A5A; margin-top: 12rpx; line-height: 1.6; }
+
+.actions { display: flex; gap: 16rpx; margin-top: 24rpx; }
+.primary-btn { flex: 1; background: #2A2A2A; color: #FFFFFF; font-size: 28rpx; border-radius: 64rpx; }
+.primary-btn.cta { margin-top: 24rpx; }
+.ghost-btn { flex: 1; background: #FFFFFF; color: #6A6A6A; border: 2rpx solid #DDD; border-radius: 64rpx; font-size: 28rpx; }
+
+.status-ok { margin-top: 16rpx; color: #4A8B6F; font-size: 28rpx; }
+.status-skipped { margin-top: 16rpx; color: #6A6A6A; font-size: 26rpx; }

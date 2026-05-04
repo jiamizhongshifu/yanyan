@@ -2,7 +2,11 @@
   "pages": [
     "pages/index/index",
     "pages/consent/index",
-    "pages/privacy-policy/index"
+    "pages/privacy-policy/index",
+    "pages/onboarding/step1-reverse-filter/index",
+    "pages/onboarding/step2-symptoms-grid/index",
+    "pages/onboarding/step3-baseline-consent/index",
+    "pages/onboarding/step4-wx-run-photo/index"
   ],
   "window": {
     "backgroundColor": "#F7F4EE",

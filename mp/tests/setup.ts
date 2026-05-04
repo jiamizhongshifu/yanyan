@@ -72,6 +72,7 @@ export function instantiateLastPage(): PageInstance {
   request: jest.fn(),
   chooseMedia: jest.fn(),
   login: jest.fn(),
+  authorize: jest.fn(),
   showToast: jest.fn(),
   redirectTo: jest.fn(),
   navigateTo: jest.fn(),

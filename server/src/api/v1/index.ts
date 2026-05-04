@@ -16,12 +16,15 @@
 import type { FastifyInstance } from 'fastify';
 import { registerHealthRoutes } from './health';
 import { registerConsentsRoutes, type RegisterConsentsOptions } from './consents';
+import { registerOnboardingRoutes, type RegisterOnboardingOptions } from './onboarding';
 
 export interface V1Options {
   consents?: RegisterConsentsOptions;
+  onboarding?: RegisterOnboardingOptions;
 }
 
 export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Promise<void> {
   await registerHealthRoutes(app);
   await registerConsentsRoutes(app, opts.consents);
+  await registerOnboardingRoutes(app, opts.onboarding);
 }

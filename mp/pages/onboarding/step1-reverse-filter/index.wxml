@@ -1,0 +1,14 @@
+<view class="container">
+  <view class="title">你最希望解决什么?</view>
+  <view class="hint">这一步用来帮你筛对的内容,选错也没关系。</view>
+  <view class="choices">
+    <view
+      wx:for="{{choices}}"
+      wx:key="key"
+      class="choice {{selected === item.key ? 'choice-selected' : ''}}"
+      data-choice="{{item.key}}"
+      bindtap="onSelect"
+    >{{item.label}}</view>
+  </view>
+  <button class="next-btn" bindtap="onNext" disabled="{{!selected}}">下一步</button>
+</view>

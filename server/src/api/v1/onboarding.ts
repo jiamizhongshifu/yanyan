@@ -1,0 +1,82 @@
+/**
+ * /api/v1 onboarding 相关端点
+ *
+ * 端点:
+ *   POST /users               — wx.login code → 创建/查找用户 → 返回 userId
+ *   POST /users/me/baseline   — 保存 onboarding 7 维度症状频次 + 反向定位选项
+ */
+
+import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
+import {
+  DevCodeToSessionResolver,
+  PgUserStore,
+  loginOrCreate,
+  saveBaseline,
+  REVERSE_FILTER_CHOICES,
+  SYMPTOM_DIMENSIONS,
+  SYMPTOM_FREQUENCY,
+  inferInitialFireLevel,
+  type CodeToSessionResolver,
+  type OnboardingBaseline,
+  type UsersDeps,
+  type UserStore
+} from '../../services/users';
+import { getKms } from '../../crypto/kms';
+
+const LoginBody = z.object({ code: z.string().min(1) });
+
+const BaselineBody = z.object({
+  reverseFilterChoice: z.enum(REVERSE_FILTER_CHOICES),
+  symptomsFrequency: z.record(z.enum(SYMPTOM_DIMENSIONS), z.enum(SYMPTOM_FREQUENCY))
+});
+
+function getUserIdFromHeader(headers: Record<string, unknown>): string {
+  const v = headers['x-user-id'];
+  if (typeof v !== 'string' || v.length === 0) {
+    throw new Error('missing X-User-Id header');
+  }
+  return v;
+}
+
+export interface RegisterOnboardingOptions {
+  /** 测试时可注入 fake store + fake resolver + fake kms */
+  deps?: { store?: UserStore; resolver?: CodeToSessionResolver };
+}
+
+export async function registerOnboardingRoutes(app: FastifyInstance, opts: RegisterOnboardingOptions = {}): Promise<void> {
+  const deps: UsersDeps = {
+    store: opts.deps?.store ?? new PgUserStore(),
+    kms: getKms(),
+    resolver: opts.deps?.resolver ?? new DevCodeToSessionResolver()
+  };
+
+  app.post('/users', async (req, reply) => {
+    const parsed = LoginBody.safeParse(req.body);
+    if (!parsed.success) {
+      reply.code(400);
+      return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
+    }
+    const result = await loginOrCreate(deps, parsed.data.code);
+    return { ok: true, ...result };
+  });
+
+  app.post('/users/me/baseline', async (req, reply) => {
+    let userId: string;
+    try {
+      userId = getUserIdFromHeader(req.headers as Record<string, unknown>);
+    } catch (err) {
+      reply.code(401);
+      return { ok: false, error: 'unauthorized', message: (err as Error).message };
+    }
+    const parsed = BaselineBody.safeParse(req.body);
+    if (!parsed.success) {
+      reply.code(400);
+      return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
+    }
+    const baseline: OnboardingBaseline = parsed.data;
+    await saveBaseline(deps, userId, baseline);
+    const initial = inferInitialFireLevel(baseline);
+    return { ok: true, initialFireLevel: initial.level, ratio: initial.ratio };
+  });
+}

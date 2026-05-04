@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="block">
+    <view class="block-title">连接微信运动(可跳过)</view>
+    <view class="block-desc">每天的步数会作为火分的辅助输入,占比仅 5%。不连接也能用,只是分数解释力弱一点。</view>
+    <view wx:if="{{wxRunGranted === null}}" class="actions">
+      <button class="primary-btn" bindtap="onLinkWxRun" disabled="{{busy}}">{{busy ? '连接中...' : '连接微信运动'}}</button>
+      <button class="ghost-btn" bindtap="onSkipWxRun">先跳过</button>
+    </view>
+    <view wx:elif="{{wxRunGranted === true}}" class="status-ok">已连接 ✓</view>
+    <view wx:else class="status-skipped">已跳过(随时可在「我的」开启)</view>
+  </view>
+
+  <view class="block">
+    <view class="block-title">中午吃饭时,拍一张</view>
+    <view class="block-desc">这一刻是产品最重要的瞬间 — 你拍的第一张餐照,会得到一个红/黄/绿的中医语言判断,以及今晚 / 明早可以避开什么。</view>
+    <button class="primary-btn cta" bindtap="onTakeFirstPhoto">完成,稍后我会拍第一张</button>
+  </view>
+</view>

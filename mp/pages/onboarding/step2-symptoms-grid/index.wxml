@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="title">过去一周,身体偶尔有过这些反应吗?</view>
+  <view class="hint">没有就跳过这一行,不用每行都选。</view>
+
+  <view class="grid">
+    <view class="grid-header">
+      <view class="dim-header"></view>
+      <view wx:for="{{freqColumns}}" wx:key="key" class="freq-header">{{item.label}}</view>
+    </view>
+
+    <view wx:for="{{rows}}" wx:for-item="row" wx:key="key" class="grid-row">
+      <view class="dim-label">{{row.label}}</view>
+      <view
+        wx:for="{{freqColumns}}"
+        wx:for-item="col"
+        wx:key="key"
+        class="cell {{row.selected === col.key ? 'cell-active' : ''}}"
+        data-dim="{{row.key}}"
+        data-freq="{{col.key}}"
+        bindtap="onCellTap"
+      ></view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button class="skip-btn" bindtap="onSkipAll" plain="{{true}}">都没有 / 跳过</button>
+    <button class="next-btn" bindtap="onNext">下一步</button>
+  </view>
+</view>

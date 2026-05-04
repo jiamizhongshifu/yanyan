@@ -1,0 +1,26 @@
+.container { padding: 48rpx 32rpx; }
+.title { font-size: 40rpx; font-weight: 600; color: #2A2A2A; }
+.hint { font-size: 26rpx; color: #6A6A6A; margin-top: 12rpx; margin-bottom: 36rpx; }
+
+.grid { background: #FFFFFF; border-radius: 16rpx; padding: 16rpx 12rpx; }
+.grid-header { display: flex; align-items: center; padding-bottom: 12rpx; border-bottom: 2rpx solid #EEE; }
+.grid-row { display: flex; align-items: center; padding: 16rpx 0; border-bottom: 2rpx solid #F2F2F2; }
+.grid-row:last-child { border-bottom: none; }
+
+.dim-header, .dim-label { flex: 0 0 220rpx; font-size: 28rpx; color: #2A2A2A; padding-left: 8rpx; }
+.dim-header { color: transparent; height: 32rpx; }
+.freq-header { flex: 1; text-align: center; font-size: 24rpx; color: #6A6A6A; }
+
+.cell {
+  flex: 1;
+  margin: 0 8rpx;
+  height: 56rpx;
+  border: 2rpx solid #DDD;
+  border-radius: 8rpx;
+  background: #FAFAFA;
+}
+.cell-active { background: #2A2A2A; border-color: #2A2A2A; }
+
+.footer { display: flex; gap: 16rpx; margin-top: 56rpx; }
+.skip-btn { flex: 1; color: #6A6A6A; font-size: 28rpx; border-radius: 64rpx; }
+.next-btn { flex: 2; background: #2A2A2A; color: #FFFFFF; font-size: 30rpx; border-radius: 64rpx; }

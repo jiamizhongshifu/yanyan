@@ -9,6 +9,7 @@
 // 这处理 plan U3 / Round 2 review 修订:存量用户在新 consent_version 上线后不绕过同意页
 
 import { evaluateConsentNeed } from './services/consents';
+import { freshOnboardingState, type OnboardingState } from './services/onboarding';
 
 interface AppGlobalData {
   userId: string | null;
@@ -16,6 +17,7 @@ interface AppGlobalData {
   consentVersionGranted: number | null;
   apiBaseUrl: string;
   bootedAt: number;
+  onboarding: OnboardingState;
 }
 
 interface YanyanApp {
@@ -34,7 +36,8 @@ App<YanyanApp>({
     consentVersionRequired: null,
     consentVersionGranted: null,
     apiBaseUrl: 'https://TODO_REPLACE_WITH_REAL_API.yanyan.com/api/v1',
-    bootedAt: 0
+    bootedAt: 0,
+    onboarding: freshOnboardingState()
   },
 
   onLaunch() {
