@@ -3,12 +3,22 @@
   "version": 2,
   "buildCommand": "npm run build",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/[...slug]" }
+    { "source": "/api/v1/(.*)", "destination": "/api/[...slug]" }
   ],
   "functions": {
     "api/[...slug].ts": {
       "memory": 512,
       "maxDuration": 10
+    },
+    "api/cron/morning-checkin-reminder.ts": {
+      "memory": 1024,
+      "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/morning-checkin-reminder",
+      "schedule": "0 23 * * *"
+    }
+  ]
 }

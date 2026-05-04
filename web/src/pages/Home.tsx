@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { TodayFireCard } from '../components/TodayFireCard';
 import { MealHistoryList } from '../components/MealHistoryList';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
+import { InappRemindersBanner } from '../components/InappRemindersBanner';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
 import { track } from '../services/tracker';
@@ -46,6 +47,8 @@ export function Home() {
       <header className="mb-5">
         <p className="text-xs text-ink/40">炎炎消防队</p>
       </header>
+
+      <InappRemindersBanner />
 
       <TodayFireCard
         yanScore={yanScore}

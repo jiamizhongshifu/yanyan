@@ -162,6 +162,25 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
 CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id);
 
 -- ─────────────────────────────────────────────────────────────────────────
+-- inapp_reminders:in-app 通知兜底队列(Phase 2 U9)
+--   触发场景:Web Push 失败 / 用户未授权 / iOS Safari < 16.4 / 浏览器后台限流
+--   用户进首页时拉 listPending 显示 banner;dismiss 后标 dismissed_at
+-- ─────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS inapp_reminders (
+  id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id       uuid NOT NULL REFERENCES users(id),
+  kind          varchar(32) NOT NULL CHECK (kind IN ('morning_checkin','pdf_ready','weekly_digest')),
+  title         varchar(128) NOT NULL,
+  body          varchar(512) NOT NULL,
+  url           text,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  dismissed_at  timestamptz
+);
+CREATE INDEX IF NOT EXISTS idx_inapp_reminders_user_pending
+  ON inapp_reminders(user_id, created_at DESC)
+  WHERE dismissed_at IS NULL;
+
+-- ─────────────────────────────────────────────────────────────────────────
 -- analytics_events:埋点事件(U12 观测仪表盘消费)
 -- ─────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS analytics_events (
