@@ -93,6 +93,16 @@ export function QuizResult() {
         </div>
       </section>
 
+      <section className="mt-5 rounded-2xl bg-white px-4 py-4" data-testid="result-scale-img">
+        <p className="text-xs text-ink/50 mb-3 px-2">炎症指数 4 档分级参考</p>
+        <img
+          src="/level-scale.png"
+          alt="平 / 微火 / 中火 / 大火 4 档对照"
+          className="w-full rounded-xl"
+          loading="lazy"
+        />
+      </section>
+
       <section className="mt-8">
         <h2 className="text-base font-medium text-ink mb-4">登录后解锁这些</h2>
         <div className="space-y-3">

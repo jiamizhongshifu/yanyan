@@ -10,7 +10,7 @@ import { Link } from 'wouter';
 export function Landing() {
   return (
     <main className="min-h-screen bg-paper" data-testid="landing">
-      <section className="px-6 pt-16 pb-12 max-w-2xl mx-auto">
+      <section className="px-6 pt-12 pb-8 max-w-2xl mx-auto">
         <p className="text-xs text-ink/40 tracking-widest">炎炎消防队</p>
 
         <h1 className="mt-4 text-3xl font-semibold text-ink leading-snug">
@@ -24,19 +24,29 @@ export function Landing() {
           <br />
           用中医「发物 / 寒热 / 上火」语言,告诉你哪些食物正在让你身体发炎 — 在第二天早上就能看到。
         </p>
+      </section>
 
-        <div className="mt-8">
-          <Link
-            href="/quiz/step1"
-            className="block w-full text-center rounded-full bg-ink text-white py-4 text-base font-medium"
-            data-testid="cta-quiz"
-          >
-            30 秒测一下你当前的炎症指数 →
-          </Link>
-          <p className="mt-3 text-xs text-ink/40 text-center">
-            不需要注册。完成后给你一份初步评估。
-          </p>
-        </div>
+      <section className="px-4 pb-8 max-w-3xl mx-auto">
+        <img
+          src="/landing-hero.png"
+          alt="拍照 → 火分 → 30 天发物档案三步流程"
+          className="w-full rounded-2xl shadow-sm"
+          loading="eager"
+          data-testid="landing-hero-img"
+        />
+      </section>
+
+      <section className="px-6 pb-12 max-w-2xl mx-auto">
+        <Link
+          href="/quiz/step1"
+          className="block w-full text-center rounded-full bg-ink text-white py-4 text-base font-medium"
+          data-testid="cta-quiz"
+        >
+          30 秒测一下你当前的炎症指数 →
+        </Link>
+        <p className="mt-3 text-xs text-ink/40 text-center">
+          不需要注册。完成后给你一份初步评估。
+        </p>
       </section>
 
       <section className="px-6 py-10 max-w-2xl mx-auto">
