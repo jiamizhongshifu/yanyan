@@ -191,3 +191,18 @@ CREATE TABLE IF NOT EXISTS analytics_events (
   occurred_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_analytics_events_name_time ON analytics_events(event_name, occurred_at DESC);
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- RLS:public schema 全部表 default deny;service_role 自动 bypass
+-- Phase 3 切 Supabase JS client 时再加 authenticated 用户 per-row policy
+-- ─────────────────────────────────────────────────────────────────────────
+ALTER TABLE users                  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE meals                  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE symptoms               ENABLE ROW LEVEL SECURITY;
+ALTER TABLE yan_score_daily        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE privacy_consents       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE env_snapshots          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE push_subscriptions     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inapp_reminders        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE analytics_events       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE food_classifications   ENABLE ROW LEVEL SECURITY;
