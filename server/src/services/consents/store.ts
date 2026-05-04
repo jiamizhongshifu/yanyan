@@ -91,6 +91,7 @@ export class PgConsentStore implements ConsentStore {
       try {
         // 顺序:子表先删,users 最后(外键依赖)
         await client.query(`DELETE FROM analytics_events WHERE user_id = $1`, [userId]);
+        await client.query(`DELETE FROM push_subscriptions WHERE user_id = $1`, [userId]);
         await client.query(`DELETE FROM yan_score_daily WHERE user_id = $1`, [userId]);
         await client.query(`DELETE FROM symptoms WHERE user_id = $1`, [userId]);
         await client.query(`DELETE FROM meals WHERE user_id = $1`, [userId]);

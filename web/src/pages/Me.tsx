@@ -1,18 +1,37 @@
 /**
  * 「我的」页(plan U10 设置入口)
  *
- * v1 占位:
+ * v1:
  *   - 体检报告上传入口(R31 — 后置入口,U13b 后接入)
  *   - 隐私政策 / 撤回同意
- *   - 推送设置开关(U11 接入)
+ *   - 推送设置开关(U11)
  *   - 登出
  */
 
+import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { signOut } from '../services/auth';
 import { postRevoke } from '../services/consents';
+import {
+  detectPushSupport,
+  getCurrentSubscription,
+  subscribeToPush,
+  unsubscribeFromPush
+} from '../services/push';
 
 export function Me() {
+  const [pushSupported, setPushSupported] = useState(true);
+  const [pushOn, setPushOn] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushHint, setPushHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    const sup = detectPushSupport();
+    setPushSupported(sup.supported);
+    if (!sup.supported) return;
+    void getCurrentSubscription().then((s) => setPushOn(!!s));
+  }, []);
+
   const onSignOut = async () => {
     await signOut();
     window.location.assign('/login');
@@ -24,6 +43,31 @@ export function Me() {
     if (ok) {
       await signOut();
       window.location.assign('/login');
+    }
+  };
+
+  const onTogglePush = async () => {
+    if (pushBusy) return;
+    setPushBusy(true);
+    setPushHint(null);
+    try {
+      if (pushOn) {
+        await unsubscribeFromPush();
+        setPushOn(false);
+      } else {
+        const r = await subscribeToPush();
+        if (r.ok) {
+          setPushOn(true);
+        } else if (r.reason === 'permission_denied') {
+          setPushHint('浏览器拒绝了通知权限,请到系统设置中允许后重试。');
+        } else if (r.reason === 'no_pushmanager' || r.reason === 'no_serviceworker' || r.reason === 'no_notification') {
+          setPushHint('当前浏览器不支持 Web Push。iOS 用户请「添加到主屏幕」后再试。');
+        } else {
+          setPushHint('开启失败,请稍后再试。');
+        }
+      }
+    } finally {
+      setPushBusy(false);
     }
   };
 
@@ -45,14 +89,34 @@ export function Me() {
         >
           上传体检报告(后置入口,Phase 2)
         </button>
-        <button
-          type="button"
-          onClick={() => alert('推送设置:U11 阶段接入')}
-          className="w-full text-left px-5 py-4 text-sm text-ink/60"
-          data-testid="link-push-settings"
-        >
-          打卡推送设置
-        </button>
+
+        <div className="px-5 py-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-ink">打卡推送设置</span>
+            <button
+              type="button"
+              onClick={onTogglePush}
+              disabled={!pushSupported || pushBusy}
+              className={`px-3 py-1 rounded-full text-xs ${
+                pushOn ? 'bg-ink text-paper' : 'bg-paper text-ink/60 border border-ink/10'
+              } ${!pushSupported || pushBusy ? 'opacity-50' : ''}`}
+              data-testid="toggle-push"
+              aria-pressed={pushOn}
+            >
+              {pushOn ? '已开启' : pushBusy ? '处理中…' : '开启'}
+            </button>
+          </div>
+          {!pushSupported && (
+            <p className="mt-2 text-xs text-ink/40" data-testid="push-unsupported">
+              当前浏览器不支持 Web Push(iOS 用户请将本应用添加到主屏幕)。
+            </p>
+          )}
+          {pushHint && (
+            <p className="mt-2 text-xs text-fire-high" data-testid="push-hint">
+              {pushHint}
+            </p>
+          )}
+        </div>
       </section>
 
       <section className="mt-6 rounded-2xl bg-white divide-y divide-paper">

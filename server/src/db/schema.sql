@@ -145,6 +145,23 @@ CREATE TABLE IF NOT EXISTS env_snapshots (
 CREATE INDEX IF NOT EXISTS idx_env_snapshots_recent ON env_snapshots(city_code, snapshot_at DESC);
 
 -- ─────────────────────────────────────────────────────────────────────────
+-- push_subscriptions:Web Push 订阅(plan U11 post-pivot)
+--   每个浏览器会产生一个 endpoint(FCM / APNS bridge / Mozilla Autopush);同一用户多设备 = 多行
+--   uniq endpoint 防重复;Phase 2 服务号备份通道独立另存
+-- ─────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id       uuid NOT NULL REFERENCES users(id),
+  endpoint      text NOT NULL UNIQUE,
+  p256dh        text NOT NULL,
+  auth          text NOT NULL,
+  user_agent    text,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  last_used_at  timestamptz
+);
+CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(user_id);
+
+-- ─────────────────────────────────────────────────────────────────────────
 -- analytics_events:埋点事件(U12 观测仪表盘消费)
 -- ─────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS analytics_events (

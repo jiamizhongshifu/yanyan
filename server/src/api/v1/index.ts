@@ -22,6 +22,7 @@ import { registerMealsRoutes, type RegisterMealsOptions } from './meals';
 import { registerSymptomsRoutes, type RegisterSymptomsOptions } from './symptoms';
 import { registerYanScoreRoutes, type RegisterYanScoreOptions } from './yan-score';
 import { registerHomeRoutes, type RegisterHomeOptions } from './home';
+import { registerPushRoutes, type RegisterPushOptions } from './push';
 
 export interface V1Options {
   consents?: RegisterConsentsOptions;
@@ -31,6 +32,7 @@ export interface V1Options {
   symptoms?: RegisterSymptomsOptions;
   yanScore?: RegisterYanScoreOptions;
   home?: RegisterHomeOptions;
+  push?: RegisterPushOptions;
 }
 
 export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Promise<void> {
@@ -42,4 +44,5 @@ export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Pr
   await registerSymptomsRoutes(app, opts.symptoms);
   await registerYanScoreRoutes(app, opts.yanScore);
   await registerHomeRoutes(app, opts.home);
+  await registerPushRoutes(app, opts.push);
 }
