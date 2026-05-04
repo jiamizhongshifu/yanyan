@@ -6,10 +6,14 @@
 
 import Fastify, { FastifyInstance } from 'fastify';
 import { registerV1, type V1Options } from './api/v1';
+import { registerAuthHook } from './auth/middleware';
+import { getDefaultAuthResolver, type AuthResolver } from './auth';
 
 export interface BuildAppOptions {
   logger?: boolean;
   v1?: V1Options;
+  /** 测试时可注入(默认走 getDefaultAuthResolver,接受 Supabase JWT + dev header in non-prod) */
+  authResolver?: AuthResolver;
 }
 
 export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInstance> {
@@ -37,6 +41,9 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
       message: `Route ${req.method}:${req.url} not found`
     });
   });
+
+  // 鉴权 preHandler:解析 Authorization Bearer JWT(生产)或 X-User-Id(dev/test 补充路径)
+  await registerAuthHook(app, opts.authResolver ?? getDefaultAuthResolver());
 
   const v1Opts = opts.v1 ?? {};
   await app.register(async (scoped) => {

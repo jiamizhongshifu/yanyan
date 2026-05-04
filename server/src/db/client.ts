@@ -12,11 +12,18 @@ let pool: Pool | null = null;
 
 export function getPool(): Pool {
   if (!pool) {
+    const cfg = getConfig();
+    const url = cfg.DATABASE_URL;
+    // Supabase Postgres 强制要求 SSL;DATABASE_URL 通常含 ?sslmode=require
+    // node-postgres 在 Vercel serverless 环境下需要显式 ssl: { rejectUnauthorized: false }(Supabase 自签 CA)
+    const useSSL = url.includes('supabase.co') || url.includes('sslmode=require');
     pool = new Pool({
-      connectionString: getConfig().DATABASE_URL,
-      max: 10,
-      idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 5_000
+      connectionString: url,
+      // Vercel 单 Function 容器寿命短;池子小,空闲快回收
+      max: 5,
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 5_000,
+      ssl: useSSL ? { rejectUnauthorized: false } : undefined
     });
     pool.on('error', (err) => {
       // eslint-disable-next-line no-console

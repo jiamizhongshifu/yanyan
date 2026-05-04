@@ -23,6 +23,7 @@ import {
   type UserStore
 } from '../../services/users';
 import { getKms } from '../../crypto/kms';
+import { requireUser } from '../../auth';
 
 const LoginBody = z.object({ code: z.string().min(1) });
 
@@ -30,14 +31,6 @@ const BaselineBody = z.object({
   reverseFilterChoice: z.enum(REVERSE_FILTER_CHOICES),
   symptomsFrequency: z.record(z.enum(SYMPTOM_DIMENSIONS), z.enum(SYMPTOM_FREQUENCY))
 });
-
-function getUserIdFromHeader(headers: Record<string, unknown>): string {
-  const v = headers['x-user-id'];
-  if (typeof v !== 'string' || v.length === 0) {
-    throw new Error('missing X-User-Id header');
-  }
-  return v;
-}
 
 export interface RegisterOnboardingOptions {
   /** 测试时可注入 fake store + fake resolver + fake kms */
@@ -62,20 +55,15 @@ export async function registerOnboardingRoutes(app: FastifyInstance, opts: Regis
   });
 
   app.post('/users/me/baseline', async (req, reply) => {
-    let userId: string;
-    try {
-      userId = getUserIdFromHeader(req.headers as Record<string, unknown>);
-    } catch (err) {
-      reply.code(401);
-      return { ok: false, error: 'unauthorized', message: (err as Error).message };
-    }
+    const user = requireUser(req, reply);
+    if (!user) return;
     const parsed = BaselineBody.safeParse(req.body);
     if (!parsed.success) {
       reply.code(400);
       return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
     }
     const baseline: OnboardingBaseline = parsed.data;
-    await saveBaseline(deps, userId, baseline);
+    await saveBaseline(deps, user.userId, baseline);
     const initial = inferInitialFireLevel(baseline);
     return { ok: true, initialFireLevel: initial.level, ratio: initial.ratio };
   });
