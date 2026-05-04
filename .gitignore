@@ -50,3 +50,8 @@ tmp/
 
 # Claude Code worktrees
 .claude/worktrees/
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
+.supabase/
