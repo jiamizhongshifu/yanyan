@@ -10,7 +10,7 @@ origin: docs/brainstorms/2026-05-04-yanyan-tcm-inflammation-system-requirements.
 
 ## Summary
 
-19-20 周 MVP 计划:微信小程序前端 + Node/Fastify 后端 + 豆包多模态食物识别 + 中医典籍 + LLM 派生的分类引擎 + 规则化 Yan-Score v0 + 两阶段次晨打卡 + 今日推荐清单 + Day 30 体质档案 PDF v0.5(群体先验版)。Day 14-30 群体先验、个体发物 Bayesian 回归、Day 30 PDF 个体版、体检 OCR 推到 Phase 2;顾问委员会与 native app 推到 Phase 3。
+19-20 周 MVP 计划(2026-05-04 平台 pivot 后):**Vite/React H5 PWA 部署 Vercel + Supabase Postgres/Auth/Storage + 豆包多模态食物识别**;中医典籍 + LLM 派生分类引擎 + 规则化 Yan-Score v0 + 两阶段次晨打卡 + 今日推荐清单 + Day 30 体质档案 PDF v0.5(群体先验版)。Day 14-30 群体先验、个体发物 Bayesian 回归、Day 30 PDF 个体版、体检 OCR 推到 Phase 2;顾问委员会与 native app 推到 Phase 3。**v1 私人 beta 限定海外华人 / 邀请制(合规);PMF 后迁阿里云华东。**
 
 ---
 
@@ -77,7 +77,8 @@ origin: docs/brainstorms/2026-05-04-yanyan-tcm-inflammation-system-requirements.
 
 ## Key Technical Decisions
 
-- **平台子形态 = 微信小程序 v1**:30-45 中产重度使用微信、分享路径最顺、原生支付与模板消息;PWA 留作 v2 评估。代价:推送受限于模板消息(7 天有效)、健康数据通道弱(只能微信运动步数)。
+- **平台子形态 = 移动端 H5/PWA(2026-05-04 修订,推翻原"微信小程序"的 inferred 选择)**:Vite + React 18 + TypeScript + Tailwind + vite-plugin-pwa,部署 **Vercel**;任何浏览器扫码即用,无需微信审核;在微信内打开作为 H5 兼容,分享靠 URL 而非小程序卡片;拍照用 `<input type="file" capture="environment">` + `getUserMedia`;登录改 **Supabase Auth**(短信 OTP / 邮箱 magic link / 微信 OAuth Web)。代价:推送弱(浏览器 Push 限制 + iOS PWA 推送支持差)— 由 Phase 2 服务号备份通道补,plan 已记入 U20。
+- **后端形态 = Supabase + Vercel Functions(2026-05-04 修订,推翻原"阿里云 ECS + RDS")**:数据库 Supabase Postgres(直接跑既有 schema.sql);用户鉴权 Supabase Auth(替代手写的 X-User-Id 占位 + JWT row-level security);文件存储 Supabase Storage(替代阿里云 OSS);后端 API 拆为 Vercel Serverless Functions(Edge Runtime)。**合规警告:Supabase 境外 region,健康数据出境违《个保法》第 38 条** — v1 私人 beta 限定海外华人 / 邀请制,不向中国大陆公开;PMF 验证后必须迁阿里云华东 + 重做 envelope encryption with 阿里云 KMS。
 - **食物识别 LLM = 豆包(火山引擎多模态)主用 + Qwen-VL 备选**:国内合规、跨境数据风险归零、中餐识别强。**不使用 GPT-4o / Gemini 2.5**(跨境数据合规与训练数据使用条款风险)。
 - **Yan-Score v0 = 规则化加权(饮食 50% / 体感 30% / 环境 15% / 微信运动 5%)**:v1 冷启动数据不足,无法跑 ML;权重支持 ce-plan 阶段调整 + 任意子集缺失降级。v2 切 ML。
 - **后端 = Node.js (TypeScript) + Fastify + PostgreSQL + Redis + 阿里云 RDS / OSS**:国内合规、《个保法》存储要求、生态成熟。
