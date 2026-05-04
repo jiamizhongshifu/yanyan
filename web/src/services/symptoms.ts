@@ -97,12 +97,21 @@ export async function fetchYesterdayCompare(today?: string): Promise<YesterdayCo
 
 export type FireLevel = '平' | '微火' | '中火' | '大火';
 
+export interface YanScoreResult {
+  score: number;
+  level: FireLevel;
+  breakdown: { food: number; symptom: number; env: number; activity: number };
+  effectiveWeights: { food: number; symptom: number; env: number; activity: number };
+  missingParts: Array<'food' | 'symptom' | 'env' | 'activity'>;
+  partScores: { food: number | null; symptom: number | null; env: number | null; activity: number | null };
+}
+
+/** Post-U8 标准化响应 */
 export interface YanScoreToday {
   hasCheckin: boolean;
-  level?: FireLevel;
-  score?: number;
-  breakdown?: { food: number; symptom: number; env: number; activity: number };
-  isPlaceholder?: boolean;
+  result: YanScoreResult | null;
+  partScores: { food: number | null; symptom: number | null; env: number | null; activity: number | null };
+  unavailableReason?: 'insufficient_parts' | 'no_data';
 }
 
 export async function fetchYanScoreToday(): Promise<YanScoreToday | null> {

@@ -167,26 +167,61 @@ describe('U7 Step 3 揭晓 + 归因 breakdown', () => {
     expect(navigateMock).toHaveBeenCalledWith('/check-in/step1');
   });
 
-  test('hasCheckin=true: 显示 level + score + 占位提示 + 点击展开 breakdown(R18)', async () => {
+  test('Post-U8: 完整 result → 显示 level + score + missingParts 提示 + 点击展开 breakdown(R18)', async () => {
     fetchYanScoreMock.mockResolvedValueOnce({
       hasCheckin: true,
-      level: '微火',
-      score: 38,
-      breakdown: { food: 0, symptom: 75, env: 0, activity: 0 },
-      isPlaceholder: true
+      result: {
+        score: 58.5,
+        level: '中火',
+        breakdown: { food: 35, symptom: 15, env: 6, activity: 2.5 },
+        effectiveWeights: { food: 0.5, symptom: 0.3, env: 0.15, activity: 0.05 },
+        missingParts: [],
+        partScores: { food: 70, symptom: 50, env: 40, activity: 50 }
+      },
+      partScores: { food: 70, symptom: 50, env: 40, activity: 50 }
     });
     render(<Step3Reveal />);
-    expect(await screen.findByTestId('reveal-level')).toHaveTextContent('微火');
-    expect(screen.getByTestId('reveal-score')).toHaveTextContent('38');
-    // 占位提示
-    expect(screen.getByText(/占位算法/)).toBeInTheDocument();
+    expect(await screen.findByTestId('reveal-level')).toHaveTextContent('中火');
+    expect(screen.getByTestId('reveal-score')).toHaveTextContent('58.5');
 
-    // 默认不展开
     expect(screen.queryByTestId('breakdown')).toBeNull();
-    // 点击 → 展开
     fireEvent.click(screen.getByTestId('reveal-level'));
     expect(screen.getByTestId('breakdown')).toBeInTheDocument();
-    expect(screen.getByTestId('breakdown')).toHaveTextContent('体感');
-    expect(screen.getByTestId('breakdown')).toHaveTextContent('75');
+    expect(screen.getByTestId('breakdown')).toHaveTextContent('饮食');
+    expect(screen.getByTestId('breakdown')).toHaveTextContent('35');
+  });
+
+  test('Post-U8: result=null + unavailableReason=insufficient_parts → "数据还不够" + partScores 列表', async () => {
+    fetchYanScoreMock.mockResolvedValueOnce({
+      hasCheckin: true,
+      result: null,
+      partScores: { food: null, symptom: 50, env: null, activity: null },
+      unavailableReason: 'insufficient_parts'
+    });
+    render(<Step3Reveal />);
+    expect(await screen.findByText(/数据还不够/)).toBeInTheDocument();
+    // partScores 列表展示原始分数
+    expect(screen.getByTestId('part-scores')).toHaveTextContent('体感');
+    expect(screen.getByTestId('part-scores')).toHaveTextContent('50');
+    // 缺失项显示 —
+    expect(screen.getByTestId('part-scores')).toHaveTextContent('—');
+  });
+
+  test('Post-U8: result + missingParts 非空 → 提示重分配', async () => {
+    fetchYanScoreMock.mockResolvedValueOnce({
+      hasCheckin: true,
+      result: {
+        score: 71.9,
+        level: '中火',
+        breakdown: { food: 62.5, symptom: 9.4, env: 0, activity: 0 },
+        effectiveWeights: { food: 0.625, symptom: 0.375, env: 0, activity: 0 },
+        missingParts: ['env', 'activity'],
+        partScores: { food: 100, symptom: 25, env: null, activity: null }
+      },
+      partScores: { food: 100, symptom: 25, env: null, activity: null }
+    });
+    render(<Step3Reveal />);
+    await screen.findByTestId('reveal-level');
+    expect(screen.getByText(/未接入,权重已按比例重分配/)).toBeInTheDocument();
   });
 });

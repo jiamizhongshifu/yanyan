@@ -111,7 +111,16 @@ describe('U7 HTTP — symptoms + yan-score 占位', () => {
     app = await buildApp({
       v1: {
         symptoms: { deps: { store, getUserDek } },
-        yanScore: { deps: { store, getUserDek } }
+        yanScore: {
+          deps: {
+            symptomStore: store,
+            getUserDek,
+            // 不连真 DB:meals 聚合 / env / activity 全占位
+            loadDailyMealAggregate: async () => ({ counts: { 发: 0, 温和: 0, 平: 0, unknown: 0 } }),
+            loadEnvSnapshot: async () => null,
+            loadActivitySnapshot: async () => null
+          }
+        }
       }
     });
   });
@@ -120,14 +129,17 @@ describe('U7 HTTP — symptoms + yan-score 占位', () => {
     await app.close();
   });
 
-  test('AE3 Day 1: 没打卡 → /yan-score/today hasCheckin=false', async () => {
+  test('AE3 Day 1: 没打卡 → /yan-score/today hasCheckin=false + unavailableReason=no_data (post-U8)', async () => {
     const res = await app.inject({
       method: 'GET',
       url: '/api/v1/yan-score/today',
       headers: { 'x-user-id': USER_ID }
     });
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual({ ok: true, hasCheckin: false });
+    const body = res.json();
+    expect(body.hasCheckin).toBe(false);
+    expect(body.result).toBeNull();
+    expect(body.unavailableReason).toBe('no_data');
   });
 
   test('Step 1 提交盲打卡 → 写入,definition_version 记录', async () => {
@@ -198,15 +210,16 @@ describe('U7 HTTP — symptoms + yan-score 占位', () => {
     expect(body.payload.nasal_congestion).toEqual({ engaged: true, severity: 2 });
   });
 
-  test('R14 占位算法:Step 1 写入后 → /yan-score/today 返回 SymptomPart 只算', async () => {
+  test('R14 post-U8: 仅 SymptomPart 可用(< 2)→ unavailableReason=insufficient_parts', async () => {
+    // U8 算法要求 ≥ 2 个 Part 可用,单 Symptom 不够 → null
     await app.inject({
       method: 'POST',
       url: '/api/v1/symptoms/checkin',
       headers: { 'content-type': 'application/json', 'x-user-id': USER_ID },
       payload: {
         payload: {
-          nasal_congestion: { engaged: true, severity: 4 }, // max for nasal=4 → 100%
-          dry_mouth: { engaged: true, severity: 2 } // max=4 → 50%
+          nasal_congestion: { engaged: true, severity: 4 },
+          dry_mouth: { engaged: true, severity: 2 }
         }
       }
     });
@@ -217,14 +230,11 @@ describe('U7 HTTP — symptoms + yan-score 占位', () => {
     });
     const body = res.json();
     expect(body.hasCheckin).toBe(true);
-    expect(body.isPlaceholder).toBe(true);
-    // SymptomPart = (100 + 50)/2 = 75 → score = 75 * 0.30 = 22.5
-    expect(body.breakdown.symptom).toBeCloseTo(75, 0);
-    expect(body.score).toBeCloseTo(22.5, 0);
-    expect(body.level).toBe('平'); // < 25
-    expect(body.breakdown.food).toBe(0);
-    expect(body.breakdown.env).toBe(0);
-    expect(body.breakdown.activity).toBe(0);
+    expect(body.result).toBeNull();
+    expect(body.unavailableReason).toBe('insufficient_parts');
+    // partScores 仍展示给前端原始 Symptom 分数
+    expect(body.partScores.symptom).toBe(75);
+    expect(body.partScores.food).toBeNull();
   });
 
   test('Edge: 用户未初始化 → POST /symptoms/checkin 返回 403', async () => {

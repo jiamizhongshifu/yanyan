@@ -1,43 +1,37 @@
 /**
- * /api/v1/yan-score/today — Yan-Score 揭晓
+ * /api/v1/yan-score/today — Yan-Score v0 算法(U8 实施)
  *
- * U7 实施:占位 stub,基于"是否做过今早打卡"返回简单火分(无完整 4 Part 算法)。
- * U8 实施:替换为完整 Yan-Score v0 算法(食物 50% + 体感 30% + 环境 15% + 步数 5%)。
+ * 替换 U7 占位实现:接入 4 Part 加权 + 缺失重分配 + <2 Part 返回 null。
  *
- * 返回结构稳定,U7 → U8 切换不破坏前端契约。
+ * 响应形态:
+ *   - hasCheckin=false:今日没打卡也没餐食(任一 Part 都缺)→ UI 提示打卡
+ *   - hasCheckin=true + result=null:可用 Part < 2 / 重分配超上限 → UI 提示"数据还不够"
+ *   - hasCheckin=true + 完整 result:正常返回 score / level / breakdown / effectiveWeights
  */
 
 import type { FastifyInstance } from 'fastify';
 import { requireUser } from '../../auth';
+import { withClient } from '../../db/client';
 import {
   PgSymptomStore,
   todayDateString,
   type SymptomStore
 } from '../../services/symptoms';
-import { decryptField } from '../../crypto/envelope';
-import { withClient } from '../../db/client';
-import type { SymptomCheckinPayload } from '../../services/symptoms';
-import { effectiveSeverityMap, SYMPTOM_DIMENSION_LEVELS, SYMPTOM_DIMENSIONS } from '../../services/symptoms/types';
-
-export type FireLevel = '平' | '微火' | '中火' | '大火';
-
-export interface YanScoreToday {
-  level: FireLevel;
-  score: number;
-  breakdown: {
-    food: number;
-    symptom: number;
-    env: number;
-    activity: number;
-  };
-  /** U7 占位标志 — 客户端可显示"占位算法,U8 替换"提示 */
-  isPlaceholder: boolean;
-}
+import {
+  computeYanScoreForDay,
+  type ScoreDeps,
+  type YanScoreResult
+} from '../../services/score';
+import type { ActivitySnapshot, DailyMealAggregate, EnvSnapshot } from '../../services/score/parts';
 
 export interface RegisterYanScoreOptions {
   deps?: {
-    store?: SymptomStore;
+    symptomStore?: SymptomStore;
     getUserDek?: (userId: string) => Promise<string | null>;
+    /** 测试 / U9 接入前可注入 */
+    loadDailyMealAggregate?: (userId: string, date: string) => Promise<DailyMealAggregate>;
+    loadEnvSnapshot?: (userId: string, date: string) => Promise<EnvSnapshot | null>;
+    loadActivitySnapshot?: (userId: string, date: string) => Promise<ActivitySnapshot | null>;
   };
 }
 
@@ -51,69 +45,41 @@ async function defaultGetUserDek(userId: string): Promise<string | null> {
   });
 }
 
-function scoreToLevel(score: number): FireLevel {
-  if (score < 25) return '平';
-  if (score < 50) return '微火';
-  if (score < 75) return '中火';
-  return '大火';
-}
-
-/**
- * U7 占位算法:
- *   - 没今早打卡 → null(客户端提示"明早打卡后揭晓")
- *   - 有打卡 → 用 SymptomPart 的简单加权(各维度严重度 / 该维度 max 档位 * 100,平均)
- *   - 其他 Part 暂为 0(U8 接入后填)
- */
-async function computeYanScorePlaceholder(
-  store: SymptomStore,
-  userId: string,
-  date: string,
-  getUserDek: (userId: string) => Promise<string | null>
-): Promise<YanScoreToday | null> {
-  const row = await store.findByDate(userId, date, 'next_morning');
-  if (!row) return null;
-
-  const dek = await getUserDek(userId);
-  if (!dek) return null;
-
-  const blind = await decryptField<SymptomCheckinPayload>(userId, dek, row.blindInputCiphertext);
-  const severityMap = effectiveSeverityMap(blind);
-
-  let symptomTotal = 0;
-  let count = 0;
-  for (const dim of SYMPTOM_DIMENSIONS) {
-    const sev = severityMap[dim];
-    if (sev != null) {
-      const max = SYMPTOM_DIMENSION_LEVELS[dim];
-      symptomTotal += (sev / max) * 100;
-      count++;
-    }
-  }
-  const symptomPart = count === 0 ? 0 : symptomTotal / count;
-  const score = Math.round(symptomPart * 0.30 * 10) / 10; // U7 仅 SymptomPart 30% 权重展示
-  const level = scoreToLevel(score);
-
-  return {
-    level,
-    score,
-    breakdown: { food: 0, symptom: Math.round(symptomPart * 10) / 10, env: 0, activity: 0 },
-    isPlaceholder: true
-  };
+/** 标准化响应,无论 hasCheckin/result 状态字段稳定 */
+interface ResponseBody {
+  ok: true;
+  hasCheckin: boolean;
+  result: YanScoreResult | null;
+  partScores: { food: number | null; symptom: number | null; env: number | null; activity: number | null };
+  /** 当 result=null 时告诉前端为什么 */
+  unavailableReason?: 'insufficient_parts' | 'no_data';
 }
 
 export async function registerYanScoreRoutes(app: FastifyInstance, opts: RegisterYanScoreOptions = {}): Promise<void> {
-  const store = opts.deps?.store ?? new PgSymptomStore();
+  const symptomStore = opts.deps?.symptomStore ?? new PgSymptomStore();
   const getUserDek = opts.deps?.getUserDek ?? defaultGetUserDek;
+  const deps: ScoreDeps = {
+    symptomStore,
+    getUserDek,
+    loadDailyMealAggregate: opts.deps?.loadDailyMealAggregate,
+    loadEnvSnapshot: opts.deps?.loadEnvSnapshot,
+    loadActivitySnapshot: opts.deps?.loadActivitySnapshot
+  };
 
   app.get('/yan-score/today', async (req, reply) => {
     const user = requireUser(req, reply);
     if (!user) return;
     const date = todayDateString();
-    const result = await computeYanScorePlaceholder(store, user.userId, date, getUserDek);
-    if (!result) {
-      // 客户端拿到 hasCheckin=false → 显示"明早打卡后揭晓你的首份火分"(R19)
-      return { ok: true, hasCheckin: false };
-    }
-    return { ok: true, hasCheckin: true, ...result };
+    const { hasAny, result, partScores } = await computeYanScoreForDay(deps, user.userId, date);
+
+    const body: ResponseBody = {
+      ok: true,
+      hasCheckin: hasAny,
+      result,
+      partScores
+    };
+    if (!hasAny) body.unavailableReason = 'no_data';
+    else if (!result) body.unavailableReason = 'insufficient_parts';
+    return body;
   });
 }
