@@ -13,6 +13,7 @@ import {
   PgUserStore,
   loginOrCreate,
   saveBaseline,
+  ensureUser,
   REVERSE_FILTER_CHOICES,
   SYMPTOM_DIMENSIONS,
   SYMPTOM_FREQUENCY,
@@ -51,6 +52,18 @@ export async function registerOnboardingRoutes(app: FastifyInstance, opts: Regis
       return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
     }
     const result = await loginOrCreate(deps, parsed.data.code);
+    return { ok: true, ...result };
+  });
+
+  /**
+   * Post-pivot:Supabase Auth 创建 auth.users 后,客户端调此端点确保
+   * public.users.<id> 存在,生成 DEK。幂等。
+   */
+  app.post('/users/me/ensure', async (req, reply) => {
+    const { requireUser } = await import('../../auth');
+    const user = requireUser(req, reply);
+    if (!user) return;
+    const result = await ensureUser(deps, user.userId);
     return { ok: true, ...result };
   });
 

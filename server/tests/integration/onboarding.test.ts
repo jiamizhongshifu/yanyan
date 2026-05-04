@@ -30,6 +30,9 @@ class FakeUserStore implements UserStore {
   async findByOpenid(openid: string): Promise<UserRow | null> {
     return this.byOpenid.get(openid) ?? null;
   }
+  async findById(id: string): Promise<UserRow | null> {
+    return this.byId.get(id) ?? null;
+  }
   async createUser(params: { wxOpenid: string; dekCiphertextB64: string }): Promise<string> {
     const id = `u-${this.nextId++}`;
     const row: UserRow = {
@@ -42,6 +45,18 @@ class FakeUserStore implements UserStore {
     this.byOpenid.set(params.wxOpenid, row);
     this.byId.set(id, row);
     return id;
+  }
+  async createUserById(params: { id: string; dekCiphertextB64: string }): Promise<void> {
+    if (this.byId.has(params.id)) return;
+    const row: UserRow = {
+      id: params.id,
+      wxOpenid: `supabase:${params.id}`,
+      consentVersionGranted: 0,
+      baselineSummary: {},
+      deletedAt: null
+    };
+    this.byId.set(params.id, row);
+    this.byOpenid.set(`supabase:${params.id}`, row);
   }
   async updateBaseline(userId: string, baseline: OnboardingBaseline): Promise<void> {
     this.baselines.set(userId, baseline as unknown as Record<string, unknown>);
@@ -230,6 +245,33 @@ describe('U4 onboarding — HTTP routes', () => {
       }
     });
     expect(res.statusCode).toBe(400);
+  });
+
+  test('POST /users/me/ensure creates public.users row when missing (idempotent)', async () => {
+    const userId = 'auth-user-supabase-uuid-1';
+    expect(store.byId.has(userId)).toBe(false);
+
+    const r1 = await app.inject({
+      method: 'POST',
+      url: '/api/v1/users/me/ensure',
+      headers: { 'x-user-id': userId }
+    });
+    expect(r1.statusCode).toBe(200);
+    expect(r1.json()).toEqual({ ok: true, userId, wasCreated: true });
+    expect(store.byId.has(userId)).toBe(true);
+
+    // 第二次幂等
+    const r2 = await app.inject({
+      method: 'POST',
+      url: '/api/v1/users/me/ensure',
+      headers: { 'x-user-id': userId }
+    });
+    expect(r2.json()).toEqual({ ok: true, userId, wasCreated: false });
+  });
+
+  test('POST /users/me/ensure without auth → 401', async () => {
+    const res = await app.inject({ method: 'POST', url: '/api/v1/users/me/ensure' });
+    expect(res.statusCode).toBe(401);
   });
 
   test('POST /users/me/baseline without X-User-Id → 401', async () => {

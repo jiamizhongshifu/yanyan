@@ -67,5 +67,26 @@ export async function saveBaseline(deps: UsersDeps, userId: string, baseline: On
   await deps.store.updateBaseline(userId, baseline);
 }
 
+/**
+ * Ensure(post-pivot):Supabase Auth 已创建 auth.users.<userId>;
+ * 此函数确保 public.users.<userId> 存在(幂等),不存在则用 KMS 派生 DEK 并 INSERT。
+ *
+ * 由 onboarding 第一屏前 / 任何写入 public.users 关联表前调用。
+ */
+export interface EnsureUserResult {
+  userId: string;
+  wasCreated: boolean;
+}
+
+export async function ensureUser(deps: UsersDeps, userId: string): Promise<EnsureUserResult> {
+  const existing = await deps.store.findById(userId);
+  if (existing) return { userId, wasCreated: false };
+
+  const dataKey = await deps.kms.generateDataKey(userId);
+  const dekCiphertextB64 = dataKey.ciphertext.toString('base64');
+  await deps.store.createUserById({ id: userId, dekCiphertextB64 });
+  return { userId, wasCreated: true };
+}
+
 export * from './types';
 export * from './store';

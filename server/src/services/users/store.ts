@@ -17,8 +17,14 @@ export interface UserRow {
 
 export interface UserStore {
   findByOpenid(openid: string): Promise<UserRow | null>;
+  findById(id: string): Promise<UserRow | null>;
   /** 创建新用户;返回 newly created id */
   createUser(params: { wxOpenid: string; dekCiphertextB64: string }): Promise<string>;
+  /**
+   * 根据 Supabase Auth user id 创建 public.users 行(post-pivot 路径)
+   * id = auth.users.id;wx_openid 用 supabase 前缀避免唯一约束冲突
+   */
+  createUserById(params: { id: string; dekCiphertextB64: string }): Promise<void>;
   /** 写入 onboarding baseline_summary */
   updateBaseline(userId: string, baseline: OnboardingBaseline): Promise<void>;
 }
@@ -50,6 +56,32 @@ export class PgUserStore implements UserStore {
     });
   }
 
+  async findById(id: string): Promise<UserRow | null> {
+    return await withClient(async (client) => {
+      const r = await client.query<{
+        id: string;
+        wx_openid: string;
+        consent_version_granted: number;
+        baseline_summary: Record<string, unknown>;
+        deleted_at: Date | null;
+      }>(
+        `SELECT id, wx_openid, consent_version_granted, baseline_summary, deleted_at
+           FROM users
+          WHERE id = $1 AND deleted_at IS NULL`,
+        [id]
+      );
+      if (r.rowCount === 0) return null;
+      const row = r.rows[0];
+      return {
+        id: row.id,
+        wxOpenid: row.wx_openid,
+        consentVersionGranted: row.consent_version_granted,
+        baselineSummary: row.baseline_summary,
+        deletedAt: row.deleted_at
+      };
+    });
+  }
+
   async createUser(params: { wxOpenid: string; dekCiphertextB64: string }): Promise<string> {
     return await withClient(async (client) => {
       const r = await client.query<{ id: string }>(
@@ -57,6 +89,17 @@ export class PgUserStore implements UserStore {
         [params.wxOpenid, params.dekCiphertextB64]
       );
       return r.rows[0].id;
+    });
+  }
+
+  async createUserById(params: { id: string; dekCiphertextB64: string }): Promise<void> {
+    await withClient(async (client) => {
+      await client.query(
+        `INSERT INTO users (id, wx_openid, dek_ciphertext_b64)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (id) DO NOTHING`,
+        [params.id, `supabase:${params.id}`, params.dekCiphertextB64]
+      );
     });
   }
 
