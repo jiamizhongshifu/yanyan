@@ -1,0 +1,336 @@
+[
+  {
+    "foodCanonicalName": "白米饭",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": 0.06,
+    "agesScore": 9,
+    "gi": 73,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》谷部·稻", "excerpt": "粳米...其性平,益气止泻,和胃健脾。" },
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #20444" }
+    ]
+  },
+  {
+    "foodCanonicalName": "糙米",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.18,
+    "agesScore": 11,
+    "gi": 68,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #20452" }
+    ]
+  },
+  {
+    "foodCanonicalName": "白米粥",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": 0.04,
+    "agesScore": 6,
+    "gi": 78,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》谷部·稻", "excerpt": "粳米煮粥,最养脾胃。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "清蒸鲈鱼",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.92,
+    "agesScore": 23,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》鳞部·鲈", "excerpt": "鲈鱼...味甘性平,益脾胃,补肝肾。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "西兰花",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -2.03,
+    "agesScore": 4,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "DII 2014 (Shivappa)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "菠菜",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -2.21,
+    "agesScore": 3,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "DII 2014 (Shivappa)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "白菜",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.92,
+    "agesScore": 4,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #11116" }
+    ]
+  },
+  {
+    "foodCanonicalName": "苹果",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.55,
+    "agesScore": 2,
+    "gi": 38,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #09003" }
+    ]
+  },
+  {
+    "foodCanonicalName": "豆腐",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.34,
+    "agesScore": 8,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》谷部·豆腐", "excerpt": "豆腐...性凉味甘,清热润燥,生津解毒。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "豆浆",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.41,
+    "agesScore": 5,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #16223" }
+    ]
+  },
+  {
+    "foodCanonicalName": "山药",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.12,
+    "agesScore": 5,
+    "gi": 51,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》菜部·薯蓣", "excerpt": "山药...味甘性平,健脾补肺,益肾固精。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "鸡蛋",
+    "tcmLabel": "温和",
+    "tcmProperty": "平",
+    "diiScore": 0.16,
+    "agesScore": 49,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #01123" }
+    ]
+  },
+  {
+    "foodCanonicalName": "蒸蛋羹",
+    "tcmLabel": "温和",
+    "tcmProperty": "平",
+    "diiScore": 0.13,
+    "agesScore": 22,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024" }
+    ]
+  },
+  {
+    "foodCanonicalName": "蛋炒饭",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.41,
+    "agesScore": 38,
+    "gi": 80,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:炒制 ↑AGEs" }
+    ]
+  },
+  {
+    "foodCanonicalName": "包子",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.32,
+    "agesScore": 28,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA + 中国食物成分表 2018" }
+    ]
+  },
+  {
+    "foodCanonicalName": "酸奶",
+    "tcmLabel": "温和",
+    "tcmProperty": "凉",
+    "diiScore": -0.08,
+    "agesScore": 12,
+    "gi": 36,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #01116" }
+    ]
+  },
+  {
+    "foodCanonicalName": "牛肉",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.45,
+    "agesScore": 41,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》兽部·牛", "excerpt": "牛肉...味甘性温,补脾胃,益气血。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "鸡肉",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.18,
+    "agesScore": 31,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》禽部·鸡", "excerpt": "鸡肉...温中益气,补虚填精。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "羊肉",
+    "tcmLabel": "发",
+    "tcmProperty": "热",
+    "diiScore": 0.55,
+    "agesScore": 56,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》兽部·羊", "excerpt": "羊肉...味甘性大热,补虚劳,益气血,但多食发热动风。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "烤羊肉串",
+    "tcmLabel": "发",
+    "tcmProperty": "热",
+    "diiScore": 1.12,
+    "agesScore": 91,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》兽部·羊" },
+      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:明火烧烤 ↑↑AGEs" }
+    ]
+  },
+  {
+    "foodCanonicalName": "虾",
+    "tcmLabel": "发",
+    "tcmProperty": "温",
+    "diiScore": 0.31,
+    "agesScore": 34,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》鳞部·虾", "excerpt": "虾...味甘性温,补肾壮阳,但发风动疾,有疮疡者忌。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "螃蟹",
+    "tcmLabel": "发",
+    "tcmProperty": "寒",
+    "diiScore": 0.28,
+    "agesScore": 27,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》介部·蟹", "excerpt": "蟹...味咸性寒,散诸热,但发风疾,孕妇忌之。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "炸鸡",
+    "tcmLabel": "发",
+    "tcmProperty": "热",
+    "diiScore": 1.85,
+    "agesScore": 88,
+    "gi": null,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:深炸 ↑↑↑AGEs" },
+      { "source": "paper", "reference": "DII 2014 (Shivappa) — saturated fat + omega-6" }
+    ]
+  },
+  {
+    "foodCanonicalName": "薯条",
+    "tcmLabel": "发",
+    "tcmProperty": "热",
+    "diiScore": 1.41,
+    "agesScore": 62,
+    "gi": 75,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:深炸 ↑↑AGEs" }
+    ]
+  },
+  {
+    "foodCanonicalName": "麻辣火锅",
+    "tcmLabel": "发",
+    "tcmProperty": "热",
+    "diiScore": 1.62,
+    "agesScore": 71,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》菜部·椒", "excerpt": "辣椒...大热,多食发火,壅气伤阴。" },
+      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:高油 + 高温" }
+    ]
+  },
+  {
+    "foodCanonicalName": "辣椒",
+    "tcmLabel": "发",
+    "tcmProperty": "热",
+    "diiScore": 0.45,
+    "agesScore": 6,
+    "gi": null,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》菜部·椒" }
+    ]
+  },
+  {
+    "foodCanonicalName": "白糖",
+    "tcmLabel": "发",
+    "tcmProperty": "温",
+    "diiScore": 1.08,
+    "agesScore": 4,
+    "gi": 65,
+    "citations": [
+      { "source": "paper", "reference": "DII 2014 (Shivappa) — refined sugar pro-inflammatory" }
+    ]
+  },
+  {
+    "foodCanonicalName": "奶茶",
+    "tcmLabel": "发",
+    "tcmProperty": "温",
+    "diiScore": 0.92,
+    "agesScore": 21,
+    "gi": 55,
+    "citations": [
+      { "source": "paper", "reference": "DII 2014:refined sugar + saturated fat" }
+    ]
+  },
+  {
+    "foodCanonicalName": "西瓜",
+    "tcmLabel": "平",
+    "tcmProperty": "寒",
+    "diiScore": -0.82,
+    "agesScore": 1,
+    "gi": 72,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》果部·瓜", "excerpt": "西瓜...味甘性寒,清热解暑,但脾胃虚寒者忌多食。" }
+    ]
+  },
+  {
+    "foodCanonicalName": "燕麦",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.73,
+    "agesScore": 9,
+    "gi": 55,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #20137" }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "description": "USDA / 公开数据集 ground truth 子集 — 用于 plan U5 verification 的 100 食物 spot check (Round 2 review 修订)。本文件仅含小样本用作单测;ce-work 阶段扩展到 100 个高频食物。",
+  "tolerance": {
+    "diiScore": 0.5,
+    "agesScore": 15,
+    "gi": 10
+  },
+  "samples": [
+    { "foodCanonicalName": "白米饭", "diiScore": 0.06, "agesScore": 9, "gi": 73 },
+    { "foodCanonicalName": "糙米",   "diiScore": -0.18, "agesScore": 11, "gi": 68 },
+    { "foodCanonicalName": "西兰花", "diiScore": -2.03, "agesScore": 4 },
+    { "foodCanonicalName": "菠菜",   "diiScore": -2.21, "agesScore": 3 },
+    { "foodCanonicalName": "苹果",   "diiScore": -0.55, "agesScore": 2, "gi": 38 },
+    { "foodCanonicalName": "鸡蛋",   "diiScore": 0.16, "agesScore": 49 },
+    { "foodCanonicalName": "牛肉",   "diiScore": 0.45, "agesScore": 41 },
+    { "foodCanonicalName": "炸鸡",   "diiScore": 1.85, "agesScore": 88 },
+    { "foodCanonicalName": "薯条",   "diiScore": 1.41, "agesScore": 62, "gi": 75 },
+    { "foodCanonicalName": "白糖",   "diiScore": 1.08, "agesScore": 4, "gi": 65 }
+  ]
+}
