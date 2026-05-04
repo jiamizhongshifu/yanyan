@@ -9,6 +9,9 @@ import { Step3BaselineConsent } from './pages/Onboarding/Step3BaselineConsent';
 import { Step4Welcome } from './pages/Onboarding/Step4Welcome';
 import { Camera } from './pages/Camera';
 import { MealResult } from './pages/MealResult';
+import { Step1Blind } from './pages/MorningCheckin/Step1Blind';
+import { Step2Compare } from './pages/MorningCheckin/Step2Compare';
+import { Step3Reveal } from './pages/MorningCheckin/Step3Reveal';
 import { RequireAuth } from './components/RequireAuth';
 
 export function App() {
@@ -52,6 +55,22 @@ export function App() {
       <Route path="/meals/:id">
         <RequireAuth>
           <MealResult />
+        </RequireAuth>
+      </Route>
+
+      <Route path="/check-in/step1">
+        <RequireAuth>
+          <Step1Blind />
+        </RequireAuth>
+      </Route>
+      <Route path="/check-in/step2">
+        <RequireAuth>
+          <Step2Compare />
+        </RequireAuth>
+      </Route>
+      <Route path="/check-in/reveal">
+        <RequireAuth>
+          <Step3Reveal />
         </RequireAuth>
       </Route>
 
