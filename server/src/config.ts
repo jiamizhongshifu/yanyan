@@ -28,6 +28,13 @@ const ConfigSchema = z.object({
   SUPABASE_STORAGE_FOOD_BUCKET: z.string().default('food-photos'),
   SUPABASE_STORAGE_PDF_BUCKET: z.string().default('profile-pdf'),
 
+  // ─── LLM 接入(post-pivot 项目核心 agent 用 DeepSeek) ───
+  // DeepSeek 用于:文本类 LLM 任务(食物分类派生 / 推荐生成 / PDF 摘要 / 发物清单解释等)
+  // 视觉类(食物拍照识别)仍走豆包多模态 / Qwen-VL — DeepSeek-VL 待 ce-work 阶段评估
+  DEEPSEEK_API_KEY: z.string().optional(),
+  DEEPSEEK_BASE_URL: z.string().url().default('https://api.deepseek.com/anthropic'),
+  DEEPSEEK_MODEL: z.string().default('deepseek-v4-pro'),
+
   // KMS:本地 dev/test 用 LocalKmsStub;生产 PMF 后迁阿里云 KMS
   KMS_MODE: z.enum(['local', 'aliyun']).default('local'),
   KMS_LOCAL_MASTER_KEY: z.string().regex(/^[0-9a-f]{64}$/i, '必须是 64 位十六进制(代表 32 字节 AES-256 主密钥)').optional(),
