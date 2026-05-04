@@ -18,6 +18,7 @@ import {
   subscribeToPush,
   unsubscribeFromPush
 } from '../services/push';
+import { track } from '../services/tracker';
 
 export function Me() {
   const [pushSupported, setPushSupported] = useState(true);
@@ -54,10 +55,12 @@ export function Me() {
       if (pushOn) {
         await unsubscribeFromPush();
         setPushOn(false);
+        track('push_unsubscribed');
       } else {
         const r = await subscribeToPush();
         if (r.ok) {
           setPushOn(true);
+          track('push_subscribed');
         } else if (r.reason === 'permission_denied') {
           setPushHint('浏览器拒绝了通知权限,请到系统设置中允许后重试。');
         } else if (r.reason === 'no_pushmanager' || r.reason === 'no_serviceworker' || r.reason === 'no_notification') {

@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { fetchYesterdayCompare, SYMPTOM_DIMENSION_LABELS, SYMPTOM_LEVEL_LABELS, type SymptomDimension } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
+import { track } from '../../services/tracker';
 
 export function Step2Compare() {
   const [, navigate] = useLocation();
@@ -16,6 +17,7 @@ export function Step2Compare() {
 
   useEffect(() => {
     let mounted = true;
+    track('checkin_step2_view');
     void fetchYesterdayCompare().then((y) => {
       if (mounted) setYesterday(y);
     });

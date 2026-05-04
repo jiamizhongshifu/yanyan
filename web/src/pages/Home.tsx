@@ -17,6 +17,7 @@ import { TodayFireCard } from '../components/TodayFireCard';
 import { MealHistoryList } from '../components/MealHistoryList';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
+import { track } from '../services/tracker';
 
 export function Home() {
   const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
@@ -25,6 +26,7 @@ export function Home() {
 
   useEffect(() => {
     let mounted = true;
+    track('tab_home_visit');
     void Promise.all([fetchYanScoreToday(), fetchHomeToday(), fetchProgress()]).then(
       ([y, h, p]) => {
         if (!mounted) return;

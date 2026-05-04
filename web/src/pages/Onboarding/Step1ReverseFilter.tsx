@@ -6,6 +6,7 @@
 import { useLocation } from 'wouter';
 import { REVERSE_FILTER_CHOICES, type ReverseFilterChoice } from '../../services/onboarding';
 import { useOnboarding } from '../../store/onboarding';
+import { track } from '../../services/tracker';
 
 const CHOICE_LABELS: Record<ReverseFilterChoice, string> = {
   rhinitis: '想改鼻炎',
@@ -45,7 +46,10 @@ export function Step1ReverseFilter() {
 
       <button
         type="button"
-        onClick={() => navigate('/onboarding/step2')}
+        onClick={() => {
+          track('onboarding_step_complete', { step: 1, primaryGoal: reverseFilterChoice });
+          navigate('/onboarding/step2');
+        }}
         disabled={!reverseFilterChoice}
         className="mt-12 w-full rounded-full bg-ink text-white py-3 text-base font-medium disabled:opacity-40"
       >

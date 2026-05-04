@@ -7,12 +7,14 @@
 
 import { useEffect, useState } from 'react';
 import { fetchProgress, type UserProgress } from '../services/home';
+import { track } from '../services/tracker';
 
 export function Findings() {
   const [progress, setProgress] = useState<UserProgress | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    track('tab_findings_visit');
     void fetchProgress().then((p) => {
       if (mounted) setProgress(p);
     });

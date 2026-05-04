@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { fetchYanScoreToday, type FireLevel } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
+import { track } from '../../services/tracker';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
@@ -31,6 +32,7 @@ export function Step3Reveal() {
 
   useEffect(() => {
     let mounted = true;
+    track('score_revealed');
     void fetchYanScoreToday().then((s) => {
       if (mounted) setYanScore(s);
     });

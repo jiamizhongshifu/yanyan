@@ -14,6 +14,7 @@ import { useLocation } from 'wouter';
 import { useAuth } from '../services/auth';
 import { compressImage, postMeal, uploadPhoto } from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
+import { track } from '../services/tracker';
 
 type Stage = 'idle' | 'compressing' | 'uploading' | 'recognizing' | 'done' | 'error';
 
@@ -54,12 +55,14 @@ export function Camera() {
         setErrorMessage('上传失败,请稍后再试。');
         return;
       }
+      track('photo_uploaded');
 
       setStage('recognizing');
       const outcome = await postMeal(key);
       if (outcome.kind === 'ok') {
         setLastMeal(outcome.data);
         setStage('done');
+        track('meal_recognized', { mealId: outcome.data.mealId });
         navigate(`/meals/${outcome.data.mealId}`);
         return;
       }

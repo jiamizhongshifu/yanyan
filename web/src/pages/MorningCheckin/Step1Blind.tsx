@@ -12,6 +12,7 @@ import { useLocation } from 'wouter';
 import { SymptomSlider } from '../../components/SymptomSlider';
 import { SYMPTOM_DIMENSIONS, postCheckin } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
+import { track } from '../../services/tracker';
 
 export function Step1Blind() {
   const [, navigate] = useLocation();
@@ -30,6 +31,7 @@ export function Step1Blind() {
       setErrorMessage('提交失败,请检查网络后重试。');
       return;
     }
+    track('checkin_step1_complete');
     navigate('/check-in/step2');
   };
 

@@ -25,28 +25,28 @@ describe('U11 subscribeToPush', () => {
   let originalPM: unknown;
 
   beforeEach(() => {
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     originalNotification = globalThis.Notification;
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     originalSW = navigator.serviceWorker;
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     originalPM = globalThis.PushManager;
   });
 
   afterEach(() => {
     if (originalNotification === undefined) {
-      // @ts-expect-error 测试桩
+      // @ts-ignore 测试桩
       delete globalThis.Notification;
     } else {
-      // @ts-expect-error 测试桩
+      // @ts-ignore 测试桩
       globalThis.Notification = originalNotification;
     }
     if (originalSW === undefined) {
-      // @ts-expect-error 测试桩
+      // @ts-ignore 测试桩
       delete (navigator as Navigator & { serviceWorker?: unknown }).serviceWorker;
     }
     if (originalPM === undefined) {
-      // @ts-expect-error 测试桩
+      // @ts-ignore 测试桩
       delete globalThis.PushManager;
     }
     vi.restoreAllMocks();
@@ -54,11 +54,11 @@ describe('U11 subscribeToPush', () => {
 
   test('permission denied → ok:false reason:permission_denied', async () => {
     // 桩出三件支持
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     globalThis.Notification = { requestPermission: vi.fn().mockResolvedValue('denied'), permission: 'default' };
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     globalThis.PushManager = function PushManager() {};
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: { ready: Promise.resolve({}) } });
 
     // 桩 auth — 让 subscribeToPush 走到 permission step
@@ -73,11 +73,11 @@ describe('U11 subscribeToPush', () => {
 
   test('未登录(无 token) → ok:false reason:not_signed_in', async () => {
     // 桩出三件支持
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     globalThis.Notification = { requestPermission: vi.fn().mockResolvedValue('granted'), permission: 'default' };
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     globalThis.PushManager = function PushManager() {};
-    // @ts-expect-error 测试桩
+    // @ts-ignore 测试桩
     Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: { ready: Promise.resolve({}) } });
 
     vi.resetModules();
