@@ -6,7 +6,7 @@
  *   - Edge case: 密文字段写入后无密钥读取报错(此处用撤回吊销模拟)
  */
 
-import { LocalKmsStub, getKms, resetKmsForTesting } from '../../src/crypto/kms';
+import { getKms, resetKmsForTesting } from '../../src/crypto/kms';
 import { encryptField, decryptField, clearDekCacheForTesting, evictDekFromCache } from '../../src/crypto/envelope';
 
 describe('U2 envelope encryption', () => {
@@ -16,7 +16,7 @@ describe('U2 envelope encryption', () => {
   });
 
   test('round-trip: encrypt then decrypt returns original payload', async () => {
-    const kms = getKms() as LocalKmsStub;
+    const kms = getKms();
     const userId = 'user-1';
     const dataKey = await kms.generateDataKey(userId);
     const dekCiphertextB64 = dataKey.ciphertext.toString('base64');
@@ -30,7 +30,7 @@ describe('U2 envelope encryption', () => {
   });
 
   test('AAD binds DEK to userId — different user cannot decrypt', async () => {
-    const kms = getKms() as LocalKmsStub;
+    const kms = getKms();
     const userA = 'user-A';
     const userB = 'user-B';
     const dekA = await kms.generateDataKey(userA);
@@ -40,7 +40,7 @@ describe('U2 envelope encryption', () => {
   });
 
   test('revocation: scheduleKeyDeletion makes future decryptDataKey fail', async () => {
-    const kms = getKms() as LocalKmsStub;
+    const kms = getKms();
     const userId = 'user-revoke';
     const dataKey = await kms.generateDataKey(userId);
     const dekCiphertextB64 = dataKey.ciphertext.toString('base64');
@@ -55,7 +55,7 @@ describe('U2 envelope encryption', () => {
   });
 
   test('cache hit: second decrypt does not re-call KMS', async () => {
-    const kms = getKms() as LocalKmsStub;
+    const kms = getKms();
     const userId = 'user-cache';
     const dataKey = await kms.generateDataKey(userId);
     const dekCiphertextB64 = dataKey.ciphertext.toString('base64');

@@ -36,7 +36,7 @@ origin: [docs/brainstorms/2026-05-04-yanyan-tcm-inflammation-system-requirements
 - **P2-R7.** R20b 周内趋势线:累计 ≥ 21 天后启用(Phase 1 已埋阈值,Phase 2 启用 UI)
 - **P2-R8.** 真实 LLM + 多模态接入 + cost-monitor + 飞书告警:替换 Phase 1 占位 client(DeepSeek + 豆包 / Qwen-VL)
 - **P2-R9.** 真实 Web Push 发送 + Vercel Cron 调度:替换 StubPushSender;Web Push 不可用降级到 in-app 通知兜底
-- **P2-R10.** 真实 KMS 阿里云迁移 + Supabase RLS 启用:替换 Phase 1 占位实现,达到 Beta 上线安全水位
+- **P2-R10.** 主密钥从 env 搬到 Supabase Vault + envelope 版本字段(forward-compat Phase 3 KMS 阿里云迁移);RLS + Supabase JS client 切换正式推 Phase 3(改动过大,Beta 不卡 — 现有 JWT API-层 auth 已足够)
 
 **Origin actors:** A1 中产用户;A2 中医顾问委员会(本 plan 仅 U6 反馈队列预留接口,真正接入推到 Phase 3);S3 发物回归引擎(本 plan 交付)
 **Origin flows:** F4 Day 14-30→30 发物清单(本 plan U1-U4 + U7 完整交付);F5 体检报告后置上传(U5 完整交付)
@@ -72,7 +72,9 @@ origin: [docs/brainstorms/2026-05-04-yanyan-tcm-inflammation-system-requirements
 
 ### Deferred to Follow-Up Work
 
-- **微信服务号备份推送通道(原 U10)**:Phase 2 收集 Web Push 真实失败率数据后,Phase 3 立项;Phase 2 内 Web Push 失败降级到 in-app 通知兜底(成本极低,Phase 1 tracker.ts 基础设施已就绪)
+- **Supabase RLS + 切 Supabase JS client(原 U10 部分)**:plan v2 deepening 后 user 选择窄化 — 切 client 涉及全部 store 重写 + 测试 fixture 重写,工作量大且 Beta 不卡(现有 raw pg + JWT-at-API-layer auth 已够用);RLS 推到 Phase 3 跟阿里云迁移一起做
+- **KMS 阿里云迁移(原 U10 部分)**:user 选项 B(Supabase Vault),Phase 2 主密钥落 Vault;阿里云 KMS 迁移推到 Phase 3 跟 ICP 备案一起做
+- **微信服务号备份推送通道(原 U10 不同 unit)**:Phase 2 收集 Web Push 真实失败率数据后,Phase 3 立项;Phase 2 内 Web Push 失败降级到 in-app 通知兜底(成本极低,Phase 1 tracker.ts 基础设施已就绪)
 - **PostgreSQL 物化视图 / ClickHouse 迁移(原 U12)**:Beta 期事件量级(~30 万行/月)用现有 SQL + PG 索引足够;dashboard P99 > 500ms 后再优化。本 plan 仅把飞书告警内联到 U8 完成
 - **ICP 备案 + 阿里云域名迁移 + PIA 法务报告(原 U13)**:Vercel 海外架构与境内 ICP 备案有架构冲突 — Phase 2 维持私人 beta 邀请制(不公开发布),Phase 3 启动正式 ICP 备案 + 阿里云域名迁移;PIA 报告 Phase 3 同期产出
 - **顾问委员会反例审核 UI**:本 plan U6 只交付反馈队列写入 + 误识别 fine-tune 自动化 hook;顾问委员会人工审核界面留 Phase 3
@@ -611,54 +613,52 @@ env_snapshots (Phase 1 已存)────────┼──→ U3 env-confou
 
 ---
 
-- U10. **真实 KMS 阿里云迁移 + Supabase RLS 启用 + 切 Supabase JS client**
+- U10. **主密钥搬到 Supabase Vault + envelope 版本字节(forward-compat)**
 
-**Goal:** Phase 1 envelope encryption 用 LocalKmsStub,Beta 上线前迁阿里云 KMS;Supabase 当前用 `X-User-Id` DevHeader(测试桩),Phase 2 启用 RLS + **全量切到 Supabase JS client**(让 RLS 的 `auth.uid()` 工作)。
+**Goal:** Phase 1 envelope encryption 主密钥在 `KMS_LOCAL_MASTER_KEY` env(Vercel encrypted env),Phase 2 搬到 Supabase Vault(`vault.secrets` + pgsodium 加密)— 主密钥静态加密在 DB 层,服务端通过 Supabase RPC 取出。同时给 envelope payload 加 1 byte `kms_version` prefix,Phase 3 切阿里云 KMS 时只需新增 0x02 路径,无 schema 变更。
 
 **Requirements:** P2-R10
 
-**Dependencies:** Phase 1(envelope.ts + auth/middleware.ts 已就绪)
+**Dependencies:** Phase 1(`envelope.ts` + `crypto.ts` 已就绪)
 
 **Files:**
-- Create: `server/src/services/kms/aliyun.ts`(`@alicloud/kms20160120` SDK)
-- Modify: `server/src/crypto/envelope.ts`(KMS 模式从 local → aliyun;**envelope payload 加 1 byte `kms_version` prefix**;reader 按版本选 KMS 路径)
-- Modify: `server/src/db/migrations/005_kms_version_byte.sql`(无 schema 变更,文档化 envelope 格式)
-- Modify: `server/.env.example`(KMS_KEY_ID 必填、KMS_LOCAL_MASTER_KEY 标 deprecated)
-- Create: `server/src/scripts/kms-rewrap.ts`(一次性 rewrap;**checkpoint + resume + dry-run** + `WHERE deleted_at IS NULL` 过滤)
-- Create: `server/src/db/policies/rls.sql`(全表 RLS:users / meals / symptoms / push_subscriptions / checkup_reports / fa_candidates / feedback / inapp_reminders)
-- Create: `server/src/db/migrations/007_enable_rls.sql`
-- **大改:全量切 Supabase JS client**(替换 raw `pg`):
-  - Modify: `server/src/db/client.ts`(导出 Supabase client + service-role client)
-  - Modify: `server/src/services/*/store.ts`(查询从 `pg.query` 切到 `supabase.from(...).select()`)
-  - Modify: `server/src/auth/dev-header.ts`(NODE_ENV=test 才启用)
-  - Modify: `server/src/auth/index.ts`(JWT-only path,移除 production DevHeader fallback)
-  - Modify: `server/tests/integration/*.ts`(从 X-User-Id header 切到 Supabase test client + service-role token 注入)
-- Test: `server/tests/integration/rls.test.ts`(用 Supabase test client 验证跨用户读写被拒)、`server/tests/integration/kms-rewrap.test.ts`
+- Create: `server/src/services/kms/vault.ts`(VaultMasterKeySource:从 Supabase Vault 读主密钥)
+- Create: `server/src/services/kms/index.ts`(MasterKeySource interface + 工厂)
+- Modify: `server/src/crypto/envelope.ts`(envelope payload 加 1 byte `kms_version` prefix,reader 按版本选 KMS)
+- Create: `server/src/db/policies/vault-init.sql`(创建 vault.secret + pgsodium 启用 + service-role grant)
+- Create: `server/src/scripts/kms-rewrap.ts`(local → vault rewrap;**checkpoint + resume + dry-run** + `WHERE deleted_at IS NULL`)
+- Modify: `server/.env.example`(`KMS_MODE=vault` 选项 + `KMS_LOCAL_MASTER_KEY` 标 deprecated for production)
+- Modify: `server/src/services/consents/store.ts`(hardDelete 不变 — 但日志记 kms_version 防仍指向旧密钥)
+- Test: `server/tests/integration/kms-vault.test.ts`、`server/tests/integration/kms-rewrap.test.ts`
 
 **Approach:**
-- 阿里云 KMS:GenerateDataKey 拿 plain DEK + envelope cipher;Decrypt envelope cipher 拿回 DEK;LRU cache 保留
-- **envelope 版本字节策略**(替代 dual-write):envelope payload 第一字节 = `kms_version`(0x00 LocalKms / 0x01 AliyunKms);reader 按 byte 选 KMS;新写入直接走 0x01;rewrap 脚本扫所有 0x00 → 解密 → 0x01 重加密 → 更新 row
-- rewrap 脚本:checkpoint table + resume + dry-run;每 1000 行 commit;`WHERE deleted_at IS NULL` 防与硬删 sweep 竞态;`SELECT FOR UPDATE` 单行锁
-- RLS:`policy users_select USING (id = auth.uid())`、`policy meals_all USING (user_id = auth.uid())` 等;service-role 通过 supabase 内置角色 bypass 用于 worker
-- DevHeader 仅 NODE_ENV=test 启用,production 启动时拒绝并记日志
-- 切 Supabase JS client 工作量大:Phase 1 全部 store 都要改,但是是 mechanical refactor;tests 用 service-role + 注入 user_id 模拟 auth.uid()
+- Supabase Vault 启用:`CREATE EXTENSION IF NOT EXISTS pgsodium`;在 `vault.secrets` 写一个 `name='yanyan_envelope_master'` 的 secret(value = 64 hex 主密钥);Vault 通过 pgsodium 自动加密静态存储
+- 服务端经 service-role client `select decrypted_secret from vault.decrypted_secrets where name=...` 取明文主密钥(只在启动时 + 缓存,LRU keep 1h)
+- envelope payload 第一字节 = `kms_version`:`0x00=local-env-master / 0x01=vault-master / 0x02=aliyun-kms(Phase 3 预留)`;reader 按版本路由
+- 新 envelope 都写 0x01;rewrap 脚本扫所有 0x00 → 解密 → 0x01 重加密 → 更新 row;每 1000 行 commit;`WHERE deleted_at IS NULL` 防硬删 sweep 竞态
+- 主密钥源接口 `MasterKeySource.getMaster()` — 抽象出来让 envelope.ts 不直接知道 Vault / Local / Aliyun
 
-**Execution note:** 切 Supabase client 是 Phase 2 单 unit 最大代码改动,建议 ce-work 起步先做 1 个 store 的 spike,验证测试套件能通过后再批量重构。
+**Execution note:** Vault 主密钥取出需要 Supabase service-role client(无 raw pg 路径)。本 unit 引入 Supabase JS client 但**仅用于这一个 RPC**,不全量切 store(那是 Phase 3 工作)。
 
-**Patterns to follow:** Phase 1 envelope.ts AAD 绑定 user_id 的设计;Supabase 官方 RLS docs
+**Patterns to follow:** Phase 1 `envelope.ts` AAD 绑定 user_id 的设计;Phase 1 LRU cache pattern
 
 **Test scenarios:**
-- Happy: 阿里云 KMS encrypt → decrypt 圆环
+- Happy: 0x01 envelope encrypt → decrypt 圆环(用 vault master)
+- Happy: 0x00 旧 envelope 仍可解(LocalKms reader path)
 - Happy: rewrap 脚本 dry-run 跑通 + apply 跑通 + 全部 0x00 转 0x01;reader 都能解
 - Happy: rewrap 中途 ctrl-C → checkpoint 保留 → resume 接续不重做
-- Edge: envelope payload 第一字节 0x00 → reader 走 LocalKms;0x01 → 走 AliyunKms
+- Edge: envelope payload 第一字节 0xFF(未来未知版本)→ reader 抛 `unknown_kms_version`,**不静默 fallback**
 - Edge: rewrap 期间用户硬删 sweep 跑 → rewrap 看到 deleted_at IS NULL 跳过 → 删除 job 之后再扫一次
-- Edge: KMS 调用失败 → LRU cache 兜底,缓存 miss 报 503
-- Edge: RLS 启用后 cross-user query 返回 0 行
-- Error: dev header 在 production 启动 → 启动失败 + log
-- Integration: Phase 1 全部 187 个测试在 RLS + Supabase client 切换后仍通过(setup helper 注入 service-role + auth context)
+- Edge: Vault RPC 调用失败(network)→ LRU cache 兜底;cache miss 报 503
+- Edge: vault.secrets 表无该 secret 行 → 启动失败 + 明确错误日志
+- Integration: Phase 1 全部 221 个测试通过率 100%(envelope 升级向后兼容 0x00)
 
-**Verification:** Beta 上线前 100% RLS coverage;KMS 调用 P99 < 200ms;rewrap 脚本 dry-run + apply 双跑成功;Phase 1 全测试通过率 100%
+**Verification:** Beta 上线前主密钥不在 env(只在 Vault);所有新 envelope 0x01;rewrap 脚本两次跑均成功;无新增 RLS / store 切换工作
+
+**Deferred to Phase 3(原 U10 范围):**
+- Supabase JS client 全量切换(替换 raw `pg`)— 工作量大,Beta 不卡
+- 全表 RLS 启用 — defense-in-depth,Beta 期 JWT-at-API-layer auth + service-role-only DB 已够用
+- 阿里云 KMS 迁移 — 跟 ICP 备案 + 阿里云 ECS 迁移一起做
 
 ---
 

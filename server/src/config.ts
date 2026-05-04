@@ -47,7 +47,7 @@ const ConfigSchema = z.object({
   QWEN_VL_API_KEY: z.string().optional(),
 
   // KMS:本地 dev/test 用 LocalKmsStub;生产 PMF 后迁阿里云 KMS
-  KMS_MODE: z.enum(['local', 'aliyun']).default('local'),
+  KMS_MODE: z.enum(['local', 'vault', 'aliyun']).default('local'),
   KMS_LOCAL_MASTER_KEY: z.string().regex(/^[0-9a-f]{64}$/i, '必须是 64 位十六进制(代表 32 字节 AES-256 主密钥)').optional(),
   KMS_KEY_ID: z.string().optional()
 });
@@ -64,6 +64,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const c = parsed.data;
   if (c.KMS_MODE === 'local' && !c.KMS_LOCAL_MASTER_KEY) {
     throw new Error('KMS_MODE=local 时必须设置 KMS_LOCAL_MASTER_KEY');
+  }
+  if (c.KMS_MODE === 'vault') {
+    if (!c.SUPABASE_URL || !c.SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('KMS_MODE=vault 时必须设置 SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+    }
+    // KMS_LOCAL_MASTER_KEY 仍可保留(用于兼容 0x00 旧 envelope 的 reader);production 应清掉新 envelope 写入
   }
   if (c.KMS_MODE === 'aliyun' && !c.KMS_KEY_ID) {
     throw new Error('KMS_MODE=aliyun 时必须设置 KMS_KEY_ID');
