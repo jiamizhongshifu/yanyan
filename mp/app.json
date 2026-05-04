@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "backgroundColor": "#F7F4EE",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F7F4EE",
+    "navigationBarTitleText": "炎炎消防队",
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "default"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "renderer": "skyline"
+}
