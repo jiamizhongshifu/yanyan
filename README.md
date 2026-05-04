@@ -1,43 +1,40 @@
 # 炎炎消防队 (Yanyan)
 
-中医发物 × 次晨体感:用现代数据闭环重写中医的「食物→次日体感」系统。
+中医发物 / 上火语言的健康追踪 H5/PWA。
 
-详见:
-- [STRATEGY.md](STRATEGY.md) — 战略与定位
-- [需求文档](docs/brainstorms/2026-05-04-yanyan-tcm-inflammation-system-requirements.md) — 详细 R/F/AE
-- [实施计划](docs/plans/2026-05-04-001-feat-yanyan-h5-mvp-plan.md) — 14 单元 19-20 周 MVP
+- **Live:** [https://web-psi-topaz-58.vercel.app](https://web-psi-topaz-58.vercel.app)
+- **Strategy:** [STRATEGY.md](STRATEGY.md)
+- **Phase 1 plan:** [docs/plans/2026-05-04-001-feat-yanyan-h5-mvp-plan.md](docs/plans/2026-05-04-001-feat-yanyan-h5-mvp-plan.md)
+- **Phase 2 plan:** [docs/plans/2026-05-04-002-feat-yanyan-phase-2-plan.md](docs/plans/2026-05-04-002-feat-yanyan-phase-2-plan.md)
 
-## 仓库结构
+## 架构
+
+单 Vercel 项目,前端 + 后端同 origin:
 
 ```
-mp/                              # 微信小程序前端 (本次 U1 已搭建脚手架)
-  app.ts / app.json / app.wxss   # 小程序入口
-  pages/                         # 页面
-  components/                    # 通用组件 (待 U4-U10 填充)
-  services/                      # API 层
-  utils/                         # 通用工具
-  tests/                         # Jest 单测
-server/                          # Node.js + Fastify 后端 (待 U2)
-docs/                            # 战略 / 需求 / 计划 / ideation 文档
+web/
+├── src/             # 前端 Vite + React + Tailwind PWA
+├── server/          # 后端业务代码(Fastify routes / services / db)
+├── api/             # Vercel Serverless Functions
+│   ├── [...slug].ts # Fastify catch-all → /api/v1/*
+│   └── cron/        # Vercel Cron(每日次晨打卡推送)
+├── tests/           # 后端 Jest 测试
+├── scripts/         # 一次性 seed / 维护脚本
+├── data/            # food-seed 等静态数据
+└── public/          # 前端静态资产
 ```
 
-## 微信小程序开发(mp/)
+后端通过 Supabase Postgres / Auth / Storage / Vault;真实接入 DeepSeek(文本)+ Qwen3.6-plus(视觉)。
+
+## 本地开发
 
 ```bash
-cd mp
-npm install                # 安装依赖
-npm run typecheck          # TypeScript 校验
-npm run lint               # ESLint
-npm test                   # Jest smoke 测试
+cd web
+npm install
+npm run dev          # 前端 :5173 + 自动代理 /api/* 到 :3000
+npm run test         # 前端 vitest
+npm run test:server  # 后端 jest
+npm run build
 ```
 
-### 开发者工具导入
-1. 微信开发者工具 → 导入项目 → 选择 `mp/` 目录
-2. AppID:首次接入需在 `mp/project.config.json` 替换 `TODO_REPLACE_WITH_REAL_APPID`
-3. 后端 API:在 `mp/app.ts` 的 `apiBaseUrl` 替换 `TODO_REPLACE_WITH_REAL_API`
-
-## 当前进度
-
-- [x] U1 微信小程序基础工程脚手架(本提交)
-- [ ] U2 后端服务基础脚手架 + 数据 schema
-- [ ] U3-U13b 见 [实施计划](docs/plans/2026-05-04-001-feat-yanyan-h5-mvp-plan.md)
+部署 push 到 `main` 即触发 Vercel 自动部署。
