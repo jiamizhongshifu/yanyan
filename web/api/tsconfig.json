@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "esModuleInterop": true,
+    "isolatedModules": false,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "allowImportingTsExtensions": false
+  },
+  "include": ["**/*.ts", "../server/**/*.ts"]
+}
