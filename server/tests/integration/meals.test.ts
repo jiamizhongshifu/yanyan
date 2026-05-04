@@ -67,6 +67,9 @@ class FakeFoodClassifierStore implements FoodClassifierStore {
   async countWithCitations(): Promise<number> {
     return this.rows.size;
   }
+  async listByLabel(label: FoodClassification['tcmLabel'], limit: number): Promise<FoodClassification[]> {
+    return [...this.rows.values()].filter((c) => c.tcmLabel === label).slice(0, limit);
+  }
 }
 
 class FakeMealStore implements MealStore {

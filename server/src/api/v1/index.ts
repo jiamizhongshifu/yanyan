@@ -24,6 +24,7 @@ import { registerYanScoreRoutes, type RegisterYanScoreOptions } from './yan-scor
 import { registerHomeRoutes, type RegisterHomeOptions } from './home';
 import { registerPushRoutes, type RegisterPushOptions } from './push';
 import { registerEventsRoutes, type RegisterEventsOptions } from './events';
+import { registerRecommendRoutes, type RegisterRecommendOptions } from './recommend';
 
 export interface V1Options {
   consents?: RegisterConsentsOptions;
@@ -35,6 +36,7 @@ export interface V1Options {
   home?: RegisterHomeOptions;
   push?: RegisterPushOptions;
   events?: RegisterEventsOptions;
+  recommend?: RegisterRecommendOptions;
 }
 
 export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Promise<void> {
@@ -48,4 +50,5 @@ export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Pr
   await registerHomeRoutes(app, opts.home);
   await registerPushRoutes(app, opts.push);
   await registerEventsRoutes(app, opts.events);
+  await registerRecommendRoutes(app, opts.recommend);
 }

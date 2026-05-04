@@ -15,6 +15,7 @@
 import { useEffect, useState } from 'react';
 import { TodayFireCard } from '../components/TodayFireCard';
 import { MealHistoryList } from '../components/MealHistoryList';
+import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
 import { track } from '../services/tracker';
@@ -51,6 +52,10 @@ export function Home() {
         canDrawTrend={progress?.flags.canDrawTrend ?? false}
         cumulativeDays={progress?.cumulativeCheckinDays ?? 0}
       />
+
+      <div className="h-3" />
+
+      <TodaySuggestionCard />
 
       <div className="h-3" />
 

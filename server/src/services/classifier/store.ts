@@ -48,6 +48,8 @@ export interface FoodClassifierStore {
   count(): Promise<number>;
   /** 测试 / 报表用 */
   countWithCitations(): Promise<number>;
+  /** U13a 推荐:按 tcm_label 列出 top-N(优先有典籍引用的) */
+  listByLabel(label: TcmLabel, limit: number): Promise<FoodClassification[]>;
 }
 
 export class PgFoodClassifierStore implements FoodClassifierStore {
@@ -101,6 +103,21 @@ export class PgFoodClassifierStore implements FoodClassifierStore {
     return await withClient(async (client) => {
       const r = await client.query<{ count: string }>(`SELECT COUNT(*)::text AS count FROM food_classifications`);
       return Number(r.rows[0].count);
+    });
+  }
+
+  async listByLabel(label: TcmLabel, limit: number): Promise<FoodClassification[]> {
+    return await withClient(async (client) => {
+      const r = await client.query<RowFromDb>(
+        `SELECT id, food_canonical_name, tcm_label, tcm_property,
+                dii_score, ages_score, gi, citations, source_versions
+           FROM food_classifications
+          WHERE tcm_label = $1
+          ORDER BY jsonb_array_length(citations) DESC, food_canonical_name ASC
+          LIMIT $2`,
+        [label, limit]
+      );
+      return r.rows.map(rowToClassification);
     });
   }
 

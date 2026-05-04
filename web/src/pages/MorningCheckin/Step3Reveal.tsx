@@ -10,6 +10,7 @@ import { useLocation } from 'wouter';
 import { fetchYanScoreToday, type FireLevel } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
 import { track } from '../../services/tracker';
+import { TodaySuggestionCard } from '../../components/TodaySuggestionCard';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
@@ -141,6 +142,10 @@ export function Step3Reveal() {
           ⓘ {r.missingParts.map((p) => PART_LABELS[p]).join(' / ')} 未接入,权重已按比例重分配到其他 Part。
         </p>
       )}
+
+      <div className="mt-8">
+        <TodaySuggestionCard />
+      </div>
 
       <button
         type="button"

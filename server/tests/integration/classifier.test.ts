@@ -61,6 +61,9 @@ class FakeFoodClassifierStore implements FoodClassifierStore {
     }
     return n;
   }
+  async listByLabel(label: 'fa' | '发' | '温和' | '平' | string, limit: number) {
+    return [...this.rows.values()].filter((r) => r.tcmLabel === label).slice(0, limit);
+  }
 }
 
 const FIXTURE_PATH = join(__dirname, '..', '..', 'data', 'seed-foods', 'v1.json');
