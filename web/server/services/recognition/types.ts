@@ -7,6 +7,12 @@ export interface RecognizedItem {
   name: string;
   /** 模型自信度,0..1 */
   confidence: number;
+  /**
+   * 模型估算的本条目添加糖克数(自由糖,不含天然糖)。null = 模型不确定。
+   * 用作 fallback:当 food_classifications.findByName 命中时优先用 DB 典型值;
+   * 没命中时回落到这里,确保未入库食物也能拿到糖分估值。
+   */
+  addedSugarGEstimate?: number | null;
 }
 
 export interface RecognitionResult {

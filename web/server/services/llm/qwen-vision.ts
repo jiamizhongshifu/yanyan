@@ -28,11 +28,13 @@ const VISION_ENDPOINT = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/
 const TIMEOUT_MS = 30_000;
 const RETRY_BACKOFF_MS = [500, 1500];
 
-const SYSTEM_PROMPT = `你是中餐食物识别专家。给定一张餐桌照片,识别其中所有可见食物条目。
-输出严格 JSON,无 markdown 包装,只含一个数组 items:
+const SYSTEM_PROMPT = `你是中餐食物识别 + 添加糖估算专家。给定一张餐桌照片,识别其中所有可见食物条目,
+并对每一条估算"典型一份"的添加糖克数(自由糖,不含天然存在于水果 / 牛奶中的糖)。
+
+输出严格 JSON,无 markdown 包装:
 {
   "items": [
-    {"name": "<食物中文名,canonical>", "confidence": 0.0-1.0}
+    {"name": "<食物中文名,canonical>", "confidence": 0.0-1.0, "addedSugarG": <number|null>}
   ],
   "overallConfidence": 0.0-1.0
 }
@@ -40,8 +42,16 @@ const SYSTEM_PROMPT = `你是中餐食物识别专家。给定一张餐桌照片
 1. name 用最常见的菜名(如"清蒸鲈鱼"、"白米饭"、"麻婆豆腐"),不写品牌或厨师姓名
 2. 每个独立菜品 1 条 item;主食和菜分开识别
 3. 不可识别 / 模糊 → confidence < 0.6
-4. 整张图整体可信度 → overallConfidence
-5. 只 JSON 输出,无其他文字`;
+4. addedSugarG 估算参考(典型一份):
+   - 可乐 330ml ≈ 35,奶茶全糖大杯 ≈ 50,加糖酸奶 ≈ 12
+   - 蛋糕一份 ≈ 28,巧克力 25g ≈ 12,雪糕一支 ≈ 22,果汁 250ml ≈ 24
+   - 大部分中餐主菜(肉/菜/汤)≈ 0–3g(调味少量糖)
+   - 红烧 / 糖醋 / 拔丝类 ≈ 5–15g
+   - 主食(米饭 / 面条 / 馒头)≈ 0(碳水高但无添加糖)
+   - 真不确定 → 用 null,不要瞎猜
+5. addedSugarG 单位克(0..200 范围),不写百分比或描述
+6. 整张图整体可信度 → overallConfidence
+7. 只 JSON 输出,无其他文字`;
 
 interface ChatChoice {
   message?: { content?: string };
@@ -53,7 +63,7 @@ interface ChatResponse {
 }
 
 interface ItemsJson {
-  items?: Array<{ name?: unknown; confidence?: unknown }>;
+  items?: Array<{ name?: unknown; confidence?: unknown; addedSugarG?: unknown }>;
   overallConfidence?: unknown;
 }
 
@@ -157,7 +167,8 @@ export class QwenVisionClient implements LlmFoodRecognizer {
           .filter((it) => it && typeof it.name === 'string' && (it.name as string).trim().length > 0)
           .map((it) => ({
             name: (it.name as string).trim(),
-            confidence: clamp01(typeof it.confidence === 'number' ? it.confidence : 0.6)
+            confidence: clamp01(typeof it.confidence === 'number' ? it.confidence : 0.6),
+            addedSugarGEstimate: parseSugarG(it.addedSugarG)
           }));
 
         const overallConfidence = clamp01(
@@ -235,6 +246,16 @@ function sniffMime(buf: Buffer): string {
 function clamp01(n: number): number {
   if (Number.isNaN(n)) return 0;
   return Math.max(0, Math.min(1, n));
+}
+
+/** 解析 LLM 返回的 addedSugarG:数字截到 [0,200];null/缺失/非法 → null */
+function parseSugarG(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  const n = typeof raw === 'number' ? raw : Number(raw);
+  if (!Number.isFinite(n)) return null;
+  if (n < 0) return 0;
+  if (n > 200) return 200;
+  return Math.round(n * 10) / 10;
 }
 
 /** 工厂 — 缺 key 返回 null,上层走 DevLlmFoodRecognizer fallback */

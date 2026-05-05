@@ -39,8 +39,8 @@ describe('U8 QwenVisionClient', () => {
               message: {
                 content: JSON.stringify({
                   items: [
-                    { name: '清蒸鲈鱼', confidence: 0.92 },
-                    { name: '白米饭', confidence: 0.98 }
+                    { name: '清蒸鲈鱼', confidence: 0.92, addedSugarG: 0 },
+                    { name: '奶茶', confidence: 0.98, addedSugarG: 50 }
                   ],
                   overallConfidence: 0.95
                 })
@@ -57,7 +57,8 @@ describe('U8 QwenVisionClient', () => {
     const r = await client.recognize('users/u1/m/photo.jpg');
     expect(r).not.toBeNull();
     expect(r!.items).toHaveLength(2);
-    expect(r!.items[0]).toEqual({ name: '清蒸鲈鱼', confidence: 0.92 });
+    expect(r!.items[0]).toEqual({ name: '清蒸鲈鱼', confidence: 0.92, addedSugarGEstimate: 0 });
+    expect(r!.items[1]).toEqual({ name: '奶茶', confidence: 0.98, addedSugarGEstimate: 50 });
     expect(r!.overallConfidence).toBe(0.95);
     expect(r!.modelVersion).toBe('qwen-vl-max-latest');
     const cost = getCostSnapshot();

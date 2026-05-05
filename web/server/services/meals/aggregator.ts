@@ -55,13 +55,20 @@ export function aggregateMeal(
     if (cls) {
       counts[cls.tcmLabel]++;
       weightedSum += WEIGHTS[cls.tcmLabel];
-      if (cls.addedSugarG !== null && cls.addedSugarG !== undefined) {
-        sugarSum += cls.addedSugarG;
-        sugarSampleCount++;
-      }
     } else {
       counts.unknown++;
       unrecognizedNames.push(items[i].name);
+    }
+
+    // 糖分:DB 命中且 addedSugarG 非 null 优先;否则回落 LLM 估算(addedSugarGEstimate)
+    const dbSugar = cls?.addedSugarG;
+    const llmSugar = items[i].addedSugarGEstimate;
+    let sugarForItem: number | null = null;
+    if (dbSugar !== null && dbSugar !== undefined) sugarForItem = dbSugar;
+    else if (llmSugar !== null && llmSugar !== undefined) sugarForItem = llmSugar;
+    if (sugarForItem !== null) {
+      sugarSum += sugarForItem;
+      sugarSampleCount++;
     }
   }
 

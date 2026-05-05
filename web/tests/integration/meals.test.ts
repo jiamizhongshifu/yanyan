@@ -119,7 +119,7 @@ const FIXTURE_PATH = join(__dirname, '..', '..', 'data', 'seed-foods', 'v1.json'
 // ─── Pure fn tests ─────────────────────────────────────────────────────
 
 describe('U6 aggregator — meal fire score (Round 2 review:统一公式,非 max)', () => {
-  const fakeCls = (name: string, label: '发' | '温和' | '平'): FoodClassification => ({
+  const fakeCls = (name: string, label: '发' | '温和' | '平', addedSugarG: number | null = null): FoodClassification => ({
     id: `f-${name}`,
     foodCanonicalName: name,
     tcmLabel: label,
@@ -127,6 +127,8 @@ describe('U6 aggregator — meal fire score (Round 2 review:统一公式,非 max
     diiScore: 0,
     agesScore: 0,
     gi: null,
+    addedSugarG,
+    carbsG: null,
     citations: [],
     sourceVersions: {}
   });
@@ -183,6 +185,46 @@ describe('U6 aggregator — meal fire score (Round 2 review:统一公式,非 max
     expect(scoreToLevel(50)).toBe('中火');
     expect(scoreToLevel(74.9)).toBe('中火');
     expect(scoreToLevel(75)).toBe('大火');
+  });
+
+  test('糖分聚合:DB 命中 addedSugarG → 用 DB 值', () => {
+    const items: RecognizedItem[] = [
+      { name: '奶茶', confidence: 0.9 },
+      { name: '可乐', confidence: 0.9 }
+    ];
+    const cls = [fakeCls('奶茶', '发', 50), fakeCls('可乐', '发', 35)];
+    const a = aggregateMeal(items, cls);
+    expect(a.sugarGrams).toBe(85);
+  });
+
+  test('糖分聚合:DB 缺 addedSugarG → 回落 LLM addedSugarGEstimate', () => {
+    const items: RecognizedItem[] = [
+      { name: '某新品奶茶', confidence: 0.9, addedSugarGEstimate: 42 },
+      { name: '可乐', confidence: 0.9 }
+    ];
+    const cls = [null, fakeCls('可乐', '发', 35)];
+    const a = aggregateMeal(items, cls);
+    expect(a.sugarGrams).toBe(77);
+    expect(a.unrecognizedNames).toEqual(['某新品奶茶']);
+  });
+
+  test('糖分聚合:DB 命中但 addedSugarG=null + LLM 给值 → 用 LLM 值', () => {
+    const items: RecognizedItem[] = [
+      { name: '炒河粉', confidence: 0.9, addedSugarGEstimate: 8 }
+    ];
+    const cls = [fakeCls('炒河粉', '温和', null)];
+    const a = aggregateMeal(items, cls);
+    expect(a.sugarGrams).toBe(8);
+  });
+
+  test('糖分聚合:全部 null → sugarGrams=null', () => {
+    const items: RecognizedItem[] = [
+      { name: '神秘菜 A', confidence: 0.9 },
+      { name: '神秘菜 B', confidence: 0.9 }
+    ];
+    const cls = [fakeCls('神秘菜 A', '平', null), null];
+    const a = aggregateMeal(items, cls);
+    expect(a.sugarGrams).toBeNull();
   });
 });
 
