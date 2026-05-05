@@ -17,11 +17,13 @@ interface Props {
   todayLevel: FireLevel | null;
 }
 
+// 用 streak-* 系列(极简单色,28px 圆环里仍可辨)
+// 替代复用主仪表盘 level-* 系列(细节多,小尺寸糊)
 const LEVEL_ICON_FILE: Record<FireLevel, string> = {
-  平: 'level-ping.png',
-  微火: 'level-weihuo.png',
-  中火: 'level-zhonghuo.png',
-  大火: 'level-dahuo.png'
+  平: 'streak-ping.png',
+  微火: 'streak-weihuo.png',
+  中火: 'streak-zhonghuo.png',
+  大火: 'streak-dahuo.png'
 };
 
 export function HomeStreakStrip({ cumulativeDays, todayLevel }: Props) {

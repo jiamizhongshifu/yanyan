@@ -58,6 +58,11 @@ const ASSETS = [
   // 第七批
   { local: 'quiz-result-hero.png', remote: 'quiz-result-hero.png', contentType: 'image/png' },
   { local: 'install-banner.png', remote: 'install-banner.png', contentType: 'image/png' },
+  // 第八批:streak 条迷你等级图标(28×28 显示,144 输出)
+  { local: 'streak-ping.png', remote: 'streak-ping.png', contentType: 'image/png' },
+  { local: 'streak-weihuo.png', remote: 'streak-weihuo.png', contentType: 'image/png' },
+  { local: 'streak-zhonghuo.png', remote: 'streak-zhonghuo.png', contentType: 'image/png' },
+  { local: 'streak-dahuo.png', remote: 'streak-dahuo.png', contentType: 'image/png' },
   // 第八批:次晨打卡 3 步配图
   { local: 'checkin-blind.png', remote: 'checkin-blind.png', contentType: 'image/png' },
   { local: 'checkin-compare.png', remote: 'checkin-compare.png', contentType: 'image/png' },
