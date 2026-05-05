@@ -17,6 +17,8 @@ export interface MealRow {
   tcmLabelsSummary: { 发: number; 温和: number; 平: number; unknown: number };
   westernNutritionSummary: Record<string, unknown>;
   fireScore: number | null;
+  /** 餐级添加糖累计(g)。null 表示未估算(老数据);0 表示估算后无添加糖 */
+  sugarGrams: number | null;
   feedback: Array<{ itemName: string; kind: 'misrecognized' | 'no_reaction'; at: string }>;
   createdAt: Date;
 }
@@ -29,6 +31,7 @@ export interface CreateMealParams {
   tcmLabelsSummary: MealRow['tcmLabelsSummary'];
   westernNutritionSummary: Record<string, unknown>;
   fireScore: number;
+  sugarGrams: number | null;
 }
 
 export interface MealStore {
@@ -47,8 +50,8 @@ export class PgMealStore implements MealStore {
       const r = await client.query<{ id: string }>(
         `INSERT INTO meals
            (user_id, ate_at, photo_oss_key, recognized_items_ciphertext,
-            tcm_labels_summary, western_nutrition_summary, fire_score)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+            tcm_labels_summary, western_nutrition_summary, fire_score, sugar_grams)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
         [
           params.userId,
           params.ateAt,
@@ -56,7 +59,8 @@ export class PgMealStore implements MealStore {
           params.recognizedItemsCiphertext,
           JSON.stringify(params.tcmLabelsSummary),
           JSON.stringify(params.westernNutritionSummary),
-          params.fireScore
+          params.fireScore,
+          params.sugarGrams
         ]
       );
       return r.rows[0].id;
@@ -74,11 +78,12 @@ export class PgMealStore implements MealStore {
         tcm_labels_summary: MealRow['tcmLabelsSummary'];
         western_nutrition_summary: Record<string, unknown>;
         fire_score: string | null;
+        sugar_grams: string | null;
         feedback: MealRow['feedback'];
         created_at: Date;
       }>(
         `SELECT id, user_id, ate_at, photo_oss_key, recognized_items_ciphertext,
-                tcm_labels_summary, western_nutrition_summary, fire_score, feedback, created_at
+                tcm_labels_summary, western_nutrition_summary, fire_score, sugar_grams, feedback, created_at
            FROM meals
           WHERE id = $1 AND user_id = $2`,
         [id, userId]
@@ -94,6 +99,7 @@ export class PgMealStore implements MealStore {
         tcmLabelsSummary: row.tcm_labels_summary,
         westernNutritionSummary: row.western_nutrition_summary,
         fireScore: row.fire_score === null ? null : Number(row.fire_score),
+        sugarGrams: row.sugar_grams === null ? null : Number(row.sugar_grams),
         feedback: row.feedback,
         createdAt: row.created_at
       };
@@ -111,11 +117,12 @@ export class PgMealStore implements MealStore {
         tcm_labels_summary: MealRow['tcmLabelsSummary'];
         western_nutrition_summary: Record<string, unknown>;
         fire_score: string | null;
+        sugar_grams: string | null;
         feedback: MealRow['feedback'];
         created_at: Date;
       }>(
         `SELECT id, user_id, ate_at, photo_oss_key, recognized_items_ciphertext,
-                tcm_labels_summary, western_nutrition_summary, fire_score, feedback, created_at
+                tcm_labels_summary, western_nutrition_summary, fire_score, sugar_grams, feedback, created_at
            FROM meals
           WHERE user_id = $1 AND ate_at::date = $2
           ORDER BY ate_at ASC`,
@@ -130,6 +137,7 @@ export class PgMealStore implements MealStore {
         tcmLabelsSummary: row.tcm_labels_summary,
         westernNutritionSummary: row.western_nutrition_summary,
         fireScore: row.fire_score === null ? null : Number(row.fire_score),
+        sugarGrams: row.sugar_grams === null ? null : Number(row.sugar_grams),
         feedback: row.feedback,
         createdAt: row.created_at
       }));
@@ -147,11 +155,12 @@ export class PgMealStore implements MealStore {
         tcm_labels_summary: MealRow['tcmLabelsSummary'];
         western_nutrition_summary: Record<string, unknown>;
         fire_score: string | null;
+        sugar_grams: string | null;
         feedback: MealRow['feedback'];
         created_at: Date;
       }>(
         `SELECT id, user_id, ate_at, photo_oss_key, recognized_items_ciphertext,
-                tcm_labels_summary, western_nutrition_summary, fire_score, feedback, created_at
+                tcm_labels_summary, western_nutrition_summary, fire_score, sugar_grams, feedback, created_at
            FROM meals
           WHERE user_id = $1 AND ate_at::date >= $2 AND ate_at::date <= $3
           ORDER BY ate_at ASC`,
@@ -166,6 +175,7 @@ export class PgMealStore implements MealStore {
         tcmLabelsSummary: row.tcm_labels_summary,
         westernNutritionSummary: row.western_nutrition_summary,
         fireScore: row.fire_score === null ? null : Number(row.fire_score),
+        sugarGrams: row.sugar_grams === null ? null : Number(row.sugar_grams),
         feedback: row.feedback,
         createdAt: row.created_at
       }));

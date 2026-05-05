@@ -165,6 +165,7 @@ describe('U10 MealHistoryList', () => {
               ateAt: '2026-05-04T05:30:00Z',
               photoOssKey: null,
               fireScore: 22,
+              sugarGrams: 0,
               level: '平',
               tcmLabelsSummary: { 发: 0, 温和: 1, 平: 2, unknown: 0 }
             },
@@ -173,6 +174,7 @@ describe('U10 MealHistoryList', () => {
               ateAt: '2026-05-04T11:30:00Z',
               photoOssKey: null,
               fireScore: 60,
+              sugarGrams: 22,
               level: '中火',
               tcmLabelsSummary: { 发: 2, 温和: 1, 平: 0, unknown: 0 }
             }
@@ -236,6 +238,7 @@ describe('U10 Home 主屏', () => {
           ateAt: '2026-05-04T05:00:00Z',
           photoOssKey: null,
           fireScore: 22,
+          sugarGrams: 0,
           level: '平',
           tcmLabelsSummary: { 发: 0, 温和: 0, 平: 1, unknown: 0 }
         }

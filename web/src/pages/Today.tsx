@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
+import { fetchSugarToday, type SugarToday } from '../services/sugar';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { useWellness, todayKey } from '../store/wellness';
 import { DailyChallengesCard } from '../components/DailyChallengesCard';
@@ -29,6 +30,7 @@ export function Today() {
   const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
   const [meals, setMeals] = useState<TodayMealItem[]>([]);
   const [_progress, setProgress] = useState<UserProgress | null>(null);
+  const [sugar, setSugar] = useState<SugarToday | null>(null);
 
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };
@@ -39,14 +41,18 @@ export function Today() {
   useEffect(() => {
     let mounted = true;
     track('tab_today_visit');
-    void Promise.all([fetchYanScoreToday(), fetchHomeToday(), fetchProgress()]).then(
-      ([y, h, p]) => {
-        if (!mounted) return;
-        setYanScore(y);
-        setMeals(h?.meals ?? []);
-        setProgress(p);
-      }
-    );
+    void Promise.all([
+      fetchYanScoreToday(),
+      fetchHomeToday(),
+      fetchProgress(),
+      fetchSugarToday()
+    ]).then(([y, h, p, s]) => {
+      if (!mounted) return;
+      setYanScore(y);
+      setMeals(h?.meals ?? []);
+      setProgress(p);
+      setSugar(s);
+    });
     return () => {
       mounted = false;
     };
@@ -99,6 +105,37 @@ export function Today() {
       )}
 
       <DailyChallengesCard progresses={progresses} tier={tier} />
+
+      {/* 控糖卡片 — 今日糖摄入 + 减糖 + 月度勋章预览 */}
+      {sugar && (
+        <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="sugar-tracker">
+          <div className="flex items-baseline justify-between">
+            <p className="text-sm text-ink">🍬 控糖</p>
+            <p className="text-xs text-ink/45">基线 {sugar.baselineDailyG} g / 天</p>
+          </div>
+          <p className="mt-2">
+            <span className="text-3xl font-light text-ink">
+              {sugar.todayGrams === null ? '—' : sugar.todayGrams}
+            </span>
+            <span className="ml-1 text-sm text-ink/55">g 今日添加糖</span>
+            {sugar.todaySavedG > 0 && (
+              <span className="ml-3 text-xs text-fire-ping font-medium">
+                ✓ 减糖 {sugar.todaySavedG} g
+              </span>
+            )}
+          </p>
+          {sugar.monthlyBadges.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-3 text-sm">
+              <span className="text-xs text-ink/45 self-center">本月勋章</span>
+              {sugar.monthlyBadges.map((b) => (
+                <span key={b.kind}>
+                  {b.emoji} {b.label} ×{b.count}
+                </span>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* 喝水快速 +/- */}
       <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="water-tracker">

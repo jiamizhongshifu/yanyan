@@ -52,6 +52,7 @@ export async function registerHomeRoutes(app: FastifyInstance, opts: RegisterHom
         ateAt: m.ateAt,
         photoOssKey: m.photoOssKey,
         fireScore: m.fireScore,
+        sugarGrams: m.sugarGrams,
         level: m.fireScore !== null ? scoreToLevel(m.fireScore) : null,
         tcmLabelsSummary: m.tcmLabelsSummary
       }))

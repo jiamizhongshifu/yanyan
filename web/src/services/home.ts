@@ -11,6 +11,7 @@ export interface TodayMealItem {
   ateAt: string;
   photoOssKey: string | null;
   fireScore: number | null;
+  sugarGrams: number | null;
   level: FireLevel | null;
   tcmLabelsSummary: { 发: number; 温和: number; 平: number; unknown: number };
 }

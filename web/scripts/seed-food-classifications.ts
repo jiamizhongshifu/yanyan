@@ -57,6 +57,8 @@ interface FoodInsert {
   dii_score: number | null;
   ages_score: number | null;
   gi: number | null;
+  added_sugar_g: number | null;
+  carbs_g: number | null;
   citations: Citation[];
   source_versions: Record<string, string>;
 }
@@ -104,6 +106,8 @@ async function main(): Promise<void> {
       dii_score: f.diiScore ?? null,
       ages_score: f.agesScore ?? null,
       gi: f.gi ?? null,
+      added_sugar_g: f.addedSugarG ?? null,
+      carbs_g: f.carbsG ?? null,
       citations: f.citations,
       source_versions: { canon: 'v1-curated', humanReviewedAt: new Date().toISOString() }
     };
@@ -156,6 +160,8 @@ async function main(): Promise<void> {
             dii_score: null,
             ages_score: null,
             gi: null,
+            added_sugar_g: null,
+            carbs_g: null,
             citations: derived.citations,
             source_versions: { llmModel: derived.modelVersion }
           };

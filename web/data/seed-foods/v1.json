@@ -6,6 +6,8 @@
     "diiScore": 0.06,
     "agesScore": 9,
     "gi": 73,
+    "addedSugarG": 0,
+    "carbsG": 53,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》谷部·稻", "excerpt": "粳米...其性平,益气止泻,和胃健脾。" },
       { "source": "modern_nutrition", "reference": "USDA FoodData Central #20444" }
@@ -18,6 +20,8 @@
     "diiScore": -0.18,
     "agesScore": 11,
     "gi": 68,
+    "addedSugarG": 0,
+    "carbsG": 47,
     "citations": [
       { "source": "modern_nutrition", "reference": "USDA FoodData Central #20452" }
     ]
@@ -29,6 +33,8 @@
     "diiScore": 0.04,
     "agesScore": 6,
     "gi": 78,
+    "addedSugarG": 0,
+    "carbsG": 28,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》谷部·稻", "excerpt": "粳米煮粥,最养脾胃。" }
     ]
@@ -40,6 +46,8 @@
     "diiScore": -0.92,
     "agesScore": 23,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》鳞部·鲈", "excerpt": "鲈鱼...味甘性平,益脾胃,补肝肾。" }
     ]
@@ -51,6 +59,8 @@
     "diiScore": -2.03,
     "agesScore": 4,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 7,
     "citations": [
       { "source": "modern_nutrition", "reference": "DII 2014 (Shivappa)" }
     ]
@@ -62,6 +72,8 @@
     "diiScore": -2.21,
     "agesScore": 3,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 4,
     "citations": [
       { "source": "modern_nutrition", "reference": "DII 2014 (Shivappa)" }
     ]
@@ -73,6 +85,8 @@
     "diiScore": -0.92,
     "agesScore": 4,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 3,
     "citations": [
       { "source": "modern_nutrition", "reference": "USDA FoodData Central #11116" }
     ]
@@ -84,8 +98,10 @@
     "diiScore": -0.55,
     "agesScore": 2,
     "gi": 38,
+    "addedSugarG": 0,
+    "carbsG": 25,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #09003" }
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #09003 (天然糖,不计添加糖)" }
     ]
   },
   {
@@ -95,6 +111,8 @@
     "diiScore": -0.34,
     "agesScore": 8,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 4,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》谷部·豆腐", "excerpt": "豆腐...性凉味甘,清热润燥,生津解毒。" }
     ]
@@ -106,8 +124,10 @@
     "diiScore": -0.41,
     "agesScore": 5,
     "gi": null,
+    "addedSugarG": 5,
+    "carbsG": 13,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #16223" }
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #16223 (含糖豆浆;无糖版 0g)" }
     ]
   },
   {
@@ -117,6 +137,8 @@
     "diiScore": -0.12,
     "agesScore": 5,
     "gi": 51,
+    "addedSugarG": 0,
+    "carbsG": 27,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》菜部·薯蓣", "excerpt": "山药...味甘性平,健脾补肺,益肾固精。" }
     ]
@@ -128,6 +150,8 @@
     "diiScore": 0.16,
     "agesScore": 49,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 1,
     "citations": [
       { "source": "modern_nutrition", "reference": "USDA FoodData Central #01123" }
     ]
@@ -139,6 +163,8 @@
     "diiScore": 0.13,
     "agesScore": 22,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 2,
     "citations": [
       { "source": "modern_nutrition", "reference": "AGEs 数据库 2024" }
     ]
@@ -150,6 +176,8 @@
     "diiScore": 0.41,
     "agesScore": 38,
     "gi": 80,
+    "addedSugarG": 1,
+    "carbsG": 50,
     "citations": [
       { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:炒制 ↑AGEs" }
     ]
@@ -161,8 +189,10 @@
     "diiScore": 0.32,
     "agesScore": 28,
     "gi": null,
+    "addedSugarG": 4,
+    "carbsG": 36,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA + 中国食物成分表 2018" }
+      { "source": "modern_nutrition", "reference": "USDA + 中国食物成分表 2018(咸馅 ~4g 添加糖)" }
     ]
   },
   {
@@ -172,8 +202,10 @@
     "diiScore": -0.08,
     "agesScore": 12,
     "gi": 36,
+    "addedSugarG": 12,
+    "carbsG": 17,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #01116" }
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central #01116(典型市售加糖酸奶 ~12g 添加糖)" }
     ]
   },
   {
@@ -183,6 +215,8 @@
     "diiScore": 0.45,
     "agesScore": 41,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》兽部·牛", "excerpt": "牛肉...味甘性温,补脾胃,益气血。" }
     ]
@@ -194,6 +228,8 @@
     "diiScore": 0.18,
     "agesScore": 31,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》禽部·鸡", "excerpt": "鸡肉...温中益气,补虚填精。" }
     ]
@@ -205,6 +241,8 @@
     "diiScore": 0.55,
     "agesScore": 56,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》兽部·羊", "excerpt": "羊肉...味甘性大热,补虚劳,益气血,但多食发热动风。" }
     ]
@@ -216,9 +254,11 @@
     "diiScore": 1.12,
     "agesScore": 91,
     "gi": null,
+    "addedSugarG": 2,
+    "carbsG": 4,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》兽部·羊" },
-      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:明火烧烤 ↑↑AGEs" }
+      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:明火烧烤 ↑↑AGEs;调料含少量糖" }
     ]
   },
   {
@@ -228,6 +268,8 @@
     "diiScore": 0.31,
     "agesScore": 34,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》鳞部·虾", "excerpt": "虾...味甘性温,补肾壮阳,但发风动疾,有疮疡者忌。" }
     ]
@@ -239,6 +281,8 @@
     "diiScore": 0.28,
     "agesScore": 27,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》介部·蟹", "excerpt": "蟹...味咸性寒,散诸热,但发风疾,孕妇忌之。" }
     ]
@@ -250,6 +294,8 @@
     "diiScore": 1.85,
     "agesScore": 88,
     "gi": null,
+    "addedSugarG": 1,
+    "carbsG": 17,
     "citations": [
       { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:深炸 ↑↑↑AGEs" },
       { "source": "paper", "reference": "DII 2014 (Shivappa) — saturated fat + omega-6" }
@@ -262,6 +308,8 @@
     "diiScore": 1.41,
     "agesScore": 62,
     "gi": 75,
+    "addedSugarG": 0,
+    "carbsG": 41,
     "citations": [
       { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:深炸 ↑↑AGEs" }
     ]
@@ -273,6 +321,8 @@
     "diiScore": 1.62,
     "agesScore": 71,
     "gi": null,
+    "addedSugarG": 3,
+    "carbsG": 12,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》菜部·椒", "excerpt": "辣椒...大热,多食发火,壅气伤阴。" },
       { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:高油 + 高温" }
@@ -285,6 +335,8 @@
     "diiScore": 0.45,
     "agesScore": 6,
     "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 9,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》菜部·椒" }
     ]
@@ -296,6 +348,8 @@
     "diiScore": 1.08,
     "agesScore": 4,
     "gi": 65,
+    "addedSugarG": 25,
+    "carbsG": 25,
     "citations": [
       { "source": "paper", "reference": "DII 2014 (Shivappa) — refined sugar pro-inflammatory" }
     ]
@@ -307,8 +361,11 @@
     "diiScore": 0.92,
     "agesScore": 21,
     "gi": 55,
+    "addedSugarG": 50,
+    "carbsG": 65,
     "citations": [
-      { "source": "paper", "reference": "DII 2014:refined sugar + saturated fat" }
+      { "source": "paper", "reference": "DII 2014:refined sugar + saturated fat" },
+      { "source": "modern_nutrition", "reference": "中国营养学会 2023:全糖大杯 ~50g 添加糖" }
     ]
   },
   {
@@ -318,6 +375,8 @@
     "diiScore": -0.82,
     "agesScore": 1,
     "gi": 72,
+    "addedSugarG": 0,
+    "carbsG": 18,
     "citations": [
       { "source": "canon", "reference": "《本草纲目》果部·瓜", "excerpt": "西瓜...味甘性寒,清热解暑,但脾胃虚寒者忌多食。" }
     ]
@@ -329,8 +388,76 @@
     "diiScore": -0.73,
     "agesScore": 9,
     "gi": 55,
+    "addedSugarG": 0,
+    "carbsG": 27,
     "citations": [
       { "source": "modern_nutrition", "reference": "USDA FoodData Central #20137" }
+    ]
+  },
+  {
+    "foodCanonicalName": "可乐",
+    "tcmLabel": "发",
+    "tcmProperty": "凉",
+    "diiScore": 1.32,
+    "agesScore": 1,
+    "gi": 63,
+    "addedSugarG": 35,
+    "carbsG": 35,
+    "citations": [
+      { "source": "paper", "reference": "DII 2014:含糖饮料强促炎(SSB)" },
+      { "source": "modern_nutrition", "reference": "USDA #14400(330ml 可乐 ~35g 添加糖)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "巧克力",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.51,
+    "agesScore": 18,
+    "gi": 49,
+    "addedSugarG": 12,
+    "carbsG": 22,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA #19120(典型奶巧克力 25g 一块 ~12g 添加糖)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "蛋糕",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.85,
+    "agesScore": 31,
+    "gi": 67,
+    "addedSugarG": 28,
+    "carbsG": 50,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA #18154 — 奶油蛋糕 100g ~28g 添加糖" }
+    ]
+  },
+  {
+    "foodCanonicalName": "雪糕",
+    "tcmLabel": "发",
+    "tcmProperty": "寒",
+    "diiScore": 0.74,
+    "agesScore": 9,
+    "gi": 51,
+    "addedSugarG": 22,
+    "carbsG": 30,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA #19090 — 香草冰淇淋 ~22g 添加糖" }
+    ]
+  },
+  {
+    "foodCanonicalName": "果汁",
+    "tcmLabel": "温和",
+    "tcmProperty": "凉",
+    "diiScore": 0.42,
+    "agesScore": 1,
+    "gi": 50,
+    "addedSugarG": 24,
+    "carbsG": 27,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国营养学会 2023:市售果汁 ~24g 添加糖/250ml" }
     ]
   }
 ]

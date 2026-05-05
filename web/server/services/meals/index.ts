@@ -35,6 +35,8 @@ export interface CreateMealResult {
   mealId: string;
   fireScore: number;
   level: FireLevel;
+  /** 餐级添加糖估算(g),null = 未估算 */
+  sugarGrams: number | null;
   items: Array<{
     name: string;
     confidence: number;
@@ -104,7 +106,8 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
     recognizedItemsCiphertext: ciphertext,
     tcmLabelsSummary: summaryFromCounts(agg.counts),
     westernNutritionSummary: western,
-    fireScore: agg.fireScore
+    fireScore: agg.fireScore,
+    sugarGrams: agg.sugarGrams
   });
 
   return {
@@ -113,6 +116,7 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
       mealId,
       fireScore: agg.fireScore,
       level: agg.level,
+      sugarGrams: agg.sugarGrams,
       items: recognition.items.map((it, i) => ({
         name: it.name,
         confidence: it.confidence,

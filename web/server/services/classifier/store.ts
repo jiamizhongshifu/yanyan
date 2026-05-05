@@ -13,6 +13,8 @@ interface RowFromDb {
   dii_score: string | null;
   ages_score: string | null;
   gi: string | null;
+  added_sugar_g: string | null;
+  carbs_g: string | null;
   citations: Citation[];
   source_versions: Record<string, unknown>;
 }
@@ -26,6 +28,8 @@ function rowToClassification(r: RowFromDb): FoodClassification {
     diiScore: r.dii_score === null ? null : Number(r.dii_score),
     agesScore: r.ages_score === null ? null : Number(r.ages_score),
     gi: r.gi === null ? null : Number(r.gi),
+    addedSugarG: r.added_sugar_g === null ? null : Number(r.added_sugar_g),
+    carbsG: r.carbs_g === null ? null : Number(r.carbs_g),
     citations: r.citations,
     sourceVersions: r.source_versions
   };
@@ -38,6 +42,8 @@ export interface UpsertParams {
   diiScore?: number | null;
   agesScore?: number | null;
   gi?: number | null;
+  addedSugarG?: number | null;
+  carbsG?: number | null;
   citations: Citation[];
   sourceVersions: Record<string, unknown>;
 }
@@ -57,7 +63,7 @@ export class PgFoodClassifierStore implements FoodClassifierStore {
     return await withClient(async (client) => {
       const r = await client.query<RowFromDb>(
         `SELECT id, food_canonical_name, tcm_label, tcm_property,
-                dii_score, ages_score, gi, citations, source_versions
+                dii_score, ages_score, gi, added_sugar_g, carbs_g, citations, source_versions
            FROM food_classifications
           WHERE food_canonical_name = $1`,
         [name]
@@ -71,19 +77,23 @@ export class PgFoodClassifierStore implements FoodClassifierStore {
     return await withClient(async (client) => {
       const r = await client.query<RowFromDb>(
         `INSERT INTO food_classifications
-           (food_canonical_name, tcm_label, tcm_property, dii_score, ages_score, gi, citations, source_versions)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           (food_canonical_name, tcm_label, tcm_property, dii_score, ages_score, gi,
+            added_sugar_g, carbs_g, citations, source_versions)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
          ON CONFLICT (food_canonical_name) DO UPDATE SET
            tcm_label = EXCLUDED.tcm_label,
            tcm_property = EXCLUDED.tcm_property,
            dii_score = EXCLUDED.dii_score,
            ages_score = EXCLUDED.ages_score,
            gi = EXCLUDED.gi,
+           added_sugar_g = EXCLUDED.added_sugar_g,
+           carbs_g = EXCLUDED.carbs_g,
            citations = EXCLUDED.citations,
            source_versions = EXCLUDED.source_versions,
            updated_at = now()
          RETURNING id, food_canonical_name, tcm_label, tcm_property,
-                   dii_score, ages_score, gi, citations, source_versions`,
+                   dii_score, ages_score, gi, added_sugar_g, carbs_g,
+                   citations, source_versions`,
         [
           params.foodCanonicalName,
           params.tcmLabel,
@@ -91,6 +101,8 @@ export class PgFoodClassifierStore implements FoodClassifierStore {
           params.diiScore ?? null,
           params.agesScore ?? null,
           params.gi ?? null,
+          params.addedSugarG ?? null,
+          params.carbsG ?? null,
           JSON.stringify(params.citations),
           JSON.stringify(params.sourceVersions)
         ]
@@ -110,7 +122,8 @@ export class PgFoodClassifierStore implements FoodClassifierStore {
     return await withClient(async (client) => {
       const r = await client.query<RowFromDb>(
         `SELECT id, food_canonical_name, tcm_label, tcm_property,
-                dii_score, ages_score, gi, citations, source_versions
+                dii_score, ages_score, gi, added_sugar_g, carbs_g,
+                citations, source_versions
            FROM food_classifications
           WHERE tcm_label = $1
           ORDER BY jsonb_array_length(citations) DESC, food_canonical_name ASC

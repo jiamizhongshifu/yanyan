@@ -27,6 +27,11 @@ export interface MealAggregate {
   counts: Record<TcmLabel | 'unknown', number>;
   /** 在 food_classifications 中查不到的食物名 */
   unrecognizedNames: string[];
+  /**
+   * 餐级添加糖累计(g)。Σ items.addedSugarG(缺失计 0)。
+   * 当所有 item 的 addedSugarG 都为 null 时返回 null,表示"未估算"而非 0g。
+   */
+  sugarGrams: number | null;
 }
 
 const WEIGHTS: Record<TcmLabel, number> = { 发: 5, 温和: 2, 平: 0 };
@@ -38,6 +43,8 @@ export function aggregateMeal(
   const counts: Record<TcmLabel | 'unknown', number> = { 发: 0, 温和: 0, 平: 0, unknown: 0 };
   const unrecognizedNames: string[] = [];
   let weightedSum = 0;
+  let sugarSum = 0;
+  let sugarSampleCount = 0;
 
   if (items.length !== classifications.length) {
     throw new Error('aggregateMeal: items 与 classifications 长度不一致');
@@ -48,18 +55,23 @@ export function aggregateMeal(
     if (cls) {
       counts[cls.tcmLabel]++;
       weightedSum += WEIGHTS[cls.tcmLabel];
+      if (cls.addedSugarG !== null && cls.addedSugarG !== undefined) {
+        sugarSum += cls.addedSugarG;
+        sugarSampleCount++;
+      }
     } else {
       counts.unknown++;
       unrecognizedNames.push(items[i].name);
-      // unknown 视为权重 0(平),保守
     }
   }
 
   const N = items.length;
   const fireScore = N === 0 ? 0 : (weightedSum / (N * 5)) * 100;
   const level = scoreToLevel(fireScore);
+  // 至少有 1 项命中糖分数据 → 返回 sum;全部 null → null(无估算)
+  const sugarGrams = sugarSampleCount > 0 ? Math.round(sugarSum * 10) / 10 : null;
 
-  return { fireScore: Math.round(fireScore * 10) / 10, level, counts, unrecognizedNames };
+  return { fireScore: Math.round(fireScore * 10) / 10, level, counts, unrecognizedNames, sugarGrams };
 }
 
 export function scoreToLevel(score: number): FireLevel {

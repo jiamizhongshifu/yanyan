@@ -26,6 +26,7 @@ import { registerPushRoutes, type RegisterPushOptions } from './push';
 import { registerEventsRoutes, type RegisterEventsOptions } from './events';
 import { registerRecommendRoutes, type RegisterRecommendOptions } from './recommend';
 import { registerProfileRoutes, type RegisterProfileOptions } from './profile';
+import { registerSugarRoutes, type RegisterSugarOptions } from './sugar';
 
 export interface V1Options {
   consents?: RegisterConsentsOptions;
@@ -39,6 +40,7 @@ export interface V1Options {
   events?: RegisterEventsOptions;
   recommend?: RegisterRecommendOptions;
   profile?: RegisterProfileOptions;
+  sugar?: RegisterSugarOptions;
 }
 
 export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Promise<void> {
@@ -54,4 +56,5 @@ export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Pr
   await registerEventsRoutes(app, opts.events);
   await registerRecommendRoutes(app, opts.recommend);
   await registerProfileRoutes(app, opts.profile);
+  await registerSugarRoutes(app, opts.sugar);
 }

@@ -47,6 +47,8 @@ export async function seedFromFixture(deps: SeedDeps, fixture: FoodSeed[]): Prom
         diiScore: seed.diiScore ?? null,
         agesScore: seed.agesScore ?? null,
         gi: seed.gi ?? null,
+        addedSugarG: seed.addedSugarG ?? null,
+        carbsG: seed.carbsG ?? null,
         citations: seed.citations,
         sourceVersions: { canon: 'v1-curated', humanReviewedAt: new Date().toISOString() }
       });

@@ -12,6 +12,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
+import { fetchSugarToday, type SugarToday } from '../services/sugar';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { useWellness, todayKey } from '../store/wellness';
 import { MonthCalendarGrid } from '../components/MonthCalendarGrid';
@@ -22,6 +23,7 @@ export function Insights() {
   const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
   const [meals, setMeals] = useState<TodayMealItem[]>([]);
   const [progress, setProgress] = useState<UserProgress | null>(null);
+  const [sugar, setSugar] = useState<SugarToday | null>(null);
 
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };
@@ -29,11 +31,17 @@ export function Insights() {
   useEffect(() => {
     let mounted = true;
     track('tab_insights_visit');
-    void Promise.all([fetchYanScoreToday(), fetchHomeToday(), fetchProgress()]).then(([y, h, p]) => {
+    void Promise.all([
+      fetchYanScoreToday(),
+      fetchHomeToday(),
+      fetchProgress(),
+      fetchSugarToday()
+    ]).then(([y, h, p, s]) => {
       if (!mounted) return;
       setYanScore(y);
       setMeals(h?.meals ?? []);
       setProgress(p);
+      setSugar(s);
     });
     return () => {
       mounted = false;
@@ -77,12 +85,20 @@ export function Insights() {
         perfect={perfect}
         great={great}
         nice={nice}
-        sugarBadges={[]}
+        sugarBadges={(sugar?.monthlyBadges ?? []).map((b) => ({
+          emoji: b.emoji,
+          label: b.label,
+          count: b.count
+        }))}
       />
 
-      <p className="mt-3 mb-4 text-[11px] text-ink/40 leading-relaxed">
-        控糖勋章(🍭 1 棒棒糖 = 减糖 6 g · 🥤 1 可乐 = 35 g · 🧋 1 奶茶 = 50 g)将在拍餐糖分识别上线后自动入瓶。
-      </p>
+      {sugar && (
+        <p className="mt-3 mb-4 text-[11px] text-ink/45 leading-relaxed">
+          本月相比基线({sugar.baselineDailyG} g/天)累计减糖 <span className="text-ink font-medium">{sugar.monthSavedG} g</span>
+          {' · '}今日{sugar.todayGrams === null ? '尚无餐照' : `已摄入 ${sugar.todayGrams} g`}
+          {sugar.todaySavedG > 0 && ` · 今日减糖 ${sugar.todaySavedG} g`}
+        </p>
+      )}
 
       <section className="mt-6 rounded-3xl bg-white px-5 py-5">
         <h2 className="mb-1 text-base font-medium text-ink">日历视图</h2>

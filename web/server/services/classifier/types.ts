@@ -34,6 +34,10 @@ export interface FoodClassification {
   diiScore: number | null;
   agesScore: number | null; // kU/serving
   gi: number | null;
+  /** 典型一份的添加糖克数(自由糖,不含天然存在于水果牛奶中的糖)。null = 未标注 */
+  addedSugarG: number | null;
+  /** 典型一份的碳水化合物克数 */
+  carbsG: number | null;
   // 引用 + 版本
   citations: Citation[];
   sourceVersions: {
@@ -51,5 +55,7 @@ export interface FoodSeed {
   diiScore?: number;
   agesScore?: number;
   gi?: number;
+  addedSugarG?: number;
+  carbsG?: number;
   citations: Citation[];
 }
