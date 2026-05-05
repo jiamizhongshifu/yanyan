@@ -160,8 +160,8 @@ async function main(): Promise<void> {
             dii_score: null,
             ages_score: null,
             gi: null,
-            added_sugar_g: null,
-            carbs_g: null,
+            added_sugar_g: derived.addedSugarG ?? null,
+            carbs_g: derived.carbsG ?? null,
             citations: derived.citations,
             source_versions: { llmModel: derived.modelVersion }
           };

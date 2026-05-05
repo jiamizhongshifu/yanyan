@@ -227,6 +227,48 @@ describe('U8 RealLlmDeriver', () => {
     expect(await d.derive('虾')).toBeNull();
   });
 
+  test('LLM 返回 addedSugarG / carbsG → 透出到 derivation,缺失 → null', async () => {
+    const client = makeClient(
+      JSON.stringify({
+        tcmLabel: '发',
+        tcmProperty: '温',
+        citations: [{ source: 'canon', reference: 'x' }],
+        confidence: 0.85,
+        addedSugarG: 50,
+        carbsG: 65
+      })
+    );
+    const r1 = await new RealLlmDeriver(client).derive('某新品奶茶');
+    expect(r1!.addedSugarG).toBe(50);
+    expect(r1!.carbsG).toBe(65);
+
+    const noSugarClient = makeClient(
+      JSON.stringify({
+        tcmLabel: '平',
+        tcmProperty: '平',
+        citations: [{ source: 'canon', reference: 'x' }],
+        confidence: 0.7
+      })
+    );
+    const r2 = await new RealLlmDeriver(noSugarClient).derive('白米饭');
+    expect(r2!.addedSugarG).toBeNull();
+    expect(r2!.carbsG).toBeNull();
+
+    const overflowClient = makeClient(
+      JSON.stringify({
+        tcmLabel: '发',
+        tcmProperty: '热',
+        citations: [{ source: 'canon', reference: 'x' }],
+        confidence: 0.8,
+        addedSugarG: 9999,
+        carbsG: -10
+      })
+    );
+    const r3 = await new RealLlmDeriver(overflowClient).derive('糖浆');
+    expect(r3!.addedSugarG).toBe(200); // clamped
+    expect(r3!.carbsG).toBe(0); // negative → 0
+  });
+
   test('空食物名 → 返回 null,不调 client', async () => {
     let called = 0;
     const client: LlmTextClient = {

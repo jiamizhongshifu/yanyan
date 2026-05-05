@@ -10,14 +10,29 @@ import { useMemo } from 'react';
 import { asset } from '../services/assets';
 import type { FireLevel } from '../services/symptoms';
 
+interface DayInfo {
+  date: string; // YYYY-MM-DD
+  tier: 'perfect' | 'great' | 'nice' | 'none';
+  fireLevel: FireLevel | null;
+}
+
 interface Props {
-  /** 当月内已打卡的累计天数(模糊估算) */
+  /** 当月内已打卡的累计天数(粗略 fallback,在 server 历史拿到前用) */
   cumulativeInMonth: number;
   /** 今日等级,用于高亮今天 */
   todayLevel: FireLevel | null;
   /** 月份基准日期(默认今天) */
   monthBase?: Date;
+  /** 来自 server 的当月每日挑战快照 — 优先用这个着色 */
+  daysHistory?: DayInfo[];
 }
+
+const TIER_COLOR: Record<DayInfo['tier'], string> = {
+  perfect: 'bg-fire-mild/70',
+  great: 'bg-fire-ping/45',
+  nice: 'bg-ink/20',
+  none: 'bg-ink/10'
+};
 
 const LEVEL_ICON_FILE: Record<FireLevel, string> = {
   平: 'level-ping.png',
@@ -26,7 +41,8 @@ const LEVEL_ICON_FILE: Record<FireLevel, string> = {
   大火: 'level-dahuo.png'
 };
 
-export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = new Date() }: Props) {
+export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = new Date(), daysHistory }: Props) {
+  const historyByDate = new Map((daysHistory ?? []).map((d) => [d.date, d]));
   const cells = useMemo(() => {
     const year = monthBase.getFullYear();
     const month = monthBase.getMonth();
@@ -69,7 +85,10 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
       <div className="grid grid-cols-7 gap-y-3 gap-x-1">
         {cells.map((c, i) => {
           if (c.day === null) return <div key={i} />;
-          const showTodayLevel = c.isToday && todayLevel !== null;
+          const dateStr = `${monthBase.getFullYear()}-${String(monthBase.getMonth() + 1).padStart(2, '0')}-${String(c.day).padStart(2, '0')}`;
+          const hist = historyByDate.get(dateStr);
+          const showTodayLevel = c.isToday && (hist?.fireLevel ?? todayLevel) !== null;
+          const todayDisplayLevel = hist?.fireLevel ?? todayLevel;
           const isChecked = checkedDays.has(c.day);
           return (
             <div key={i} className="flex flex-col items-center gap-1">
@@ -85,11 +104,16 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
                   c.isToday ? 'bg-ink/95' : 'bg-transparent'
                 }`}
               >
-                {showTodayLevel ? (
+                {showTodayLevel && todayDisplayLevel ? (
                   <img
-                    src={asset(LEVEL_ICON_FILE[todayLevel!])}
-                    alt={todayLevel ?? ''}
+                    src={asset(LEVEL_ICON_FILE[todayDisplayLevel])}
+                    alt={todayDisplayLevel}
                     className="w-7 h-7 object-contain"
+                  />
+                ) : hist && hist.tier !== 'none' ? (
+                  <div
+                    className={`w-7 h-7 rounded-full ${TIER_COLOR[hist.tier]}`}
+                    title={hist.tier}
                   />
                 ) : isChecked ? (
                   <div className="w-7 h-7 rounded-full bg-ink/15" />

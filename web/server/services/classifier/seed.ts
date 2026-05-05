@@ -92,6 +92,8 @@ export async function seedWithLlmDerivation(deps: SeedDeps, foodNames: string[])
         foodCanonicalName: name,
         tcmLabel: derived.tcmLabel,
         tcmProperty: derived.tcmProperty,
+        addedSugarG: derived.addedSugarG ?? null,
+        carbsG: derived.carbsG ?? null,
         citations: derived.citations,
         sourceVersions: { llmModel: derived.modelVersion }
       });

@@ -7,12 +7,13 @@
  *   - 本地 wellness     → 喝水(挑战 3) + 步数(挑战 5)
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
 import { fetchSugarToday, type SugarToday } from '../services/sugar';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
+import { upsertTodayChallenges } from '../services/dailyChallenges';
 import { useWellness, todayKey } from '../store/wellness';
 import { DailyChallengesCard } from '../components/DailyChallengesCard';
 import { InappRemindersBanner } from '../components/InappRemindersBanner';
@@ -65,6 +66,28 @@ export function Today() {
     steps: dayEntry.steps
   });
   const tier = tierForDay(progresses);
+
+  // 节流上报当日挑战快照(防抖 1.5s):任一挑战值变化 → upsert /users/me/challenges/today
+  const completedKeys = progresses.filter((p) => p.done).map((p) => p.key);
+  const completedCount = completedKeys.length;
+  const upsertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (upsertTimerRef.current) clearTimeout(upsertTimerRef.current);
+    upsertTimerRef.current = setTimeout(() => {
+      void upsertTodayChallenges({
+        date: dateKey,
+        tier,
+        completedCount,
+        completedKeys,
+        fireLevel: yanScore?.result?.level ?? null
+      });
+    }, 1500);
+    return () => {
+      if (upsertTimerRef.current) clearTimeout(upsertTimerRef.current);
+    };
+    // 依赖:tier + completedCount + completedKeys.join + fireLevel + dateKey
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateKey, tier, completedCount, completedKeys.join('|'), yanScore?.result?.level]);
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28" data-testid="today">

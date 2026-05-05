@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
 import { fetchSugarToday, type SugarToday } from '../services/sugar';
+import { fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { useWellness, todayKey } from '../store/wellness';
 import { MonthCalendarGrid } from '../components/MonthCalendarGrid';
@@ -24,6 +25,7 @@ export function Insights() {
   const [meals, setMeals] = useState<TodayMealItem[]>([]);
   const [progress, setProgress] = useState<UserProgress | null>(null);
   const [sugar, setSugar] = useState<SugarToday | null>(null);
+  const [monthCh, setMonthCh] = useState<MonthChallenges | null>(null);
 
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };
@@ -35,13 +37,15 @@ export function Insights() {
       fetchYanScoreToday(),
       fetchHomeToday(),
       fetchProgress(),
-      fetchSugarToday()
-    ]).then(([y, h, p, s]) => {
+      fetchSugarToday(),
+      fetchMonthChallenges()
+    ]).then(([y, h, p, s, m]) => {
       if (!mounted) return;
       setYanScore(y);
       setMeals(h?.meals ?? []);
       setProgress(p);
       setSugar(s);
+      setMonthCh(m);
     });
     return () => {
       mounted = false;
@@ -65,10 +69,18 @@ export function Insights() {
     []
   );
 
-  // 今日 tier 计入本月(server 端历史接入前的占位估算)
-  const perfect = todayTier === 'perfect' ? 1 : 0;
-  const great = todayTier === 'great' ? 1 : 0;
-  const nice = todayTier === 'nice' ? 1 : 0;
+  // 月度计数:优先用 server 累积值;若 server 还没今日记录,把当下计算出的 tier 暂叠加(防双计:server 已有今日记录则不再叠)
+  const todayInServer = monthCh?.days.some((d) => d.date === dateKey) ?? false;
+  const addToday = todayInServer
+    ? { perfect: 0, great: 0, nice: 0 }
+    : {
+        perfect: todayTier === 'perfect' ? 1 : 0,
+        great: todayTier === 'great' ? 1 : 0,
+        nice: todayTier === 'nice' ? 1 : 0
+      };
+  const perfect = (monthCh?.perfect ?? 0) + addToday.perfect;
+  const great = (monthCh?.great ?? 0) + addToday.great;
+  const nice = (monthCh?.nice ?? 0) + addToday.nice;
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28" data-testid="insights">
@@ -106,6 +118,11 @@ export function Insights() {
         <MonthCalendarGrid
           cumulativeInMonth={Math.min(cumulativeDays, 31)}
           todayLevel={yanScore?.result?.level ?? null}
+          daysHistory={(monthCh?.days ?? []).map((d) => ({
+            date: d.date,
+            tier: d.tier,
+            fireLevel: d.fireLevel
+          }))}
         />
       </section>
 

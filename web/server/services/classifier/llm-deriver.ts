@@ -20,6 +20,10 @@ export interface LlmDerivation {
   /** 模型自报的置信度,< 0.6 视为低置信,需要人工 review 才入库 */
   confidence: number;
   modelVersion: string;
+  /** 典型一份的添加糖克数(自由糖)。null = 模型不确定,入库时也写 null,不强行 0 */
+  addedSugarG?: number | null;
+  /** 典型一份的碳水克数 */
+  carbsG?: number | null;
 }
 
 export interface LlmDeriver {
@@ -50,33 +54,40 @@ export class DevLlmDeriver implements LlmDeriver {
  *   - 至少 1 条 citation(典籍引用 — source/reference)
  *   - 不确定时低 confidence,U5 流程会进人工 review 不直接入库(R33)
  */
-const DERIVE_SYSTEM_PROMPT = `你是中医食物分类专家。给定一个食物的中文名,你必须输出严格 JSON。
+const DERIVE_SYSTEM_PROMPT = `你是中医食物分类 + 添加糖估算专家。给定一个食物的中文名,你必须输出严格 JSON。
 
 输出 JSON schema(每个字段值必须严格在指定 enum 内):
 {
   "tcmLabel": "发" | "温和" | "平",   // 必须是这三个汉字之一
   "tcmProperty": "寒" | "凉" | "平" | "温" | "热",  // 必须是这五个汉字之一,**单个汉字**,不带任何修饰词
   "citations": [{"source": "canon", "reference": "典籍名"}],  // source 只能是 canon/paper/modern_nutrition;reference 是简短名称
-  "confidence": 0.0-1.0   // 数字
+  "confidence": 0.0-1.0,   // 数字
+  "addedSugarG": <number|null>,  // 典型一份的添加糖克数(自由糖,不含天然糖);真不确定 → null
+  "carbsG": <number|null>         // 典型一份的碳水化合物克数;真不确定 → null
 }
 
 字段定义:
 - tcmLabel = 发物分类。"发"=刺激性 / 海鲜 / 辣 / 油炸;"温和"=辛温补益;"平"=主食 / 平和清淡。**必须从这三个值中选一个**,不能写"凉"或"寒"等寒热属性词。
 - tcmProperty = 寒热属性。**必须只写一个汉字**(寒/凉/平/温/热),不要写"性凉"也不要写"味甘性凉"或"归肺经"等长描述。
+- addedSugarG = 这个食物典型一份的添加糖克数(0..200)。参考:可乐 330ml ≈ 35,奶茶全糖大杯 ≈ 50,加糖酸奶 ≈ 12,蛋糕一份 ≈ 28,巧克力 25g ≈ 12,雪糕一支 ≈ 22,果汁 250ml ≈ 24。绝大多数主菜 / 主食 / 蔬菜 / 肉类 = 0;红烧 / 糖醋 / 拔丝类 = 5–15。真不确定时填 null,不要瞎猜。
+- carbsG = 典型一份的总碳水克数(包含天然糖和淀粉)。米饭 ≈ 50,馒头 ≈ 35,面条 ≈ 60,水果 = 自然糖含量。
 
 正例(原样照写):
 食物:海带
-{"tcmLabel":"平","tcmProperty":"凉","citations":[{"source":"canon","reference":"《本草纲目》海菜部"}],"confidence":0.85}
+{"tcmLabel":"平","tcmProperty":"凉","citations":[{"source":"canon","reference":"《本草纲目》海菜部"}],"confidence":0.85,"addedSugarG":0,"carbsG":7}
 
 食物:饺子
-{"tcmLabel":"平","tcmProperty":"温","citations":[{"source":"canon","reference":"《饮膳正要》"}],"confidence":0.75}
+{"tcmLabel":"平","tcmProperty":"温","citations":[{"source":"canon","reference":"《饮膳正要》"}],"confidence":0.75,"addedSugarG":1,"carbsG":35}
 
 食物:虾
-{"tcmLabel":"发","tcmProperty":"温","citations":[{"source":"canon","reference":"《本草纲目》"}],"confidence":0.9}
+{"tcmLabel":"发","tcmProperty":"温","citations":[{"source":"canon","reference":"《本草纲目》"}],"confidence":0.9,"addedSugarG":0,"carbsG":0}
+
+食物:糖醋里脊
+{"tcmLabel":"温和","tcmProperty":"温","citations":[{"source":"canon","reference":"《随园食单》"}],"confidence":0.8,"addedSugarG":15,"carbsG":25}
 
 要求:
 1. citations 至少 1 条
-2. 不确定时 confidence < 0.6
+2. 不确定时 confidence < 0.6;addedSugarG/carbsG 不确定时填 null
 3. 只输出 JSON,无任何文字 / markdown / 解释 / 代码块`;
 
 const TCM_LABELS_SET = new Set(['发', '温和', '平']);
@@ -87,6 +98,17 @@ interface DeriveJsonShape {
   tcmProperty?: string;
   citations?: Array<{ source?: string; reference?: string; excerpt?: string }>;
   confidence?: number;
+  addedSugarG?: unknown;
+  carbsG?: unknown;
+}
+
+function parseGrams(raw: unknown, max = 500): number | null {
+  if (raw === null || raw === undefined) return null;
+  const n = typeof raw === 'number' ? raw : Number(raw);
+  if (!Number.isFinite(n)) return null;
+  if (n < 0) return 0;
+  if (n > max) return max;
+  return Math.round(n * 10) / 10;
 }
 
 function tryParseJson(content: string): DeriveJsonShape | null {
@@ -146,6 +168,9 @@ export class RealLlmDeriver implements LlmDeriver {
           reference: c.reference!,
           ...(c.excerpt ? { excerpt: c.excerpt } : {})
         }));
+      const addedSugarG = parseGrams(json.addedSugarG, 200);
+      const carbsG = parseGrams(json.carbsG, 500);
+
       if (citations.length === 0) {
         // 缺典籍引用 → 强制进人工 review(置信度封顶 0.5)
         return {
@@ -153,12 +178,22 @@ export class RealLlmDeriver implements LlmDeriver {
           tcmProperty,
           citations: [],
           confidence: Math.min(0.5, json.confidence ?? 0.4),
-          modelVersion: this.client.modelVersion
+          modelVersion: this.client.modelVersion,
+          addedSugarG,
+          carbsG
         };
       }
 
       const confidence = clamp01(json.confidence ?? 0.7);
-      return { tcmLabel, tcmProperty, citations, confidence, modelVersion: this.client.modelVersion };
+      return {
+        tcmLabel,
+        tcmProperty,
+        citations,
+        confidence,
+        modelVersion: this.client.modelVersion,
+        addedSugarG,
+        carbsG
+      };
     } catch (err) {
       // LlmCallError 或其他 — 统一返回 null,上层走 backfill 队列
       if (err instanceof LlmCallError) {
