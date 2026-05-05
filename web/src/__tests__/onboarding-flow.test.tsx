@@ -51,6 +51,10 @@ beforeEach(() => {
   onAuthStateChangeListeners.length = 0;
   supabaseMockState.session = { access_token: 'fake-jwt', user: { id: 'auth-uuid-1' } };
   useOnboarding.getState().reset();
+  // Step3 进页面会校验 PRIVACY_AGREED_KEY,这里默认设为已同意(模拟登录前已同意)
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('yanyan.privacy.agreed.v1', 'true');
+  }
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (url: string | URL | Request, init?: RequestInit) => {
     const urlStr = typeof url === 'string' ? url : url.toString();
     if (urlStr.includes('/consents/required')) {
@@ -134,7 +138,7 @@ describe('U4 redo Step 3', () => {
     useOnboarding.getState().setReverseFilterChoice('rhinitis');
     render(<Step3BaselineConsent />);
 
-    fireEvent.click(screen.getByText(/我已阅读并同意/));
+    fireEvent.click(screen.getByText(/建立 baseline/));
 
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step4'));
 
@@ -150,7 +154,7 @@ describe('U4 redo Step 3', () => {
   test('Step 1 缺失 reverseFilterChoice → submit errorMessage,不发 ensure', async () => {
     useOnboarding.getState().setReverseFilterChoice(null as unknown as 'rhinitis');
     render(<Step3BaselineConsent />);
-    fireEvent.click(screen.getByText(/我已阅读并同意/));
+    fireEvent.click(screen.getByText(/建立 baseline/));
     expect(await screen.findByRole('alert')).toHaveTextContent(/Step 1/);
   });
 
@@ -169,7 +173,7 @@ describe('U4 redo Step 3', () => {
     });
 
     render(<Step3BaselineConsent />);
-    fireEvent.click(screen.getByText(/我已阅读并同意/));
+    fireEvent.click(screen.getByText(/建立 baseline/));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/账号初始化失败/);
     expect(navigateMock).not.toHaveBeenCalled();
@@ -193,9 +197,21 @@ describe('U4 redo Login', () => {
     return waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step1'));
   });
 
-  test('未登录 + 提交无效邮箱 → errorMessage,不调 signInWithOtp', async () => {
+  test('未勾隐私同意 → 提交按钮 disabled,不调 signInWithOtp', () => {
     supabaseMockState.session = null;
+    localStorage.removeItem('yanyan.privacy.agreed.v1');
     render(<Login />);
+    const submit = screen.getByText(/发送登录链接/) as HTMLButtonElement;
+    expect(submit.disabled).toBe(true);
+    fireEvent.click(submit);
+    expect(signInWithOtpMock).not.toHaveBeenCalled();
+  });
+
+  test('未登录 + 已勾同意 + 提交无效邮箱 → errorMessage,不调 signInWithOtp', async () => {
+    supabaseMockState.session = null;
+    localStorage.removeItem('yanyan.privacy.agreed.v1');
+    render(<Login />);
+    fireEvent.click(screen.getByTestId('privacy-agree-checkbox'));
     const input = screen.getByPlaceholderText('you@example.com') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'not-email' } });
     fireEvent.click(screen.getByText(/发送登录链接/));
@@ -203,9 +219,11 @@ describe('U4 redo Login', () => {
     expect(signInWithOtpMock).not.toHaveBeenCalled();
   });
 
-  test('未登录 + 有效邮箱 → 调 signInWithOtp + 显示成功 status', async () => {
+  test('未登录 + 已勾同意 + 有效邮箱 → 调 signInWithOtp + 显示成功 status', async () => {
     supabaseMockState.session = null;
+    localStorage.removeItem('yanyan.privacy.agreed.v1');
     render(<Login />);
+    fireEvent.click(screen.getByTestId('privacy-agree-checkbox'));
     const input = screen.getByPlaceholderText('you@example.com') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'user@example.com' } });
     fireEvent.click(screen.getByText(/发送登录链接/));
@@ -215,8 +233,10 @@ describe('U4 redo Login', () => {
 
   test('signInWithOtp 失败 → errorMessage', async () => {
     supabaseMockState.session = null;
+    localStorage.removeItem('yanyan.privacy.agreed.v1');
     signInWithOtpMock.mockResolvedValueOnce({ data: {}, error: { message: 'rate_limit' } as never });
     render(<Login />);
+    fireEvent.click(screen.getByTestId('privacy-agree-checkbox'));
     fireEvent.change(screen.getByPlaceholderText('you@example.com'), { target: { value: 'user@example.com' } });
     fireEvent.click(screen.getByText(/发送登录链接/));
     expect(await screen.findByRole('alert')).toHaveTextContent(/发送失败/);

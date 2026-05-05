@@ -253,9 +253,9 @@ describe('U10 Home 主屏', () => {
       </Router>
     );
 
-    await waitFor(() => expect(screen.getByTestId('card-level')).toHaveTextContent('平'));
+    await waitFor(() => expect(screen.getByTestId('dial-level')).toHaveTextContent('平'));
     expect(screen.getByText('今日餐食 · 1 餐')).toBeInTheDocument();
-    expect(screen.getByTestId('card-trend-pending')).toHaveTextContent(/累计 5\/21 天/);
+    expect(screen.getByText(/累计 5\/21/)).toBeInTheDocument();
   });
 
   test('AE3 路径:hasCheckin=false → 主屏显示等待打卡', async () => {
@@ -275,7 +275,8 @@ describe('U10 Home 主屏', () => {
         <Home />
       </Router>
     );
-    await waitFor(() => expect(screen.getByTestId('card-state')).toHaveTextContent('等待打卡'));
+    // hasCheckin=false + 无 quiz + 无 initialFireLevel → dial 退化到"做一次评估"占位
+    await waitFor(() => expect(screen.getByText(/做一次评估/)).toBeInTheDocument());
     expect(screen.getByText(/还没拍今天的第一餐/)).toBeInTheDocument();
   });
 });
