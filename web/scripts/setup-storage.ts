@@ -12,20 +12,39 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createClient } from '@supabase/supabase-js';
 
-const BUCKETS = [
+interface BucketSpec {
+  id: string;
+  name: string;
+  description: string;
+  isPublic: boolean;
+  fileSizeLimit: number;
+  allowedMimeTypes: string[];
+}
+
+const BUCKETS: BucketSpec[] = [
   {
     id: 'food-photos',
     name: 'food-photos',
     description: '食物拍照(私有,服务端识别用 service-role 读)',
-    fileSizeLimit: 10 * 1024 * 1024, // 10MB
+    isPublic: false,
+    fileSizeLimit: 10 * 1024 * 1024,
     allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
   },
   {
     id: 'profile-pdf',
     name: 'profile-pdf',
     description: 'Day 30 体质档案 PDF(私有,短期签名 URL 分享)',
+    isPublic: false,
     fileSizeLimit: 20 * 1024 * 1024,
     allowedMimeTypes: ['application/pdf']
+  },
+  {
+    id: 'app-assets',
+    name: 'app-assets',
+    description: '前端站内配图(公开 read,landing hero / 等级图等)',
+    isPublic: true,
+    fileSizeLimit: 5 * 1024 * 1024,
+    allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
   }
 ];
 
@@ -51,20 +70,19 @@ async function main(): Promise<void> {
 
   for (const b of BUCKETS) {
     if (existingIds.has(b.id)) {
-      // 更新 metadata(idempotent)
       const { error } = await sb.storage.updateBucket(b.id, {
-        public: false,
+        public: b.isPublic,
         fileSizeLimit: b.fileSizeLimit,
         allowedMimeTypes: b.allowedMimeTypes
       });
-      console.log(`  [update] ${b.id}:`, error ? 'ERR ' + error.message : 'ok');
+      console.log(`  [update] ${b.id}:`, error ? 'ERR ' + error.message : `ok (public=${b.isPublic})`);
     } else {
       const { error } = await sb.storage.createBucket(b.id, {
-        public: false,
+        public: b.isPublic,
         fileSizeLimit: b.fileSizeLimit,
         allowedMimeTypes: b.allowedMimeTypes
       });
-      console.log(`  [create] ${b.id}:`, error ? 'ERR ' + error.message : 'ok');
+      console.log(`  [create] ${b.id}:`, error ? 'ERR ' + error.message : `ok (public=${b.isPublic})`);
     }
   }
 

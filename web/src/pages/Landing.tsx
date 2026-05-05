@@ -6,6 +6,7 @@
  */
 
 import { Link } from 'wouter';
+import { asset } from '../services/assets';
 
 export function Landing() {
   return (
@@ -28,7 +29,7 @@ export function Landing() {
 
       <section className="px-4 pb-8 max-w-3xl mx-auto">
         <img
-          src="/landing-hero.png"
+          src={asset('landing-hero.png')}
           alt="拍照 → 火分 → 30 天发物档案三步流程"
           className="w-full rounded-2xl shadow-sm"
           loading="eager"
