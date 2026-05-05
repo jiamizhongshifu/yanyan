@@ -80,7 +80,8 @@ export function Login() {
     const { error } = await getSupabase().auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/onboarding/step1',
+        // 统一回到 /auth/callback,由它根据 quiz prefill 决定 → /app or /onboarding/step1
+        redirectTo: window.location.origin + '/auth/callback',
         queryParams: { access_type: 'offline', prompt: 'select_account' }
       }
     });
