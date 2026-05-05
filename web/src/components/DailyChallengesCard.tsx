@@ -7,6 +7,14 @@
 
 import type { ChallengeProgress, DayTier } from '../services/challenges';
 import { TIER_LABEL } from '../services/challenges';
+import { asset } from '../services/assets';
+
+const TIER_ICON: Record<DayTier, string | null> = {
+  perfect: 'level-ping.png', // 完美一天 = 平,绿
+  great: 'level-weihuo.png',
+  nice: 'level-zhonghuo.png',
+  none: null
+};
 
 interface Props {
   progresses: ChallengeProgress[];
@@ -17,13 +25,20 @@ export function DailyChallengesCard({ progresses, tier }: Props) {
   const done = progresses.filter((p) => p.done).length;
   const remainingForPerfect = Math.max(0, 4 - done);
 
+  const tierIconFile = TIER_ICON[tier];
+
   return (
     <section className="rounded-3xl bg-white px-6 pt-6 pb-5" data-testid="daily-challenges-card">
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-center justify-between">
         <h2 className="text-base font-medium text-ink">今日挑战</h2>
-        <p className="text-xs text-ink/40">
-          {done} / 5 完成{tier !== 'none' ? ` · ${TIER_LABEL[tier]}` : ''}
-        </p>
+        <div className="flex items-center gap-1.5">
+          {tierIconFile && (
+            <img src={asset(tierIconFile)} alt={TIER_LABEL[tier]} className="w-5 h-5 object-contain" />
+          )}
+          <p className="text-xs text-ink/40">
+            {done} / 5 完成{tier !== 'none' ? ` · ${TIER_LABEL[tier]}` : ''}
+          </p>
+        </div>
       </div>
 
       {remainingForPerfect > 0 && tier !== 'perfect' && (

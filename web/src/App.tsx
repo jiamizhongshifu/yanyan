@@ -9,6 +9,7 @@ import { Today } from './pages/Today';
 import { Insights } from './pages/Insights';
 import { Findings } from './pages/Findings';
 import { Me } from './pages/Me';
+import { HealthShortcut } from './pages/HealthShortcut';
 import { Consent } from './pages/Consent';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Login } from './pages/Login';
@@ -134,6 +135,11 @@ export function App() {
         <Route path="/me">
           <RequireAuth>
             <Me />
+          </RequireAuth>
+        </Route>
+        <Route path="/me/health-shortcut">
+          <RequireAuth>
+            <HealthShortcut />
           </RequireAuth>
         </Route>
 

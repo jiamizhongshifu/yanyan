@@ -39,10 +39,11 @@ export async function registerHomeRoutes(app: FastifyInstance, opts: RegisterHom
   const symptomStore = opts.deps?.symptomStore ?? new PgSymptomStore();
   const now = opts.deps?.now ?? (() => new Date());
 
-  app.get('/home/today', async (req, reply) => {
+  app.get<{ Querystring: { date?: string } }>('/home/today', async (req, reply) => {
     const user = requireUser(req, reply);
     if (!user) return;
-    const date = todayDateString(now());
+    const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+    const date = req.query.date && dateRe.test(req.query.date) ? req.query.date : todayDateString(now());
     const meals = await mealStore.listByDate(user.userId, date);
     return {
       ok: true,
@@ -77,6 +78,48 @@ export async function registerHomeRoutes(app: FastifyInstance, opts: RegisterHom
     };
   });
 
-  // U3 撤回流程曾依赖 withClient(我们这里不需要,但 import 保持检查通过)
-  void withClient;
+  /** GET /home/month?year=&month= — 当月汇总(餐数 / 拍餐天 / 打卡天 / 累计步数) */
+  app.get<{ Querystring: { year?: string; month?: string } }>('/home/month', async (req, reply) => {
+    const user = requireUser(req, reply);
+    if (!user) return;
+    const today = now();
+    const year = Number(req.query.year ?? today.getFullYear());
+    const month = Number(req.query.month ?? today.getMonth() + 1);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) {
+      reply.code(400);
+      return { ok: false, error: 'invalid_query' };
+    }
+    const start = `${year}-${String(month).padStart(2, '0')}-01`;
+    const endDate = new Date(year, month, 0);
+    const end = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+
+    const summary = await withClient(async (c) => {
+      const r = await c.query<{
+        total_meals: string;
+        photo_days: string;
+        checkin_days: string;
+        total_steps: string;
+      }>(
+        `SELECT
+          (SELECT COUNT(*)::text FROM meals
+            WHERE user_id = $1 AND ate_at::date BETWEEN $2 AND $3) AS total_meals,
+          (SELECT COUNT(DISTINCT ate_at::date)::text FROM meals
+            WHERE user_id = $1 AND ate_at::date BETWEEN $2 AND $3) AS photo_days,
+          (SELECT COUNT(DISTINCT recorded_for_date)::text FROM symptoms
+            WHERE user_id = $1 AND recorded_for_date BETWEEN $2 AND $3
+              AND source = 'next_morning') AS checkin_days,
+          (SELECT COALESCE(SUM(steps), 0)::text FROM user_health_daily
+            WHERE user_id = $1 AND date BETWEEN $2 AND $3) AS total_steps`,
+        [user.userId, start, end]
+      );
+      const row = r.rows[0];
+      return {
+        totalMeals: Number(row.total_meals),
+        photoDays: Number(row.photo_days),
+        checkinDays: Number(row.checkin_days),
+        totalSteps: Number(row.total_steps)
+      };
+    });
+    return { ok: true, year, month, ...summary };
+  });
 }

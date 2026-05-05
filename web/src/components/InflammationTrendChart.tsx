@@ -12,9 +12,13 @@ interface Props {
   entries: YanScoreHistoryEntry[];
   /** 高度,默认 140 */
   height?: number;
+  /** 点击点 → 回调当日 date(YYYY-MM-DD);未传则不可点 */
+  onSelectDate?: (date: string) => void;
+  /** 高亮选中日期 */
+  selectedDate?: string | null;
 }
 
-export function InflammationTrendChart({ entries, height = 140 }: Props) {
+export function InflammationTrendChart({ entries, height = 140, onSelectDate, selectedDate }: Props) {
   const points = useMemo(() => {
     if (entries.length === 0) return [];
     const w = 600;
@@ -97,11 +101,37 @@ export function InflammationTrendChart({ entries, height = 140 }: Props) {
         {pathD.length > 0 && (
           <path d={pathD.join(' ')} fill="none" stroke="url(#trend-grad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         )}
-        {points.map((p, i) =>
-          p.y === null ? null : (
-            <circle key={i} cx={p.x} cy={p.y} r={i === points.length - 1 ? 4 : 2.2} fill="#fff" stroke="#222" strokeWidth={i === points.length - 1 ? 1.4 : 0.6} />
-          )
-        )}
+        {points.map((p, i) => {
+          if (p.y === null) return null;
+          const isLast = i === points.length - 1;
+          const isSelected = selectedDate === p.date;
+          const r = isSelected ? 5 : isLast ? 4 : 2.2;
+          return (
+            <g key={i}>
+              {/* 隐形大点击区域,扩大命中 */}
+              {onSelectDate && (
+                <circle
+                  cx={p.x}
+                  cy={p.y}
+                  r={12}
+                  fill="transparent"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => onSelectDate(p.date)}
+                  data-testid={`trend-point-${p.date}`}
+                />
+              )}
+              <circle
+                cx={p.x}
+                cy={p.y}
+                r={r}
+                fill={isSelected ? '#222' : '#fff'}
+                stroke="#222"
+                strokeWidth={isSelected ? 2 : isLast ? 1.4 : 0.6}
+                pointerEvents="none"
+              />
+            </g>
+          );
+        })}
         {lastValid && (
           <text x={lastValid.x} y={lastValid.y! - 8} fontSize="11" textAnchor="middle" fill="#222" fontWeight="600">
             {lastValid.total}
