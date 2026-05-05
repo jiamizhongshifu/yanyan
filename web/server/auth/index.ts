@@ -26,8 +26,13 @@ export function getDefaultAuthResolver(): AuthResolver {
   const cfg = getConfig();
   const resolvers: AuthResolver[] = [];
 
-  if (cfg.SUPABASE_JWT_SECRET) {
-    resolvers.push(new SupabaseJwtAuthResolver(cfg.SUPABASE_JWT_SECRET));
+  if (cfg.SUPABASE_JWT_SECRET || cfg.SUPABASE_URL) {
+    resolvers.push(
+      new SupabaseJwtAuthResolver({
+        jwtSecret: cfg.SUPABASE_JWT_SECRET,
+        supabaseUrl: cfg.SUPABASE_URL
+      })
+    );
   }
 
   if (cfg.NODE_ENV !== 'production') {

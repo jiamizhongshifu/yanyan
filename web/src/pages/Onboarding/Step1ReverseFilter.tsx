@@ -23,12 +23,18 @@ export function Step1ReverseFilter() {
   const { reverseFilterChoice, setReverseFilterChoice, setSymptomsFrequency } = useOnboarding();
   const quiz = useQuiz();
 
-  // 从公开 quiz prefill 一次(仅在 onboarding 还空 + quiz 已完成时)
+  // 从公开 quiz prefill + 自动跳过到 step3:quiz 已完成,answers 全部齐 → 直接 baseline 同意
   useEffect(() => {
-    if (!reverseFilterChoice && quiz.completedAt) {
-      if (quiz.reverseFilterChoice) setReverseFilterChoice(quiz.reverseFilterChoice);
+    if (quiz.completedAt) {
+      if (!reverseFilterChoice && quiz.reverseFilterChoice) {
+        setReverseFilterChoice(quiz.reverseFilterChoice);
+      }
       if (Object.keys(quiz.symptomsFrequency).length > 0) {
         setSymptomsFrequency(quiz.symptomsFrequency);
+      }
+      // quiz 答案够 → 跳过 step1 + step2 直接到同意页
+      if (quiz.reverseFilterChoice) {
+        navigate('/onboarding/step3', { replace: true });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

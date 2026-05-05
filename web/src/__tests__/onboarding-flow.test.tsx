@@ -130,26 +130,11 @@ describe('U4 redo Step 3', () => {
     expect(screen.getByTestId('local-fire-level')).toHaveTextContent('大火');
   });
 
-  test('未全勾 5 scope → errorMessage 提示,无 ensure / consent / baseline 调用', async () => {
-    useOnboarding.getState().setReverseFilterChoice('rhinitis');
-    render(<Step3BaselineConsent />);
-    fireEvent.click(screen.getByText(/我已阅读并同意 5 项/));
-    expect(await screen.findByRole('alert')).toHaveTextContent(/5 项均需勾选/);
-    const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
-    const writes = fetchMock.mock.calls.filter((c: unknown[]) => {
-      const init = c[1] as RequestInit | undefined;
-      return init?.method === 'POST';
-    });
-    expect(writes).toHaveLength(0);
-  });
-
-  test('Happy: 全勾 → ensure → consent → baseline → 跳 step4 + 写 initialFireLevel store', async () => {
+  test('Happy: 单按钮提交 → ensure → consent(默认 5 项) → baseline → 跳 step4', async () => {
     useOnboarding.getState().setReverseFilterChoice('rhinitis');
     render(<Step3BaselineConsent />);
 
-    const cbs = await screen.findAllByRole('checkbox');
-    cbs.forEach((cb) => fireEvent.click(cb));
-    fireEvent.click(screen.getByText(/我已阅读并同意 5 项/));
+    fireEvent.click(screen.getByText(/我已阅读并同意/));
 
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step4'));
 
@@ -163,12 +148,9 @@ describe('U4 redo Step 3', () => {
   });
 
   test('Step 1 缺失 reverseFilterChoice → submit errorMessage,不发 ensure', async () => {
-    // 先勾选 5 个 scope
     useOnboarding.getState().setReverseFilterChoice(null as unknown as 'rhinitis');
     render(<Step3BaselineConsent />);
-    const cbs = await screen.findAllByRole('checkbox');
-    cbs.forEach((cb) => fireEvent.click(cb));
-    fireEvent.click(screen.getByText(/我已阅读并同意 5 项/));
+    fireEvent.click(screen.getByText(/我已阅读并同意/));
     expect(await screen.findByRole('alert')).toHaveTextContent(/Step 1/);
   });
 
@@ -187,9 +169,7 @@ describe('U4 redo Step 3', () => {
     });
 
     render(<Step3BaselineConsent />);
-    const cbs = await screen.findAllByRole('checkbox');
-    cbs.forEach((cb) => fireEvent.click(cb));
-    fireEvent.click(screen.getByText(/我已阅读并同意 5 项/));
+    fireEvent.click(screen.getByText(/我已阅读并同意/));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/账号初始化失败/);
     expect(navigateMock).not.toHaveBeenCalled();
