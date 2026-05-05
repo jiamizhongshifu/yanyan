@@ -74,7 +74,7 @@ export function Consent() {
       <header className="mb-8">
         <h1 className="text-2xl font-semibold text-ink">敏感个人信息处理同意</h1>
         <p className="mt-3 text-sm text-ink/70 leading-relaxed">
-          炎炎消防队基于《个人信息保护法》第二十八条,对以下 5 类敏感个人信息逐项征求同意。任意一项不勾选,该类数据不会被采集 — 但部分核心功能将不可用。
+          Soak 基于《个人信息保护法》第二十八条,对以下 5 类敏感个人信息逐项征求同意。任意一项不勾选,该类数据不会被采集 — 但部分核心功能将不可用。
         </p>
       </header>
 

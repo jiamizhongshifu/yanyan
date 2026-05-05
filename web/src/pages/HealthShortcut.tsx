@@ -1,5 +1,5 @@
 /**
- * iOS 快捷指令配置页 — 教用户从 Apple Health 自动同步步数到 yanyan
+ * iOS 快捷指令配置页 — 教用户从 Apple Health 自动同步步数到 Soak
  *
  * 现实约束:Web App 无法直接读 HealthKit;唯一靠谱路径是用户用「快捷指令」app
  * 配一条自动化(每天某时刻执行),从健康 app 读 today steps 后 POST 到我们的 API。
@@ -48,7 +48,7 @@ URL:    ${typeof window !== 'undefined' ? window.location.origin : 'https://web-
       <header className="mb-6">
         <h1 className="text-2xl font-semibold text-ink">Apple Health 自动同步</h1>
         <p className="mt-2 text-sm text-ink/60 leading-relaxed">
-          用一条 iOS 快捷指令,每天早上自动从「健康」app 读取昨日 / 当日步数,推送到 yanyan。
+          用一条 iOS 快捷指令,每天早上自动从「健康」app 读取昨日 / 当日步数,推送到 Soak。
           省去手动录入。
         </p>
       </header>

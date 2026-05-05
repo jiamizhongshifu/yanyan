@@ -112,7 +112,7 @@ export function Home() {
       <header className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs text-ink/45">{greeting}</p>
-          <p className="mt-0.5 text-lg font-medium text-ink">炎炎消防队</p>
+          <p className="mt-0.5 text-lg font-medium text-ink">Soak</p>
         </div>
         <Link
           href="/me"

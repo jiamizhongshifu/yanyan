@@ -125,7 +125,7 @@ export async function registerExportRoutes(app: FastifyInstance): Promise<void> 
     const today = new Date().toISOString().slice(0, 10);
 
     reply.header('Content-Type', 'text/csv; charset=utf-8');
-    reply.header('Content-Disposition', `attachment; filename="yanyan-export-${today}.csv"`);
+    reply.header('Content-Disposition', `attachment; filename="soak-export-${today}.csv"`);
     return csv;
   });
 }

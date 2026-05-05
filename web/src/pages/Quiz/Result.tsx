@@ -73,7 +73,7 @@ export function QuizResult() {
 
   return (
     <main className="min-h-screen bg-paper px-6 pt-12 pb-20 max-w-md mx-auto" data-testid="quiz-result">
-      <header className="text-xs text-ink/40 tracking-widest">炎炎消防队 · 初步评估</header>
+      <header className="text-xs text-ink/40 tracking-widest">Soak · 初步评估</header>
 
       <section className="mt-6 rounded-3xl bg-white px-6 py-10 text-center">
         <img

@@ -2,7 +2,7 @@
  * U1-redo smoke:验证 PWA 工程框架最小可启动 + API wrapper 网络降级
  *
  * 测试点(对应 plan U1 测试场景的 H5 版本):
- *   - Happy path: <App /> 渲染首页 → 标题"炎炎消防队"出现
+ *   - Happy path: <App /> 渲染首页 → 标题 "Soak" 出现
  *   - Edge case: fetch 失败 → 返回降级文案"网络不通,请检查后重试"
  *   - Edge case: 5xx → 返回"服务忙,请稍后再试"
  *   - Edge case: timeout → 返回"请求超时,请检查网络后重试"
@@ -14,11 +14,11 @@ import { App } from '../App';
 import { request } from '../services/api';
 
 describe('U1 web smoke', () => {
-  test('App renders 炎炎消防队 brand somewhere(任一路径)', () => {
+  test('App renders Soak brand somewhere(任一路径)', () => {
     // U10 后路由结构变了:/ 受 RequireAuth 保护;无 session 时 RequireAuth 显示 loading 或重定向 login
     // smoke test 只断言 React 树能正常 mount(找品牌名,Login / Home / 未授权 loading 任一路径都包含)
     render(<App />);
-    expect(screen.queryAllByText(/炎炎消防队|加载中|中医发物/).length).toBeGreaterThan(0);
+    expect(screen.queryAllByText(/Soak|加载中|控糖/).length).toBeGreaterThan(0);
   });
 });
 

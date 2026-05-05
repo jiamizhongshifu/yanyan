@@ -25,7 +25,7 @@ function ProfileBody({ data }: { data: ProfileV05Data }) {
   return (
     <article className="bg-white px-6 py-8 print:px-10 print:py-10 max-w-2xl mx-auto" data-testid="profile-body">
       <header className="mb-6">
-        <p className="text-xs text-ink/40">炎炎消防队</p>
+        <p className="text-xs text-ink/40">Soak</p>
         <h1 className="mt-1 text-2xl font-semibold text-ink">{data.title}</h1>
         <p className="mt-2 text-xs text-ink/50">
           生成于 {new Date(data.generatedAt).toLocaleDateString('zh-CN')} · 累计打卡 {data.cumulativeCheckinDays} 天

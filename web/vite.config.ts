@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: '炎炎消防队',
-        short_name: '炎炎',
-        description: '中医发物 × 次晨体感',
+        name: 'Soak',
+        short_name: 'Soak',
+        description: '控糖 × 炎症 × 次晨体感',
         theme_color: '#F7F4EE',
         background_color: '#F7F4EE',
         display: 'standalone',

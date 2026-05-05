@@ -12,7 +12,7 @@ export function Landing() {
   return (
     <main className="min-h-screen bg-paper" data-testid="landing">
       <section className="px-6 pt-12 pb-8 max-w-2xl mx-auto">
-        <p className="text-xs text-ink/40 tracking-widest">炎炎消防队</p>
+        <p className="text-xs text-ink/40 tracking-widest">Soak</p>
 
         <h1 className="mt-4 text-3xl font-semibold text-ink leading-snug">
           每餐拍一张,
