@@ -33,6 +33,7 @@ import { useQuiz } from '../store/quiz';
 import { useOnboarding } from '../store/onboarding';
 import { computeInflammationIndex } from '../services/quiz';
 import { track } from '../services/tracker';
+import { asset } from '../services/assets';
 
 const LEVEL_ICON_FILE = {
   平: 'level-ping.png',
@@ -122,6 +123,16 @@ export function Home() {
           ◆
         </Link>
       </header>
+
+      {/* Body hero — 4 part 围绕水豚冥想图 */}
+      <div className="mb-3 -mx-1 rounded-3xl overflow-hidden">
+        <img
+          src={asset('body-hero.png')}
+          alt="身体 4 维度"
+          className="w-full h-auto block"
+          loading="lazy"
+        />
+      </div>
 
       <div className="mb-6">
         <HomeStreakStrip cumulativeDays={progress?.cumulativeCheckinDays ?? 0} todayLevel={dial?.level ?? null} />

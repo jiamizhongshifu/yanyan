@@ -10,6 +10,7 @@ import {
   type SymptomFrequency
 } from '../../services/onboarding';
 import { useQuiz } from '../../store/quiz';
+import { asset } from '../../services/assets';
 
 const DIM_LABELS: Record<SymptomDimension, string> = {
   nasal_congestion: '鼻塞',
@@ -44,6 +45,9 @@ export function QuizStep2Symptoms() {
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="quiz-step2">
       <header className="mb-3 text-xs text-ink/50">2 / 3</header>
+      <div className="flex justify-center mb-3">
+        <img src={asset('onboarding-mirror.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />
+      </div>
       <h1 className="text-2xl font-semibold text-ink">过去一周,身体偶尔有过这些反应吗?</h1>
       <p className="mt-3 text-sm text-ink/60">没有就跳过这一行,不用每行都选。</p>
 

@@ -37,7 +37,11 @@ const ASSETS = [
   { local: 'onboarding-mirror.png', remote: 'onboarding-mirror.png', contentType: 'image/png' },
   { local: 'onboarding-seedling.png', remote: 'onboarding-seedling.png', contentType: 'image/png' },
   { local: 'camera-tabletop.png', remote: 'camera-tabletop.png', contentType: 'image/png' },
-  { local: 'findings-hourglass.png', remote: 'findings-hourglass.png', contentType: 'image/png' }
+  { local: 'findings-hourglass.png', remote: 'findings-hourglass.png', contentType: 'image/png' },
+  // 第三批:Body / MealResult / Quiz 配图
+  { local: 'body-hero.png', remote: 'body-hero.png', contentType: 'image/png' },
+  { local: 'meal-analysis.png', remote: 'meal-analysis.png', contentType: 'image/png' },
+  { local: 'quiz-lifestyle.png', remote: 'quiz-lifestyle.png', contentType: 'image/png' }
 ];
 
 async function main(): Promise<void> {

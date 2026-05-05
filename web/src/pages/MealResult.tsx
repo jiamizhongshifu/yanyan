@@ -11,6 +11,7 @@ import { useLocation } from 'wouter';
 import { FoodItemCard } from '../components/FoodItemCard';
 import { postMealFeedback, type FireLevel } from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
+import { asset } from '../services/assets';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
@@ -45,7 +46,16 @@ export function MealResult() {
 
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
-      <header className="mb-10">
+      {/* 餐盘分析 hero — 糖立方/辣椒/绿叶 3 标签漂浮 */}
+      <div className="flex justify-center mb-4">
+        <img
+          src={asset('meal-analysis.png')}
+          alt=""
+          className="w-40 h-40 object-contain"
+          loading="lazy"
+        />
+      </div>
+      <header className="mb-10 text-center">
         <p className="text-sm text-ink/60">这一餐</p>
         <div
           className={`mt-2 text-7xl font-semibold leading-none ${LEVEL_COLOR[result.level]}`}

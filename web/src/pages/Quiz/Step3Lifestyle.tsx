@@ -3,6 +3,7 @@
  */
 
 import { useLocation } from 'wouter';
+import { asset } from '../../services/assets';
 import {
   RECENT_DIET_OPTIONS,
   RECENT_DIET_LABELS,
@@ -27,6 +28,9 @@ export function QuizStep3Lifestyle() {
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="quiz-step3">
       <header className="mb-3 text-xs text-ink/50">3 / 3</header>
+      <div className="flex justify-center mb-3">
+        <img src={asset('quiz-lifestyle.png')} alt="" className="w-40 h-40 object-contain rounded-2xl" loading="lazy" />
+      </div>
       <h1 className="text-2xl font-semibold text-ink">最后两题,关于你的近期状态</h1>
 
       <section className="mt-8">
