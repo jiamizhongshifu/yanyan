@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { signOut } from '../services/auth';
-import { useAuth } from '../services/auth';
+import { useAuth, getCurrentAccessToken } from '../services/auth';
 import { postRevoke } from '../services/consents';
 import {
   detectPushSupport,
@@ -49,6 +49,37 @@ export function Me() {
     if (ok) {
       await signOut();
       navigate('/login');
+    }
+  };
+
+  const [exporting, setExporting] = useState(false);
+  const onExportCsv = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const token = await getCurrentAccessToken();
+      if (!token) {
+        alert('未登录');
+        return;
+      }
+      const res = await fetch('/api/v1/users/me/export', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        alert('导出失败,请稍后再试');
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `yanyan-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -139,6 +170,16 @@ export function Me() {
         >
           <span>📋 上传体检报告</span>
           <span className="text-ink/30 text-xs">Phase 2</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => void onExportCsv()}
+          disabled={exporting}
+          className="w-full flex items-center justify-between px-5 py-4 text-sm text-ink disabled:opacity-50"
+          data-testid="btn-export-csv"
+        >
+          <span>📥 导出我的数据(CSV)</span>
+          <span className="text-ink/30 text-xs">{exporting ? '导出中…' : '↓'}</span>
         </button>
         <Link
           href="/privacy-policy"

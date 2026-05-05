@@ -29,6 +29,7 @@ import { registerProfileRoutes, type RegisterProfileOptions } from './profile';
 import { registerSugarRoutes, type RegisterSugarOptions } from './sugar';
 import { registerDailyChallengesRoutes, type RegisterDailyChallengesOptions } from './daily-challenges';
 import { registerHealthDailyRoutes, type RegisterHealthDailyOptions } from './health-daily';
+import { registerExportRoutes } from './export';
 
 export interface V1Options {
   consents?: RegisterConsentsOptions;
@@ -63,4 +64,5 @@ export async function registerV1(app: FastifyInstance, opts: V1Options = {}): Pr
   await registerSugarRoutes(app, opts.sugar);
   await registerDailyChallengesRoutes(app, opts.dailyChallenges);
   await registerHealthDailyRoutes(app, opts.healthDaily);
+  await registerExportRoutes(app);
 }
