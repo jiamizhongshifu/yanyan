@@ -114,17 +114,33 @@ export function Me() {
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-12 pb-24 max-w-md mx-auto" data-testid="me">
-      <header className="mb-6 flex items-center justify-between">
+      <header className="mb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={() => navigate('/app')}
-          className="text-sm text-ink/45"
+          className="text-sm text-ink/45 active:opacity-60"
         >
           ← 返回
         </button>
         <h1 className="text-base font-medium text-ink">我的</h1>
         <div className="w-10" />
       </header>
+
+      {/* Soak emblem 顶部品牌 */}
+      <div className="flex flex-col items-center mb-6">
+        <img
+          src={asset('soak-emblem.png')}
+          alt="Soak"
+          className="w-20 h-20 object-contain"
+          loading="eager"
+        />
+        <img
+          src={asset('soak-wordmark.png')}
+          alt="Soak"
+          className="mt-2 h-7 w-auto object-contain opacity-80"
+          loading="lazy"
+        />
+      </div>
 
       {/* 身份卡 — mascot + email */}
       <section className="mb-5 rounded-3xl bg-white px-5 py-5 flex items-center gap-4">

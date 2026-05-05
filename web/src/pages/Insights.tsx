@@ -411,13 +411,24 @@ function AchievementCard({
           className="absolute -right-4 -top-2 w-20 h-20 object-contain opacity-50 pointer-events-none"
         />
       )}
-      <img
-        src={asset(icon)}
-        alt=""
-        className={`relative z-10 w-12 h-12 object-contain ${unlocked ? '' : 'opacity-30 grayscale'}`}
-      />
+      <div className="relative z-10 flex-shrink-0">
+        <img
+          src={asset(icon)}
+          alt=""
+          className={`w-12 h-12 object-contain ${unlocked ? '' : 'opacity-25 grayscale'}`}
+        />
+        {!unlocked && (
+          // 未解锁:右下角小锁角标 + 整图灰度
+          <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-ink/85 flex items-center justify-center shadow-sm">
+            <svg viewBox="0 0 24 24" className="w-3 h-3 text-paper" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 1 1 8 0v4" />
+            </svg>
+          </div>
+        )}
+      </div>
       <div className="flex-1 min-w-0 relative z-10">
-        <p className={`text-sm font-medium ${unlocked ? 'text-ink' : 'text-ink/55'}`}>
+        <p className={`text-sm font-medium ${unlocked ? 'text-ink' : 'text-ink/45'}`}>
           {unlocked ? `✓ ${title}` : title}
         </p>
         <p className="text-[11px] text-ink/45 mt-0.5">{requirement}</p>
