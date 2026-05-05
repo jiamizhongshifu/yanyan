@@ -150,18 +150,37 @@ export function Insights() {
         </div>
       </header>
 
-      <AchievementJar
-        monthLabel={monthLabel}
-        perfect={perfect}
-        great={great}
-        nice={nice}
-        sugarBadges={(sugar?.monthlyBadges ?? []).map((b) => ({
-          emoji: b.emoji,
-          label: b.label,
-          count: b.count,
-          iconFile: SUGAR_BADGE_ICON[b.kind]
-        }))}
-      />
+      {/* 全新用户:0 数据 → 显示引导卡片替代空玻璃瓶 */}
+      {cumulativeDays === 0 && meals.length === 0 && (perfect + great + nice) === 0 ? (
+        <section className="mb-4 rounded-3xl bg-fire-ping/10 px-5 py-6 flex items-center gap-4" data-testid="insights-new-user">
+          <img
+            src={asset('mascot-thinking.png')}
+            alt=""
+            className="w-20 h-20 object-contain flex-shrink-0"
+            loading="lazy"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-ink">这里还没什么可看</p>
+            <p className="mt-1.5 text-xs text-ink/65 leading-relaxed">
+              拍第一餐 + 完成今日挑战后,玻璃瓶会开始装勋章,日历会出现小太阳。
+              累计 21 天解锁炎症趋势线。
+            </p>
+          </div>
+        </section>
+      ) : (
+        <AchievementJar
+          monthLabel={monthLabel}
+          perfect={perfect}
+          great={great}
+          nice={nice}
+          sugarBadges={(sugar?.monthlyBadges ?? []).map((b) => ({
+            emoji: b.emoji,
+            label: b.label,
+            count: b.count,
+            iconFile: SUGAR_BADGE_ICON[b.kind]
+          }))}
+        />
+      )}
 
       {sugar && (
         <p className="mt-3 mb-4 text-[11px] text-ink/45 leading-relaxed text-center">

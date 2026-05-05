@@ -126,6 +126,24 @@ export function Today() {
 
       <InappRemindersBanner />
 
+      {/* 全新用户欢迎卡 — 没拍餐 / 没打卡 / 0 杯水 → 引导拍第一餐 */}
+      {meals.length === 0 && !yanScore?.hasCheckin && dayEntry.waterCups === 0 && (
+        <section className="mb-4 rounded-3xl bg-fire-ping/10 px-5 py-5 flex items-center gap-4" data-testid="new-user-welcome">
+          <img
+            src={asset('mascot-happy.png')}
+            alt=""
+            className="w-16 h-16 object-contain flex-shrink-0"
+            loading="lazy"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-ink">第一次见!</p>
+            <p className="mt-1 text-xs text-ink/65 leading-relaxed">
+              先拍中午这一餐,5 秒识别食物 + 添加糖估算,你就能看到第一份炎症分。
+            </p>
+          </div>
+        </section>
+      )}
+
       {/* 顶部炎症一句话 — 加 level 插画 */}
       {yanScore?.result && (
         <section className="mb-5 rounded-2xl bg-white px-5 py-4 flex items-center gap-4" data-testid="today-fire-strip">
@@ -251,6 +269,8 @@ export function Today() {
             +1000
           </button>
         </div>
+        {/* shortcut 已配置 → 不再显示教程链接 */}
+        {serverHealth?.source !== 'shortcut' && (
         <Link
           href="/me/health-shortcut"
           className="mt-2 inline-block text-[11px] text-ink/45 underline"
@@ -258,6 +278,7 @@ export function Today() {
         >
           配置 iOS 快捷指令自动同步 Apple Health 步数 →
         </Link>
+        )}
       </section>
 
       {/* 今日建议 + 拍餐 CTA */}
