@@ -57,7 +57,11 @@ const ASSETS = [
   { local: 'landing-step-archive.png', remote: 'landing-step-archive.png', contentType: 'image/png' },
   // 第七批
   { local: 'quiz-result-hero.png', remote: 'quiz-result-hero.png', contentType: 'image/png' },
-  { local: 'install-banner.png', remote: 'install-banner.png', contentType: 'image/png' }
+  { local: 'install-banner.png', remote: 'install-banner.png', contentType: 'image/png' },
+  // 第八批:次晨打卡 3 步配图
+  { local: 'checkin-blind.png', remote: 'checkin-blind.png', contentType: 'image/png' },
+  { local: 'checkin-compare.png', remote: 'checkin-compare.png', contentType: 'image/png' },
+  { local: 'checkin-reveal.png', remote: 'checkin-reveal.png', contentType: 'image/png' }
 ];
 
 async function main(): Promise<void> {

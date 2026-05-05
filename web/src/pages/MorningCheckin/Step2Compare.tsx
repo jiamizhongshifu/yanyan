@@ -10,6 +10,7 @@ import { useLocation } from 'wouter';
 import { fetchYesterdayCompare, SYMPTOM_DIMENSION_LABELS, SYMPTOM_LEVEL_LABELS, type SymptomDimension } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
 import { track } from '../../services/tracker';
+import { asset } from '../../services/assets';
 
 export function Step2Compare() {
   const [, navigate] = useLocation();
@@ -39,6 +40,9 @@ export function Step2Compare() {
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="checkin-step2">
       <header className="mb-3 text-xs text-ink/50">早安 · Step 2</header>
+      <div className="flex justify-center mb-3">
+        <img src={asset('checkin-compare.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />
+      </div>
       <h1 className="text-2xl font-semibold text-ink">对照昨天</h1>
 
       {!yesterday && (

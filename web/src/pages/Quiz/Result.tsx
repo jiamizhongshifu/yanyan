@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useMemo } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { computeInflammationIndex, LEVEL_HINT, type InflammationIndex } from '../../services/quiz';
 import { useQuiz } from '../../store/quiz';
 import { asset } from '../../services/assets';
@@ -142,14 +142,15 @@ export function QuizResult() {
         </div>
       </section>
 
-      <section className="mt-10 sticky bottom-4">
-        <Link
-          href="/login?from=quiz"
-          className="block w-full text-center rounded-full bg-ink text-white py-4 text-base font-medium shadow-lg"
+      <section className="mt-10 sticky bottom-4 z-30">
+        <button
+          type="button"
+          onClick={() => navigate('/login')}
+          className="block w-full text-center rounded-full bg-ink text-white py-4 text-base font-medium shadow-lg active:opacity-80"
           data-testid="cta-login"
         >
           登录解锁完整体验 →
-        </Link>
+        </button>
         <p className="mt-3 text-xs text-ink/40 text-center">
           登录后,你刚才的回答会自动作为 baseline,无需重答。
         </p>

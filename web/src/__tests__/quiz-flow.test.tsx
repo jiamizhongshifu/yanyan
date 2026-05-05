@@ -110,7 +110,10 @@ describe('U-Quiz Result', () => {
     const score = parseInt(screen.getByTestId('result-score').textContent ?? '0', 10);
     expect(score).toBeGreaterThan(50); // heavy symptoms + bad lifestyle
     expect(['中火', '大火']).toContain(screen.getByTestId('result-level').textContent);
-    expect(screen.getByTestId('cta-login').getAttribute('href')).toBe('/login?from=quiz');
+    // CTA 现在是 button + onClick navigate(),不再是 Link
+    const cta = screen.getByTestId('cta-login');
+    expect(cta.tagName.toLowerCase()).toBe('button');
+    expect(cta.textContent).toMatch(/登录解锁/);
   });
 });
 

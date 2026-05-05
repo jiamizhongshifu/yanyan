@@ -46,7 +46,7 @@ export function MealResult() {
 
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
-      {/* 餐盘分析 hero — 糖立方/辣椒/绿叶 3 标签漂浮 */}
+      {/* 餐盘分析 hero */}
       <div className="flex justify-center mb-4">
         <img
           src={asset('meal-analysis.png')}
@@ -55,7 +55,7 @@ export function MealResult() {
           loading="lazy"
         />
       </div>
-      <header className="mb-10 text-center">
+      <header className="mb-8 text-center">
         <p className="text-sm text-ink/60">这一餐</p>
         <div
           className={`mt-2 text-7xl font-semibold leading-none ${LEVEL_COLOR[result.level]}`}
@@ -64,9 +64,24 @@ export function MealResult() {
           {result.level}
         </div>
         <p className="mt-1 text-xs text-ink/40">
-          火分 <span data-testid="fire-score">{result.fireScore}</span> / 100
+          炎症分 <span data-testid="fire-score">{result.fireScore}</span> / 100
         </p>
-        <p className="mt-4 text-sm text-ink/70 leading-relaxed">{LEVEL_HINT[result.level]}</p>
+        {/* mascot 反应:平/微火 → happy / 中火 → thinking / 大火 → worried */}
+        <div className="mt-5 flex items-center justify-center gap-3 px-2">
+          <img
+            src={asset(
+              result.level === '平' || result.level === '微火'
+                ? 'mascot-happy.png'
+                : result.level === '中火'
+                ? 'mascot-thinking.png'
+                : 'mascot-worried.png'
+            )}
+            alt=""
+            className="w-16 h-16 object-contain flex-shrink-0"
+            loading="lazy"
+          />
+          <p className="text-sm text-ink/70 leading-relaxed text-left">{LEVEL_HINT[result.level]}</p>
+        </div>
       </header>
 
       <section>

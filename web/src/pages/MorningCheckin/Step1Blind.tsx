@@ -13,6 +13,7 @@ import { SymptomSlider } from '../../components/SymptomSlider';
 import { SYMPTOM_DIMENSIONS, postCheckin } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
 import { track } from '../../services/tracker';
+import { asset } from '../../services/assets';
 
 export function Step1Blind() {
   const [, navigate] = useLocation();
@@ -38,6 +39,9 @@ export function Step1Blind() {
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="checkin-step1">
       <header className="mb-3 text-xs text-ink/50">早安 · Step 1</header>
+      <div className="flex justify-center mb-3">
+        <img src={asset('checkin-blind.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />
+      </div>
       <h1 className="text-2xl font-semibold text-ink">今早身体感觉怎么样?</h1>
       <p className="mt-3 text-sm text-ink/60 leading-relaxed">
         没反应就跳过,不用每项都选。先勾选,再滑动选程度 — 默认不预填,选错了点同一档可以撤销。

@@ -89,7 +89,7 @@ export function InstallPrompt() {
 
   return (
     <div
-      className="fixed bottom-20 inset-x-3 z-50 rounded-2xl bg-white shadow-lg border border-ink/10 px-4 py-3 flex items-center gap-3"
+      className="fixed top-3 inset-x-3 z-50 rounded-2xl bg-white shadow-lg border border-ink/10 px-4 py-3 flex items-center gap-3 max-w-md mx-auto"
       role="dialog"
       data-testid="install-prompt"
     >

@@ -11,6 +11,7 @@ import { fetchYanScoreToday, type FireLevel } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
 import { track } from '../../services/tracker';
 import { TodaySuggestionCard } from '../../components/TodaySuggestionCard';
+import { asset } from '../../services/assets';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
@@ -71,6 +72,9 @@ export function Step3Reveal() {
     return (
       <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="checkin-step3">
         <header className="mb-3 text-xs text-ink/50">早安 · 揭晓</header>
+        <div className="flex justify-center mb-3">
+          <img src={asset('checkin-reveal.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />
+        </div>
         <p className="text-sm text-ink/60 leading-relaxed">
           数据还不够,先不评分。再拍几餐 / 完整一天后火分会出现。
         </p>

@@ -10,6 +10,7 @@ import { Insights } from './pages/Insights';
 import { Findings } from './pages/Findings';
 import { Me } from './pages/Me';
 import { HealthShortcut } from './pages/HealthShortcut';
+import { NotFound } from './pages/NotFound';
 import { Consent } from './pages/Consent';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Login } from './pages/Login';
@@ -145,7 +146,7 @@ export function App() {
         </Route>
 
         <Route>
-          <div className="p-8 text-center text-ink/60">页面不存在</div>
+          <NotFound />
         </Route>
       </Switch>
       <MaybeBottomTabs />
