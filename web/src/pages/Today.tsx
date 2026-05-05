@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
-import { fetchSugarToday, type SugarToday } from '../services/sugar';
+import { fetchSugarToday, SUGAR_BADGE_ICON, type SugarToday } from '../services/sugar';
 import { fetchHealthToday, postHealthSteps, type HealthDaily } from '../services/health';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { upsertTodayChallenges } from '../services/dailyChallenges';
@@ -170,12 +170,18 @@ export function Today() {
             )}
           </p>
           {sugar.monthlyBadges.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-3 text-sm">
-              <span className="text-xs text-ink/45 self-center">本月勋章</span>
+            <div className="mt-3 flex flex-wrap items-center gap-2.5 text-sm">
+              <span className="text-xs text-ink/45">本月勋章</span>
               {sugar.monthlyBadges.map((b) => (
-                <span key={b.kind}>
-                  {b.emoji} {b.label} ×{b.count}
-                </span>
+                <div key={b.kind} className="flex items-center gap-1">
+                  <img
+                    src={asset(SUGAR_BADGE_ICON[b.kind])}
+                    alt={b.label}
+                    className="w-7 h-7 object-contain"
+                    loading="lazy"
+                  />
+                  <span className="text-xs text-ink">×{b.count}</span>
+                </div>
               ))}
             </div>
           )}

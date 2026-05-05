@@ -24,28 +24,37 @@ export function Step4Welcome() {
       </div>
       <h1 className="text-2xl font-semibold text-ink text-center">就绪了。</h1>
       {initialFireLevel && (
-        <p className="mt-3 text-sm text-ink/70 leading-relaxed">
-          系统已为你建好初始档案,首份火分:<span className="font-medium text-ink">{initialFireLevel}</span>。
+        <p className="mt-3 text-sm text-ink/70 leading-relaxed text-center">
+          系统已为你建好初始档案,首份炎症指数:
+          <span className="font-medium text-ink">{initialFireLevel}</span>。
         </p>
       )}
 
-      <section className="mt-12 rounded-2xl bg-white px-6 py-7">
-        <h2 className="text-lg font-medium text-ink">中午吃饭时,拍一张</h2>
-        <p className="mt-3 text-sm text-ink/60 leading-relaxed">
-          这一刻是产品最重要的瞬间 — 你拍的第一张餐照,会得到一个红/黄/绿的中医语言判断,以及今晚 / 明早可以避开什么。
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate('/app')}
-          className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
-        >
-          完成,稍后我会拍第一张
-        </button>
+      <section className="mt-10 rounded-3xl bg-white px-6 py-6 flex items-start gap-4">
+        <img
+          src={asset('mascot-happy.png')}
+          alt=""
+          className="w-20 h-20 object-contain flex-shrink-0"
+          loading="lazy"
+        />
+        <div className="flex-1">
+          <h2 className="text-base font-medium text-ink">中午吃饭时,拍一张</h2>
+          <p className="mt-2 text-sm text-ink/65 leading-relaxed">
+            你拍的第一张餐照,会得到三档反应程度判断 + 添加糖估算,以及今晚 / 明早可以避开什么。
+          </p>
+        </div>
       </section>
 
+      <button
+        type="button"
+        onClick={() => navigate('/app')}
+        className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
+      >
+        完成,稍后我会拍第一张
+      </button>
+
       <p className="mt-8 text-xs text-ink/40 text-center leading-relaxed">
-        v1 阶段健康数据(步数 / 心率)接入推迟到 Phase 2;<br />
-        当前火分仅基于饮食 + 体感打卡 + 环境。
+        步数 / 心率 接入需 iOS 快捷指令;炎症指数当前基于饮食 + 体感打卡。
       </p>
     </main>
   );

@@ -60,24 +60,36 @@ export function Landing() {
       </section>
 
       <section className="px-6 py-10 max-w-2xl mx-auto">
-        <h2 className="text-base font-medium text-ink mb-4">它怎么工作</h2>
-        <ol className="space-y-4 text-sm text-ink/70 leading-relaxed">
-          <li>
-            <span className="font-medium text-ink">每餐拍一张照</span>
-            <br />
-            <span className="text-ink/60">AI 识别食物,估算这一餐的添加糖与碳水,标三档反应程度,给当餐炎症分。</span>
-          </li>
-          <li>
-            <span className="font-medium text-ink">次日早晨 30 秒打卡</span>
-            <br />
-            <span className="text-ink/60">7 维度:鼻塞 / 起痘 / 口干 / 大便 / 精神 / 浮肿 / 喉咙痒。</span>
-          </li>
-          <li>
-            <span className="font-medium text-ink">14-30 天累积</span>
-            <br />
-            <span className="text-ink/60">系统统计你的减糖累计,回归出哪几样食物对你这个体质最容易引发反应。</span>
-          </li>
-        </ol>
+        <h2 className="text-base font-medium text-ink mb-6 text-center">它怎么工作</h2>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4 rounded-3xl bg-white px-5 py-4">
+            <img src={asset('landing-step-photo.png')} alt="" className="w-20 h-20 object-contain flex-shrink-0" loading="lazy" />
+            <div>
+              <p className="text-sm font-medium text-ink">① 每餐拍一张照</p>
+              <p className="mt-1.5 text-xs text-ink/60 leading-relaxed">
+                AI 识别食物,估算这一餐的添加糖与碳水,标三档反应程度,给当餐炎症分。
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 rounded-3xl bg-white px-5 py-4">
+            <img src={asset('landing-step-checkin.png')} alt="" className="w-20 h-20 object-contain flex-shrink-0" loading="lazy" />
+            <div>
+              <p className="text-sm font-medium text-ink">② 次日早晨 30 秒打卡</p>
+              <p className="mt-1.5 text-xs text-ink/60 leading-relaxed">
+                7 维度:鼻塞 / 起痘 / 口干 / 大便 / 精神 / 浮肿 / 喉咙痒。
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 rounded-3xl bg-white px-5 py-4">
+            <img src={asset('landing-step-archive.png')} alt="" className="w-20 h-20 object-contain flex-shrink-0" loading="lazy" />
+            <div>
+              <p className="text-sm font-medium text-ink">③ 14-30 天累积</p>
+              <p className="mt-1.5 text-xs text-ink/60 leading-relaxed">
+                系统统计你的减糖累计,回归出哪几样食物对你这个体质最容易引发反应。
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="px-6 py-10 pb-20 max-w-2xl mx-auto border-t border-ink/5">

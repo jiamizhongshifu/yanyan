@@ -12,7 +12,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
-import { fetchSugarToday, type SugarToday } from '../services/sugar';
+import { fetchSugarToday, SUGAR_BADGE_ICON, type SugarToday } from '../services/sugar';
 import { fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { fetchYanScoreHistory, type YanScoreHistory } from '../services/yanScoreHistory';
 import { fetchHomeMonth, fetchMealsByDate, type HomeMonth } from '../services/homeMonth';
@@ -158,7 +158,8 @@ export function Insights() {
         sugarBadges={(sugar?.monthlyBadges ?? []).map((b) => ({
           emoji: b.emoji,
           label: b.label,
-          count: b.count
+          count: b.count,
+          iconFile: SUGAR_BADGE_ICON[b.kind]
         }))}
       />
 

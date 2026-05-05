@@ -41,7 +41,20 @@ const ASSETS = [
   // 第三批:Body / MealResult / Quiz 配图
   { local: 'body-hero.png', remote: 'body-hero.png', contentType: 'image/png' },
   { local: 'meal-analysis.png', remote: 'meal-analysis.png', contentType: 'image/png' },
-  { local: 'quiz-lifestyle.png', remote: 'quiz-lifestyle.png', contentType: 'image/png' }
+  { local: 'quiz-lifestyle.png', remote: 'quiz-lifestyle.png', contentType: 'image/png' },
+  // 第四批:mascot 表情扩展
+  { local: 'mascot-happy.png', remote: 'mascot-happy.png', contentType: 'image/png' },
+  { local: 'mascot-worried.png', remote: 'mascot-worried.png', contentType: 'image/png' },
+  { local: 'mascot-thinking.png', remote: 'mascot-thinking.png', contentType: 'image/png' },
+  // 第五批:糖分等价勋章 sticker(替代 emoji)
+  { local: 'badge-lollipop.png', remote: 'badge-lollipop.png', contentType: 'image/png' },
+  { local: 'badge-cola.png', remote: 'badge-cola.png', contentType: 'image/png' },
+  { local: 'badge-milktea.png', remote: 'badge-milktea.png', contentType: 'image/png' },
+  { local: 'badge-chocolate.png', remote: 'badge-chocolate.png', contentType: 'image/png' },
+  // 第六批:Landing 三步流程
+  { local: 'landing-step-photo.png', remote: 'landing-step-photo.png', contentType: 'image/png' },
+  { local: 'landing-step-checkin.png', remote: 'landing-step-checkin.png', contentType: 'image/png' },
+  { local: 'landing-step-archive.png', remote: 'landing-step-archive.png', contentType: 'image/png' }
 ];
 
 async function main(): Promise<void> {
