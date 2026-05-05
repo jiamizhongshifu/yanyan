@@ -70,7 +70,7 @@ export function Consent() {
   };
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-12">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-12 max-w-md mx-auto">
       <header className="mb-8">
         <h1 className="text-2xl font-semibold text-ink">敏感个人信息处理同意</h1>
         <p className="mt-3 text-sm text-ink/70 leading-relaxed">

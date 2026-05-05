@@ -197,49 +197,21 @@ describe('U4 redo Login', () => {
     return waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step1'));
   });
 
-  test('未勾隐私同意 → 提交按钮 disabled,不调 signInWithOtp', () => {
+  test('未勾隐私同意 → Google 按钮 disabled', () => {
     supabaseMockState.session = null;
     localStorage.removeItem('yanyan.privacy.agreed.v1');
     render(<Login />);
-    const submit = screen.getByText(/发送登录链接/) as HTMLButtonElement;
-    expect(submit.disabled).toBe(true);
-    fireEvent.click(submit);
-    expect(signInWithOtpMock).not.toHaveBeenCalled();
+    const googleBtn = screen.getByTestId('btn-google-signin') as HTMLButtonElement;
+    expect(googleBtn.disabled).toBe(true);
   });
 
-  test('未登录 + 已勾同意 + 提交无效邮箱 → errorMessage,不调 signInWithOtp', async () => {
+  test('已勾隐私同意 → Google 按钮可点', () => {
     supabaseMockState.session = null;
     localStorage.removeItem('yanyan.privacy.agreed.v1');
     render(<Login />);
     fireEvent.click(screen.getByTestId('privacy-agree-checkbox'));
-    const input = screen.getByPlaceholderText('you@example.com') as HTMLInputElement;
-    fireEvent.change(input, { target: { value: 'not-email' } });
-    fireEvent.click(screen.getByText(/发送登录链接/));
-    expect(await screen.findByRole('alert')).toHaveTextContent(/有效的邮箱/);
-    expect(signInWithOtpMock).not.toHaveBeenCalled();
-  });
-
-  test('未登录 + 已勾同意 + 有效邮箱 → 调 signInWithOtp + 显示成功 status', async () => {
-    supabaseMockState.session = null;
-    localStorage.removeItem('yanyan.privacy.agreed.v1');
-    render(<Login />);
-    fireEvent.click(screen.getByTestId('privacy-agree-checkbox'));
-    const input = screen.getByPlaceholderText('you@example.com') as HTMLInputElement;
-    fireEvent.change(input, { target: { value: 'user@example.com' } });
-    fireEvent.click(screen.getByText(/发送登录链接/));
-    await waitFor(() => expect(signInWithOtpMock).toHaveBeenCalled());
-    expect(await screen.findByRole('status')).toHaveTextContent(/已发送登录链接/);
-  });
-
-  test('signInWithOtp 失败 → errorMessage', async () => {
-    supabaseMockState.session = null;
-    localStorage.removeItem('yanyan.privacy.agreed.v1');
-    signInWithOtpMock.mockResolvedValueOnce({ data: {}, error: { message: 'rate_limit' } as never });
-    render(<Login />);
-    fireEvent.click(screen.getByTestId('privacy-agree-checkbox'));
-    fireEvent.change(screen.getByPlaceholderText('you@example.com'), { target: { value: 'user@example.com' } });
-    fireEvent.click(screen.getByText(/发送登录链接/));
-    expect(await screen.findByRole('alert')).toHaveTextContent(/发送失败/);
+    const googleBtn = screen.getByTestId('btn-google-signin') as HTMLButtonElement;
+    expect(googleBtn.disabled).toBe(false);
   });
 
   test('登录后 onAuthStateChange 触发 → navigate step1', async () => {

@@ -19,7 +19,7 @@ export function BottomTabs() {
       className="fixed bottom-0 inset-x-0 z-30 bg-white/90 backdrop-blur border-t border-ink/10"
       data-testid="bottom-tabs"
     >
-      <ul className="flex max-w-3xl mx-auto">
+      <ul className="flex max-w-md mx-auto">
         {TABS.map((t) => {
           const active = t.exact ? location === t.matchPrefix : location.startsWith(t.matchPrefix);
           return (

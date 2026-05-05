@@ -45,7 +45,7 @@ export function Step3Reveal() {
 
   if (!yanScore) {
     return (
-      <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+      <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
         <p className="text-sm text-ink/60">加载中…</p>
       </main>
     );
@@ -54,7 +54,7 @@ export function Step3Reveal() {
   // hasCheckin=false:今日完全无数据
   if (!yanScore.hasCheckin) {
     return (
-      <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+      <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
         <p className="text-sm text-ink/60 leading-relaxed">没找到今早打卡记录。先去打卡吧。</p>
         <button
           type="button"
@@ -70,7 +70,7 @@ export function Step3Reveal() {
   // result=null:可用 Part 不足 / 上限超
   if (!yanScore.result) {
     return (
-      <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="checkin-step3">
+      <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto" data-testid="checkin-step3">
         <header className="mb-3 text-xs text-ink/50">早安 · 揭晓</header>
         <div className="flex justify-center mb-3">
           <img src={asset('checkin-reveal.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />
@@ -106,7 +106,7 @@ export function Step3Reveal() {
   const r = yanScore.result;
   const level = r.level;
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="checkin-step3">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto" data-testid="checkin-step3">
       <header className="mb-3 text-xs text-ink/50">早安 · 揭晓</header>
       <p className="text-sm text-ink/60">今日体质</p>
       <button

@@ -43,7 +43,7 @@ export function QuizStep2Symptoms() {
   };
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="quiz-step2">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto" data-testid="quiz-step2">
       <header className="mb-3 text-xs text-ink/50">2 / 3</header>
       <div className="flex justify-center mb-3">
         <img src={asset('onboarding-mirror.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />

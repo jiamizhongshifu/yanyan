@@ -97,7 +97,7 @@ export function Today() {
   }, [dateKey, tier, completedCount, completedKeys.join('|'), yanScore?.result?.level]);
 
   return (
-    <main className="min-h-screen bg-paper px-5 pt-10 pb-28" data-testid="today">
+    <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="today">
       <header className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs text-ink/45">今天</p>

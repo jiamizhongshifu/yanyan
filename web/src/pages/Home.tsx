@@ -109,7 +109,7 @@ export function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-paper px-5 pt-10 pb-28" data-testid="home">
+    <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="home">
       <header className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs text-ink/45">{greeting}</p>

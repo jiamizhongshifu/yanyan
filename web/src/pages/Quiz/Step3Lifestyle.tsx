@@ -26,7 +26,7 @@ export function QuizStep3Lifestyle() {
   };
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="quiz-step3">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto" data-testid="quiz-step3">
       <header className="mb-3 text-xs text-ink/50">3 / 3</header>
       <div className="flex justify-center mb-3">
         <img src={asset('quiz-lifestyle.png')} alt="" className="w-40 h-40 object-contain rounded-2xl" loading="lazy" />

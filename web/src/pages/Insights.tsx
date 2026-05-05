@@ -132,7 +132,7 @@ export function Insights() {
     : null;
 
   return (
-    <main className="min-h-screen bg-paper px-5 pt-10 pb-28" data-testid="insights">
+    <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="insights">
       <header className="mb-5 flex items-center justify-between">
         <div>
           <p className="text-xs text-ink/45">洞悉</p>

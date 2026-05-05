@@ -86,7 +86,7 @@ export function Camera() {
     : 'camera-tabletop.png';
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
       <div className="flex justify-center mb-2">
         <img
           src={asset(headerImg)}

@@ -21,7 +21,7 @@ export function NotFound({
   ctaLabel = '回到今天'
 }: Props) {
   return (
-    <main className="min-h-screen bg-paper px-7 pt-24 pb-10 flex flex-col items-center text-center">
+    <main className="min-h-screen bg-paper px-7 pt-24 pb-10 flex flex-col items-center text-center max-w-md mx-auto">
       <img
         src={asset('mascot-worried.png')}
         alt=""

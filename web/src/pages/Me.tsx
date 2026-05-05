@@ -75,7 +75,7 @@ export function Me() {
   };
 
   return (
-    <main className="min-h-screen bg-paper px-5 pt-12 pb-24" data-testid="me">
+    <main className="min-h-screen bg-paper px-5 pt-12 pb-24 max-w-md mx-auto" data-testid="me">
       <header className="mb-6">
         <h1 className="text-xl font-medium text-ink">我的</h1>
       </header>

@@ -45,7 +45,7 @@ export function Step2SymptomsGrid() {
   };
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
       <header className="mb-3 text-xs text-ink/50">2 / 4</header>
       <div className="flex justify-center mb-3">
         <img src={asset('onboarding-mirror.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />

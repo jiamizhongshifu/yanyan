@@ -31,7 +31,7 @@ export function Findings() {
   const eligible = progress?.flags.eligibleForProfilePdf ?? false;
 
   return (
-    <main className="min-h-screen bg-paper px-5 pt-12 pb-24" data-testid="findings">
+    <main className="min-h-screen bg-paper px-5 pt-12 pb-24 max-w-md mx-auto" data-testid="findings">
       <header className="mb-4">
         <h1 className="text-xl font-medium text-ink">易诱炎食物</h1>
         <p className="mt-2 text-sm text-ink/60 leading-relaxed">

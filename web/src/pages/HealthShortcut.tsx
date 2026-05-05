@@ -36,7 +36,7 @@ URL:    ${typeof window !== 'undefined' ? window.location.origin : 'https://web-
   Authorization: Bearer <把下方 token 粘到这里>`;
 
   return (
-    <main className="min-h-screen bg-paper px-6 pt-12 pb-24" data-testid="health-shortcut">
+    <main className="min-h-screen bg-paper px-6 pt-12 pb-24 max-w-md mx-auto" data-testid="health-shortcut">
       <button
         type="button"
         onClick={() => navigate('/app')}

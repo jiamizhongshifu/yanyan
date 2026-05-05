@@ -45,7 +45,7 @@ export function MealResult() {
   };
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
       {/* 餐盘分析 hero */}
       <div className="flex justify-center mb-4">
         <img

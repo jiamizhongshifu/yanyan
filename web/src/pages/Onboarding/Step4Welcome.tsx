@@ -16,7 +16,7 @@ export function Step4Welcome() {
   const { initialFireLevel } = useOnboarding();
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
       <header className="mb-3 text-xs text-ink/50">4 / 4</header>
 
       <div className="flex justify-center mb-2">

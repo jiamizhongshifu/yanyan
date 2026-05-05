@@ -42,7 +42,7 @@ export function Step1ReverseFilter() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
       <header className="mb-3 text-xs text-ink/50">1 / 4</header>
       <div className="flex justify-center mb-3">
         <img src={asset('onboarding-path.png')} alt="" className="w-36 h-36 object-contain" loading="lazy" />

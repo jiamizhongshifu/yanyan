@@ -20,7 +20,7 @@ export function QuizStep1Goal() {
   const { reverseFilterChoice, setReverseFilterChoice } = useQuiz();
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-12 pb-10" data-testid="quiz-step1">
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto" data-testid="quiz-step1">
       <header className="mb-3 text-xs text-ink/50">1 / 3</header>
       <div className="flex justify-center mb-3">
         <img src={asset('onboarding-path.png')} alt="" className="w-36 h-36 object-contain" loading="lazy" />

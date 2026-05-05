@@ -72,7 +72,7 @@ export function QuizResult() {
   const hint = LEVEL_HINT[index.level];
 
   return (
-    <main className="min-h-screen bg-paper px-6 pt-12 pb-20" data-testid="quiz-result">
+    <main className="min-h-screen bg-paper px-6 pt-12 pb-20 max-w-md mx-auto" data-testid="quiz-result">
       <header className="text-xs text-ink/40 tracking-widest">炎炎消防队 · 初步评估</header>
 
       {/* hero — 水豚捧仪表盘 */}
