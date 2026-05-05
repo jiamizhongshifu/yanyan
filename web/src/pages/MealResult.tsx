@@ -22,8 +22,8 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
 const LEVEL_HINT: Record<FireLevel, string> = {
   平: '这一餐很清气。继续保持。',
   微火: '微微偏火,下一餐稍清淡。',
-  中火: '偏中火,今晚 / 明早建议避开发物。',
-  大火: '这一餐发物较多。下一餐建议清蒸 / 凉拌为主。'
+  中火: '偏中火,今晚 / 明早建议避开高糖与高反应食物。',
+  大火: '这一餐反应食物偏多。下一餐建议清蒸 / 凉拌为主。'
 };
 
 export function MealResult() {

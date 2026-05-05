@@ -283,35 +283,34 @@ describe('U10 Home 主屏', () => {
 
 // ─── BottomTabs ────────────────────────────────────────────────────────
 
-describe('U10 BottomTabs', () => {
-  test('home 路径 → home tab active', () => {
+describe('BottomTabs (3 tab IA)', () => {
+  test('/app 路径 → today tab active', () => {
     render(
       <Router hook={memoryLocation({ path: '/app' }).hook}>
         <BottomTabs />
       </Router>
     );
-    expect(screen.getByTestId('tab-home')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByTestId('tab-findings')).not.toHaveAttribute('aria-current');
+    expect(screen.getByTestId('tab-today')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByTestId('tab-body')).not.toHaveAttribute('aria-current');
   });
 
-  test('findings 路径 → findings tab active', () => {
+  test('/app/body 路径 → body tab active', () => {
     render(
-      <Router hook={memoryLocation({ path: '/findings' }).hook}>
+      <Router hook={memoryLocation({ path: '/app/body' }).hook}>
         <BottomTabs />
       </Router>
     );
-    expect(screen.getByTestId('tab-findings')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByTestId('tab-home')).not.toHaveAttribute('aria-current');
+    expect(screen.getByTestId('tab-body')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByTestId('tab-today')).not.toHaveAttribute('aria-current');
   });
 
-  test('点 me tab 不抛错(链接基本可点)', () => {
+  test('点 insights tab 不抛错', () => {
     render(
       <Router hook={memoryLocation({ path: '/app' }).hook}>
         <BottomTabs />
       </Router>
     );
-    fireEvent.click(screen.getByTestId('tab-me'));
-    // wouter Link 在 memoryLocation 下不会真正跳;这一断言只确保点击不抛
+    fireEvent.click(screen.getByTestId('tab-insights'));
   });
 });
 

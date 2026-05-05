@@ -123,7 +123,7 @@ export function Login() {
   return (
     <main className="min-h-screen bg-paper px-7 pt-16 pb-10">
       <h1 className="text-3xl font-semibold text-ink">炎炎消防队</h1>
-      <p className="mt-3 text-sm text-ink/60">中医发物 × 次晨体感</p>
+      <p className="mt-3 text-sm text-ink/60">控糖 × 炎症 × 次晨体感</p>
 
       {/* 隐私政策同意 — 登录前置 */}
       <label

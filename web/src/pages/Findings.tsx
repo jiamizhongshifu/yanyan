@@ -1,8 +1,8 @@
 /**
- * 发物与发现 tab(plan U10 R21 空状态版)
+ * 易诱炎食物档案(中医亦称"发物")— Day 30 解锁
  *
- * v1 行为:展示"发物档案将在 Day 30 生成"占位 + 当前累计天数进度。
- * 真实发物清单(渐进式 Day 14-29 + Day 30 体质档案)由 Phase 2 实施。
+ * v1 行为:展示"档案将在 Day 30 生成"占位 + 当前累计天数进度。
+ * 真实清单(渐进式 Day 14-29 + Day 30 体质档案)由 Phase 2 实施。
  */
 
 import { useEffect, useState } from 'react';
@@ -32,11 +32,11 @@ export function Findings() {
   return (
     <main className="min-h-screen bg-paper px-5 pt-12 pb-24" data-testid="findings">
       <header className="mb-6">
-        <h1 className="text-xl font-medium text-ink">发物与发现</h1>
+        <h1 className="text-xl font-medium text-ink">易诱炎食物</h1>
         <p className="mt-2 text-sm text-ink/60 leading-relaxed">
           {eligible
             ? '你的体质档案已可生成。'
-            : '继续拍照 + 次晨打卡,你的个人发物档案会在 Day 30 出现。'}
+            : '继续拍照 + 次晨打卡,你的个人易诱炎食物档案会在 Day 30 出现。'}
         </p>
       </header>
 
@@ -58,8 +58,8 @@ export function Findings() {
           {eligible
             ? '体质档案 v0.5(群体先验版)已生成,Phase 2 个体 Bayesian 版会替换。'
             : days >= 14
-            ? '已超过 14 天:Phase 2 上线后,这里会渐进展示候选发物 + 置信度。'
-            : '未到 14 天:发物候选规律需要更多数据。'}
+            ? '已超过 14 天:Phase 2 上线后,这里会渐进展示候选食物 + 置信度。'
+            : '未到 14 天:候选食物规律需要更多数据。'}
         </p>
         {eligible && (
           <Link

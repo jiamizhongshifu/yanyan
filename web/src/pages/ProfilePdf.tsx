@@ -48,7 +48,7 @@ function ProfileBody({ data }: { data: ProfileV05Data }) {
       </section>
 
       <section className="mb-6" data-testid="common-fa-section">
-        <h2 className="text-sm font-medium text-ink mb-3">群体常见发物(参考)</h2>
+        <h2 className="text-sm font-medium text-ink mb-3">群体常见易诱炎食物(参考)</h2>
         <ul className="space-y-1 text-sm text-ink">
           {data.commonFaFoods.map((f) => (
             <li key={f.name}>

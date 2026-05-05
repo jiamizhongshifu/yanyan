@@ -5,6 +5,8 @@ import { QuizStep2Symptoms } from './pages/Quiz/Step2Symptoms';
 import { QuizStep3Lifestyle } from './pages/Quiz/Step3Lifestyle';
 import { QuizResult } from './pages/Quiz/Result';
 import { Home } from './pages/Home';
+import { Today } from './pages/Today';
+import { Insights } from './pages/Insights';
 import { Findings } from './pages/Findings';
 import { Me } from './pages/Me';
 import { Consent } from './pages/Consent';
@@ -23,7 +25,7 @@ import { ProfilePdf } from './pages/ProfilePdf';
 import { RequireAuth } from './components/RequireAuth';
 import { BottomTabs } from './components/BottomTabs';
 
-/** 登录后主屏 + 4 tab 在以下前缀显示 */
+/** 登录后主屏 + 3 tab 在以下前缀显示 */
 const TAB_VISIBLE_PREFIXES = ['/app', '/findings', '/me'];
 
 function MaybeBottomTabs() {
@@ -47,10 +49,20 @@ export function App() {
         <Route path="/login" component={Login} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
 
-        {/* 受保护 — 登录后主屏 */}
+        {/* 受保护 — 3 tab 主屏 */}
         <Route path="/app">
           <RequireAuth>
+            <Today />
+          </RequireAuth>
+        </Route>
+        <Route path="/app/body">
+          <RequireAuth>
             <Home />
+          </RequireAuth>
+        </Route>
+        <Route path="/app/insights">
+          <RequireAuth>
+            <Insights />
           </RequireAuth>
         </Route>
 
