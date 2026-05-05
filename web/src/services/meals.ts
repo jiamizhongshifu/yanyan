@@ -108,7 +108,8 @@ export async function postMeal(storageKey: string): Promise<
     url: '/meals',
     method: 'POST',
     authToken: token,
-    data: { storageKey }
+    data: { storageKey },
+    timeoutMs: 60_000 // LLM 视觉识别最长 ~30s,留冗余
   });
   if (res.ok) return { kind: 'ok', data: res.data };
   if (res.status === 422) return { kind: 'low_confidence', message: '看不太清,要不要补一张?' };
