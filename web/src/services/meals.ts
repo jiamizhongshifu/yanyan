@@ -109,7 +109,7 @@ export async function postMeal(storageKey: string): Promise<
     method: 'POST',
     authToken: token,
     data: { storageKey },
-    timeoutMs: 60_000 // LLM 视觉识别最长 ~30s,留冗余
+    timeoutMs: 55_000 // server-side LLM 25s+25s+overhead,client 略小于 Vercel 60s function 上限
   });
   if (res.ok) return { kind: 'ok', data: res.data };
   if (res.status === 422) return { kind: 'low_confidence', message: '看不太清,要不要补一张?' };
