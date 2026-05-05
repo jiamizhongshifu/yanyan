@@ -127,22 +127,6 @@ export function Me() {
         <div className="w-10" />
       </header>
 
-      {/* Soak emblem 顶部品牌 */}
-      <div className="flex flex-col items-center mb-6">
-        <img
-          src={asset('soak-emblem.png')}
-          alt="Soak"
-          className="w-20 h-20 object-contain"
-          loading="eager"
-        />
-        <img
-          src={asset('soak-wordmark.png')}
-          alt="Soak"
-          className="mt-2 h-7 w-auto object-contain opacity-80"
-          loading="lazy"
-        />
-      </div>
-
       {/* 身份卡 — mascot + email */}
       <section className="mb-5 rounded-3xl bg-white px-5 py-5 flex items-center gap-4">
         <img
@@ -279,9 +263,15 @@ export function Me() {
         </button>
       </section>
 
-      <p className="mt-10 text-center text-[11px] text-ink/35 leading-relaxed">
-        v1 私人 beta · 控糖 × 炎症 × 次晨体感
-      </p>
+      <footer className="mt-10 flex flex-col items-center gap-1.5 text-ink/35">
+        <img
+          src={asset('soak-wordmark.png')}
+          alt="Soak"
+          className="h-4 w-auto object-contain opacity-60"
+          loading="lazy"
+        />
+        <p className="text-[11px] leading-relaxed">v1 私人 beta · 控糖 × 炎症 × 次晨体感</p>
+      </footer>
     </main>
   );
 }
