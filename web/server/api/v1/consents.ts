@@ -19,9 +19,9 @@ import {
   recordConsent,
   revokeConsent,
   getConsentStatus,
-  PgConsentStore,
   type ConsentDeps
 } from '../../services/consents';
+import { SupabaseRestConsentStore } from '../../services/consents/store-rest';
 import { getKms, hashClientIp } from '../../crypto/kms';
 import { requireUser } from '../../auth';
 
@@ -36,7 +36,8 @@ export interface RegisterConsentsOptions {
 }
 
 export async function registerConsentsRoutes(app: FastifyInstance, opts: RegisterConsentsOptions = {}): Promise<void> {
-  const deps: ConsentDeps = opts.deps ?? { store: new PgConsentStore(), kms: getKms() };
+  // 默认走 Supabase REST 绕过 pg.Pool DATABASE_URL 鉴权问题
+  const deps: ConsentDeps = opts.deps ?? { store: new SupabaseRestConsentStore(), kms: getKms() };
 
   app.get('/consents/required', async () => {
     return { ok: true, consentVersionRequired: CURRENT_CONSENT_VERSION_REQUIRED };

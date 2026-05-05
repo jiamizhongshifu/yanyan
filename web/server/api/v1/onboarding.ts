@@ -10,7 +10,6 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import {
   DevCodeToSessionResolver,
-  PgUserStore,
   loginOrCreate,
   saveBaseline,
   ensureUser,
@@ -23,6 +22,7 @@ import {
   type UsersDeps,
   type UserStore
 } from '../../services/users';
+import { SupabaseRestUserStore } from '../../services/users/store-rest';
 import { getKms } from '../../crypto/kms';
 import { requireUser } from '../../auth';
 
@@ -40,7 +40,8 @@ export interface RegisterOnboardingOptions {
 
 export async function registerOnboardingRoutes(app: FastifyInstance, opts: RegisterOnboardingOptions = {}): Promise<void> {
   const deps: UsersDeps = {
-    store: opts.deps?.store ?? new PgUserStore(),
+    // 默认走 Supabase REST(service_role)— 绕过 pg.Pool 的 DATABASE_URL 鉴权问题
+    store: opts.deps?.store ?? new SupabaseRestUserStore(),
     kms: getKms(),
     resolver: opts.deps?.resolver ?? new DevCodeToSessionResolver()
   };
