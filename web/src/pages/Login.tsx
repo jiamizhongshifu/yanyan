@@ -13,6 +13,7 @@ import { useAuth } from '../services/auth';
 import { useQuiz } from '../store/quiz';
 import { useOnboarding } from '../store/onboarding';
 import { bootstrapFromQuiz } from '../services/bootstrap';
+import { asset } from '../services/assets';
 
 const PRIVACY_AGREED_KEY = 'yanyan.privacy.agreed.v1';
 
@@ -121,9 +122,17 @@ export function Login() {
   const buttonsDisabled = !agreedPrivacy;
 
   return (
-    <main className="min-h-screen bg-paper px-7 pt-16 pb-10">
-      <h1 className="text-3xl font-semibold text-ink">炎炎消防队</h1>
-      <p className="mt-3 text-sm text-ink/60">控糖 × 炎症 × 次晨体感</p>
+    <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
+      <div className="flex justify-center mb-2">
+        <img
+          src={asset('login-hero.png')}
+          alt=""
+          className="w-44 h-44 object-contain"
+          loading="lazy"
+        />
+      </div>
+      <h1 className="text-3xl font-semibold text-ink text-center">炎炎消防队</h1>
+      <p className="mt-2 text-sm text-ink/60 text-center">控糖 × 炎症 × 次晨体感</p>
 
       {/* 隐私政策同意 — 登录前置 */}
       <label

@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { fetchProgress, type UserProgress } from '../services/home';
 import { track } from '../services/tracker';
+import { asset } from '../services/assets';
 
 export function Findings() {
   const [progress, setProgress] = useState<UserProgress | null>(null);
@@ -31,7 +32,7 @@ export function Findings() {
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-12 pb-24" data-testid="findings">
-      <header className="mb-6">
+      <header className="mb-4">
         <h1 className="text-xl font-medium text-ink">易诱炎食物</h1>
         <p className="mt-2 text-sm text-ink/60 leading-relaxed">
           {eligible
@@ -39,6 +40,17 @@ export function Findings() {
             : '继续拍照 + 次晨打卡,你的个人易诱炎食物档案会在 Day 30 出现。'}
         </p>
       </header>
+
+      {!eligible && (
+        <div className="flex justify-center mb-2">
+          <img
+            src={asset('findings-hourglass.png')}
+            alt=""
+            className="w-48 h-48 object-contain"
+            loading="lazy"
+          />
+        </div>
+      )}
 
       <section className="rounded-2xl bg-white px-6 py-7" data-testid="progress-card">
         <div className="flex items-baseline justify-between">

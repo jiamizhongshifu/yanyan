@@ -13,6 +13,7 @@ import { useLocation } from 'wouter';
 import { CONSENT_SCOPES, fetchRequiredVersion, postConsent } from '../../services/consents';
 import { ensureUser, localEstimateFireLevel, postBaseline, type FireLevel } from '../../services/onboarding';
 import { useOnboarding } from '../../store/onboarding';
+import { asset } from '../../services/assets';
 
 const PRIVACY_AGREED_KEY = 'yanyan.privacy.agreed.v1';
 
@@ -105,11 +106,18 @@ export function Step3BaselineConsent() {
         <p className="mt-4 text-sm text-ink/70 leading-relaxed">{FIRE_LEVEL_TO_HINT[localLevel]}</p>
       </section>
 
-      <section className="rounded-2xl bg-white px-6 py-5">
-        <h2 className="text-base font-medium text-ink">即将完成初始化</h2>
-        <p className="mt-3 text-sm text-ink/70 leading-relaxed">
-          点击下方按钮,系统会用你刚才的回答建立体质 baseline。后续每餐拍照、次晨打卡都会以此为起点。
-        </p>
+      <section className="rounded-2xl bg-white px-6 py-5 flex items-center gap-4">
+        <img
+          src={asset('onboarding-seedling.png')}
+          alt=""
+          className="w-20 h-20 object-contain flex-shrink-0"
+        />
+        <div className="flex-1">
+          <h2 className="text-base font-medium text-ink">即将完成初始化</h2>
+          <p className="mt-2 text-sm text-ink/70 leading-relaxed">
+            点击下方按钮,系统会用你刚才的回答建立体质 baseline。后续每餐拍照、次晨打卡都会以此为起点。
+          </p>
+        </div>
       </section>
 
       {errorMessage && (

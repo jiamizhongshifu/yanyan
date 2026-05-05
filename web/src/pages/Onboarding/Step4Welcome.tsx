@@ -9,6 +9,7 @@
 
 import { useLocation } from 'wouter';
 import { useOnboarding } from '../../store/onboarding';
+import { asset } from '../../services/assets';
 
 export function Step4Welcome() {
   const [, navigate] = useLocation();
@@ -18,7 +19,10 @@ export function Step4Welcome() {
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
       <header className="mb-3 text-xs text-ink/50">4 / 4</header>
 
-      <h1 className="text-2xl font-semibold text-ink">就绪了。</h1>
+      <div className="flex justify-center mb-2">
+        <img src={asset('achievement-unlock.png')} alt="" className="w-40 h-40 object-contain" loading="lazy" />
+      </div>
+      <h1 className="text-2xl font-semibold text-ink text-center">就绪了。</h1>
       {initialFireLevel && (
         <p className="mt-3 text-sm text-ink/70 leading-relaxed">
           系统已为你建好初始档案,首份火分:<span className="font-medium text-ink">{initialFireLevel}</span>。

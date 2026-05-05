@@ -30,7 +30,14 @@ const ASSETS = [
   { local: 'body-food.png', remote: 'body-food.png', contentType: 'image/png' },
   { local: 'body-symptom.png', remote: 'body-symptom.png', contentType: 'image/png' },
   { local: 'body-env.png', remote: 'body-env.png', contentType: 'image/png' },
-  { local: 'body-activity.png', remote: 'body-activity.png', contentType: 'image/png' }
+  { local: 'body-activity.png', remote: 'body-activity.png', contentType: 'image/png' },
+  // 第二批:页面 hero / 空状态插画
+  { local: 'login-hero.png', remote: 'login-hero.png', contentType: 'image/png' },
+  { local: 'onboarding-path.png', remote: 'onboarding-path.png', contentType: 'image/png' },
+  { local: 'onboarding-mirror.png', remote: 'onboarding-mirror.png', contentType: 'image/png' },
+  { local: 'onboarding-seedling.png', remote: 'onboarding-seedling.png', contentType: 'image/png' },
+  { local: 'camera-tabletop.png', remote: 'camera-tabletop.png', contentType: 'image/png' },
+  { local: 'findings-hourglass.png', remote: 'findings-hourglass.png', contentType: 'image/png' }
 ];
 
 async function main(): Promise<void> {

@@ -15,6 +15,7 @@ import { useAuth } from '../services/auth';
 import { compressImage, postMeal, uploadPhoto } from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
 import { track } from '../services/tracker';
+import { asset } from '../services/assets';
 
 type Stage = 'idle' | 'compressing' | 'uploading' | 'recognizing' | 'done' | 'error';
 
@@ -79,9 +80,17 @@ export function Camera() {
 
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
-      <h1 className="text-2xl font-semibold text-ink">拍下这一餐</h1>
-      <p className="mt-3 text-sm text-ink/60 leading-relaxed">
-        AI 会判断每个食物的中医属性,几秒钟出红/黄/绿。识别后你可以标记错的,我们会修正。
+      <div className="flex justify-center mb-2">
+        <img
+          src={asset('camera-tabletop.png')}
+          alt=""
+          className="w-44 h-44 object-contain"
+          loading="lazy"
+        />
+      </div>
+      <h1 className="text-2xl font-semibold text-ink text-center">拍下这一餐</h1>
+      <p className="mt-3 text-sm text-ink/60 leading-relaxed text-center">
+        AI 会估算这一餐的添加糖与碳水,标三档反应程度,出当餐炎症分。识别后你可以标记错的,我们会修正。
       </p>
 
       <input
