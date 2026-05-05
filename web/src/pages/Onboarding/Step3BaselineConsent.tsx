@@ -1,14 +1,17 @@
 /**
- * Onboarding Step 3 — 体质 baseline 即视感 + 静默写入同意 / baseline
+ * Onboarding Step 3 — 体质 baseline 自动建立
  *
  * 用户登录前已在 Login 页勾选《隐私政策》同意,所以此屏不再显示同意 UI。
- * 单按钮"继续"触发:ensureUser → postConsent(5 项,基于登录前同意)→ postBaseline → step4
+ * 进页面后自动触发:ensureUser → postConsent(5 项) → postBaseline → step4
+ * 用户看到本地估算的炎症等级 + "正在保存..." 进度,完成后自动跳转。
+ *
+ * 失败 → 显示 mascot-worried + 重试按钮(让用户控制)
  *
  * 防绕过:进页面时校验 localStorage('yanyan.privacy.agreed.v1') = 'true',
  *   未同意 → 跳回 /login(理论上不会发生)
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { CONSENT_SCOPES, fetchRequiredVersion, postConsent } from '../../services/consents';
 import { ensureUser, localEstimateFireLevel, postBaseline, type FireLevel } from '../../services/onboarding';
@@ -31,14 +34,56 @@ const fireClass: Record<FireLevel, string> = {
   大火: 'text-fire-high'
 };
 
+type Stage = 'preparing' | 'saving' | 'error';
+
 export function Step3BaselineConsent() {
   const [, navigate] = useLocation();
   const { reverseFilterChoice, symptomsFrequency, setInitialFireLevel } = useOnboarding();
-  const [consentVersion, setConsentVersion] = useState(1);
-  const [submitting, setSubmitting] = useState(false);
+  const [stage, setStage] = useState<Stage>('preparing');
   const [errorMessage, setErrorMessage] = useState('');
+  const triggerRef = useRef(false);
 
   const localLevel = useMemo(() => localEstimateFireLevel(symptomsFrequency), [symptomsFrequency]);
+
+  const runBaseline = async () => {
+    if (triggerRef.current) return;
+    triggerRef.current = true;
+    if (!reverseFilterChoice) {
+      setErrorMessage('缺少第一步选项,请退回 Step 1 重选。');
+      setStage('error');
+      triggerRef.current = false;
+      return;
+    }
+    setStage('saving');
+    setErrorMessage('');
+
+    const ensured = await ensureUser();
+    if (!ensured.ok) {
+      setErrorMessage('账号初始化失败,请刷新或重新登录后重试。');
+      setStage('error');
+      triggerRef.current = false;
+      return;
+    }
+
+    const version = (await fetchRequiredVersion()) ?? 1;
+    const consentOk = await postConsent([...CONSENT_SCOPES], version);
+    if (!consentOk) {
+      setErrorMessage('同意提交失败,请稍后重试。');
+      setStage('error');
+      triggerRef.current = false;
+      return;
+    }
+
+    const baseline = await postBaseline(reverseFilterChoice, symptomsFrequency);
+    if (!baseline) {
+      setErrorMessage('体质数据保存失败,请稍后重试。');
+      setStage('error');
+      triggerRef.current = false;
+      return;
+    }
+    setInitialFireLevel(baseline.initialFireLevel);
+    navigate('/onboarding/step4');
+  };
 
   useEffect(() => {
     // 防绕过:未在 Login 页同意者不应进到这里
@@ -46,56 +91,19 @@ export function Step3BaselineConsent() {
       navigate('/login', { replace: true });
       return;
     }
-    let mounted = true;
-    void fetchRequiredVersion().then((v) => {
-      if (mounted && v != null) setConsentVersion(v);
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [navigate]);
-
-  const onSubmit = async () => {
-    if (submitting) return;
-    if (!reverseFilterChoice) {
-      setErrorMessage('缺少第一步选项,请退回 Step 1 重选。');
-      return;
-    }
-    setSubmitting(true);
-    setErrorMessage('');
-
-    // 1. ensure user(post-Supabase Auth 创建 public.users + 生成 DEK)
-    const ensured = await ensureUser();
-    if (!ensured.ok) {
-      setSubmitting(false);
-      setErrorMessage('账号初始化失败,请刷新或重新登录后重试。');
-      return;
-    }
-
-    // 2. 静默 postConsent — 用户在 Login 页已同意 5 项
-    const consentOk = await postConsent([...CONSENT_SCOPES], consentVersion);
-    if (!consentOk) {
-      setSubmitting(false);
-      setErrorMessage('同意提交失败,请稍后重试。');
-      return;
-    }
-
-    // 3. baseline
-    const baseline = await postBaseline(reverseFilterChoice, symptomsFrequency);
-    if (!baseline) {
-      setSubmitting(false);
-      setErrorMessage('体质数据保存失败,请稍后重试。');
-      return;
-    }
-    setInitialFireLevel(baseline.initialFireLevel);
-    navigate('/onboarding/step4');
-  };
+    // 进页面 1.2s 后自动触发(让用户先看清本地估算)
+    const timer = setTimeout(() => {
+      void runBaseline();
+    }, 1200);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
       <header className="mb-3 text-xs text-ink/50">3 / 4</header>
 
-      <section className="mb-10">
+      <section className="mb-8">
         <p className="text-sm text-ink/60">看起来你近期偏</p>
         <div
           className={`mt-2 text-7xl font-semibold leading-none ${fireClass[localLevel]}`}
@@ -106,35 +114,48 @@ export function Step3BaselineConsent() {
         <p className="mt-4 text-sm text-ink/70 leading-relaxed">{FIRE_LEVEL_TO_HINT[localLevel]}</p>
       </section>
 
-      <section className="rounded-2xl bg-white px-6 py-5 flex items-center gap-4">
-        <img
-          src={asset('onboarding-seedling.png')}
-          alt=""
-          className="w-20 h-20 object-contain flex-shrink-0"
-        />
-        <div className="flex-1">
-          <h2 className="text-base font-medium text-ink">即将完成初始化</h2>
-          <p className="mt-2 text-sm text-ink/70 leading-relaxed">
-            点击下方按钮,系统会用你刚才的回答建立体质 baseline。后续每餐拍照、次晨打卡都会以此为起点。
-          </p>
-        </div>
-      </section>
-
-      {errorMessage && (
-        <div role="alert" className="mt-6 rounded-2xl bg-fire-high/10 px-4 py-3 flex items-center gap-3">
-          <img src={asset('mascot-worried.png')} alt="" className="w-12 h-12 object-contain flex-shrink-0" />
-          <span className="text-sm text-fire-high">{errorMessage}</span>
-        </div>
+      {stage === 'error' ? (
+        <section className="rounded-2xl bg-fire-high/10 px-5 py-4 flex items-center gap-3" role="alert">
+          <img
+            src={asset('mascot-worried.png')}
+            alt=""
+            className="w-12 h-12 object-contain flex-shrink-0"
+          />
+          <span className="text-sm text-fire-high flex-1">{errorMessage}</span>
+        </section>
+      ) : (
+        <section className="rounded-2xl bg-white px-6 py-5 flex items-center gap-4">
+          <img
+            src={asset(stage === 'saving' ? 'mascot-thinking.png' : 'onboarding-seedling.png')}
+            alt=""
+            className="w-16 h-16 object-contain flex-shrink-0 transition-opacity"
+          />
+          <div className="flex-1">
+            <h2 className="text-base font-medium text-ink">
+              {stage === 'saving' ? '正在为你建立 baseline…' : '即将完成初始化'}
+            </h2>
+            <p className="mt-2 text-xs text-ink/60 leading-relaxed">
+              {stage === 'saving'
+                ? '保存今天作为体质起点,后续每餐 / 每晨数据都以此为参照。'
+                : '马上保存今天作为体质起点,后续每餐拍照、次晨打卡都以此为参照。'}
+            </p>
+          </div>
+        </section>
       )}
 
-      <button
-        type="button"
-        onClick={onSubmit}
-        disabled={submitting}
-        className="mt-10 w-full rounded-full bg-ink text-white py-3 text-base font-medium disabled:opacity-50"
-      >
-        {submitting ? '提交中...' : '建立 baseline → 下一步'}
-      </button>
+      {stage === 'error' ? (
+        <button
+          type="button"
+          onClick={() => void runBaseline()}
+          className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
+        >
+          重试
+        </button>
+      ) : (
+        <p className="mt-8 text-xs text-ink/40 text-center leading-relaxed">
+          {stage === 'saving' ? '保存完成后会自动进入下一步' : '正在准备…'}
+        </p>
+      )}
     </main>
   );
 }

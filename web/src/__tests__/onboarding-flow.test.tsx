@@ -136,13 +136,14 @@ describe('U4 redo Step 3', () => {
     expect(screen.getByTestId('local-fire-level')).toHaveTextContent('大火');
   });
 
-  test('Happy: 单按钮提交 → ensure → consent(默认 5 项) → baseline → 跳 step4', async () => {
+  test('Happy: 自动触发 ensure → consent → baseline → 跳 step4(无须点击)', async () => {
     useOnboarding.getState().setReverseFilterChoice('rhinitis');
     render(<Step3BaselineConsent />);
 
-    fireEvent.click(screen.getByText(/建立 baseline/));
-
-    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step4'));
+    // 1.2s auto-trigger 后会跑完整链路 → navigate step4
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step4'), {
+      timeout: 3000
+    });
 
     const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
     const urls = fetchMock.mock.calls.map((c: unknown[]) => (c[0] as string));
@@ -153,14 +154,13 @@ describe('U4 redo Step 3', () => {
     expect(useOnboarding.getState().initialFireLevel).toBe('微火');
   });
 
-  test('Step 1 缺失 reverseFilterChoice → submit errorMessage,不发 ensure', async () => {
+  test('Step 1 缺失 reverseFilterChoice → 显示错误 + 重试按钮,不发 ensure', async () => {
     useOnboarding.getState().setReverseFilterChoice(null as unknown as 'rhinitis');
     render(<Step3BaselineConsent />);
-    fireEvent.click(screen.getByText(/建立 baseline/));
-    expect(await screen.findByRole('alert')).toHaveTextContent(/Step 1/);
+    expect(await screen.findByRole('alert', undefined, { timeout: 3000 })).toHaveTextContent(/Step 1/);
   });
 
-  test('ensure 失败 → errorMessage 不继续到 consent', async () => {
+  test('ensure 失败 → 显示错误 + 重试按钮,不继续到 consent', async () => {
     useOnboarding.getState().setReverseFilterChoice('rhinitis');
     const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
     fetchMock.mockImplementation(async (url: string | URL | Request) => {
@@ -175,9 +175,7 @@ describe('U4 redo Step 3', () => {
     });
 
     render(<Step3BaselineConsent />);
-    fireEvent.click(screen.getByText(/建立 baseline/));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(/账号初始化失败/);
+    expect(await screen.findByRole('alert', undefined, { timeout: 3000 })).toHaveTextContent(/账号初始化失败/);
     expect(navigateMock).not.toHaveBeenCalled();
   });
 });
