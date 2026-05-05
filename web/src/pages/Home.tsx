@@ -33,7 +33,6 @@ import { useQuiz } from '../store/quiz';
 import { useOnboarding } from '../store/onboarding';
 import { computeInflammationIndex } from '../services/quiz';
 import { track } from '../services/tracker';
-import { asset } from '../services/assets';
 
 const LEVEL_ICON_FILE = {
   平: 'level-ping.png',
@@ -117,22 +116,15 @@ export function Home() {
         </div>
         <Link
           href="/me"
-          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/60 text-sm"
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/60 active:scale-95 transition-transform"
           aria-label="我的"
         >
-          ◆
+          <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
         </Link>
       </header>
-
-      {/* Body hero — 4 part 围绕水豚冥想图 */}
-      <div className="mb-3 -mx-1 rounded-3xl overflow-hidden">
-        <img
-          src={asset('body-hero.png')}
-          alt="身体 4 维度"
-          className="w-full h-auto block"
-          loading="lazy"
-        />
-      </div>
 
       <div className="mb-6">
         <HomeStreakStrip cumulativeDays={progress?.cumulativeCheckinDays ?? 0} todayLevel={dial?.level ?? null} />

@@ -51,6 +51,8 @@ export function Insights() {
   // 趋势点击选中日 → 详情面板数据
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDateMeals, setSelectedDateMeals] = useState<TodayMealItem[] | null>(null);
+  // 趋势锁定面板:即使 < 21 天也允许点开看现有数据
+  const [trendExpanded, setTrendExpanded] = useState(false);
 
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };
@@ -196,13 +198,24 @@ export function Insights() {
         const TREND_THRESHOLD = progress?.thresholds.trendLineDays ?? 21;
         const canDraw = (progress?.flags.canDrawTrend ?? false) || cumulativeDays >= TREND_THRESHOLD;
         if (!canDraw) {
+          // 锁定面板:右侧用真实迷你曲线 preview 替代装饰图;
+          // 整卡可点 → 展开本期已有的全量趋势(即使数据稀疏)
+          const entries = history?.entries ?? [];
           return (
-            <section className="mt-6 rounded-3xl bg-white px-5 py-5 relative overflow-hidden" data-testid="trend-locked">
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <h2 className="mb-2 text-base font-medium text-ink">炎症指数趋势</h2>
-                  <p className="text-xs text-ink/55 leading-relaxed">
-                    累计打卡 {TREND_THRESHOLD} 天后解锁。当前 {cumulativeDays} / {TREND_THRESHOLD}。
+            <section className="mt-6 rounded-3xl bg-white px-5 py-5" data-testid="trend-locked">
+              <button
+                type="button"
+                onClick={() => setTrendExpanded((v) => !v)}
+                className="w-full text-left flex items-start gap-4"
+                aria-expanded={trendExpanded}
+              >
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-base font-medium text-ink flex items-center gap-1.5">
+                    炎症指数趋势
+                    <span className="text-xs text-ink/40">{trendExpanded ? '收起 ▴' : '展开 ▾'}</span>
+                  </h2>
+                  <p className="mt-1 text-xs text-ink/55 leading-relaxed">
+                    累计 {cumulativeDays} / {TREND_THRESHOLD} 天{cumulativeDays >= TREND_THRESHOLD ? '' : ',再坚持解锁完整版'}
                   </p>
                   <div className="mt-3 h-2 rounded-full bg-paper overflow-hidden">
                     <div
@@ -211,12 +224,30 @@ export function Insights() {
                     />
                   </div>
                 </div>
-                <div className="flex-shrink-0 flex items-end gap-1 opacity-70 -mr-2">
-                  <img src={asset('level-ping.png')} alt="" className="w-10 h-10" />
-                  <img src={asset('level-weihuo.png')} alt="" className="w-12 h-12" />
-                  <img src={asset('level-zhonghuo.png')} alt="" className="w-10 h-10" />
+                {/* 真实迷你曲线预览(36px 高,无坐标轴) */}
+                <div className="flex-shrink-0 w-28 pl-2 pointer-events-none">
+                  <MiniTrendPreview entries={entries} />
                 </div>
-              </div>
+              </button>
+
+              {trendExpanded && (
+                <div className="mt-5 pt-4 border-t border-ink/5">
+                  <p className="text-xs text-ink/45 mb-2">{entries.length === 0 ? '当前没有可显示的数据点' : `${entries.length} 天数据`}</p>
+                  <InflammationTrendChart
+                    entries={entries}
+                    onSelectDate={setSelectedDate}
+                    selectedDate={selectedDate}
+                  />
+                  {selectedDate && (
+                    <DayDetailPanel
+                      date={selectedDate}
+                      entry={selectedDay}
+                      snapshot={selectedSnapshot}
+                      meals={selectedDateMeals}
+                    />
+                  )}
+                </div>
+              )}
             </section>
           );
         }
@@ -397,6 +428,61 @@ function AchievementCard({
         )}
       </div>
     </div>
+  );
+}
+
+function MiniTrendPreview({ entries }: { entries: import('../services/yanScoreHistory').YanScoreHistoryEntry[] }) {
+  const W = 112;
+  const H = 36;
+  // 没数据 → 画一条示意性的"理想趋势"虚线波浪,告诉用户解锁后会看到什么
+  if (entries.length < 2) {
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-9">
+        <path
+          d={`M 0 ${H * 0.7} Q ${W * 0.25} ${H * 0.25}, ${W * 0.5} ${H * 0.5} T ${W} ${H * 0.4}`}
+          fill="none"
+          stroke="#0002"
+          strokeWidth="2"
+          strokeDasharray="3 3"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+  // 真实曲线 — 把所有 total 标准化到 viewBox
+  const valid = entries.filter((e) => e.total !== null);
+  if (valid.length < 2) {
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-9">
+        <circle cx={W / 2} cy={H / 2} r="2.5" fill="#999" />
+      </svg>
+    );
+  }
+  const stepX = W / Math.max(1, entries.length - 1);
+  const path: string[] = [];
+  let drawing = false;
+  for (let i = 0; i < entries.length; i++) {
+    const v = entries[i].total;
+    if (v === null) {
+      drawing = false;
+      continue;
+    }
+    const x = i * stepX;
+    const y = H - 4 - (Math.max(0, Math.min(100, v)) / 100) * (H - 8);
+    path.push(`${drawing ? 'L' : 'M'} ${x.toFixed(1)} ${y.toFixed(1)}`);
+    drawing = true;
+  }
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-9">
+      <defs>
+        <linearGradient id="mini-trend-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stopColor="#4A8B6F" />
+          <stop offset="50%" stopColor="#C9A227" />
+          <stop offset="100%" stopColor="#B43A30" />
+        </linearGradient>
+      </defs>
+      <path d={path.join(' ')} fill="none" stroke="url(#mini-trend-grad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 

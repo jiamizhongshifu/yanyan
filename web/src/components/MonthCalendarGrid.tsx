@@ -27,18 +27,20 @@ interface Props {
   daysHistory?: DayInfo[];
 }
 
-const TIER_COLOR: Record<DayInfo['tier'], string> = {
-  perfect: 'bg-fire-mild/70',
-  great: 'bg-fire-ping/45',
-  nice: 'bg-ink/20',
-  none: 'bg-ink/10'
+// streak-* 是为小尺寸圆环设计的极简单色等级图标(28×28 仍清晰)
+const STREAK_ICON_FILE: Record<FireLevel, string> = {
+  平: 'streak-ping.png',
+  微火: 'streak-weihuo.png',
+  中火: 'streak-zhonghuo.png',
+  大火: 'streak-dahuo.png'
 };
 
-const LEVEL_ICON_FILE: Record<FireLevel, string> = {
-  平: 'level-ping.png',
-  微火: 'level-weihuo.png',
-  中火: 'level-zhonghuo.png',
-  大火: 'level-dahuo.png'
+// tier 状态视觉差异化 — 完美/美好/奈斯/无,不同环色 + 阴影深度
+const TIER_RING: Record<DayInfo['tier'], string> = {
+  perfect: 'ring-2 ring-fire-mild bg-fire-mild/15',
+  great: 'ring-2 ring-fire-ping/70 bg-fire-ping/10',
+  nice: 'ring-1 ring-ink/30 bg-ink/5',
+  none: 'bg-ink/10'
 };
 
 export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = new Date(), daysHistory }: Props) {
@@ -100,25 +102,42 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
                 {c.day}
               </span>
               <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center ${
-                  c.isToday ? 'bg-ink/95' : 'bg-transparent'
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                  c.isToday ? 'ring-2 ring-ink ring-offset-2 ring-offset-white' : ''
                 }`}
               >
                 {showTodayLevel && todayDisplayLevel ? (
-                  <img
-                    src={asset(LEVEL_ICON_FILE[todayDisplayLevel])}
-                    alt={todayDisplayLevel}
-                    className="w-7 h-7 object-contain"
-                  />
-                ) : hist && hist.tier !== 'none' ? (
+                  // 今天 + 已知等级 → streak 图标(高亮)
+                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
+                    <img
+                      src={asset(STREAK_ICON_FILE[todayDisplayLevel])}
+                      alt={todayDisplayLevel}
+                      className="w-7 h-7 object-contain"
+                    />
+                  </div>
+                ) : hist && hist.fireLevel ? (
+                  // 历史日 + 有等级 → streak 图标 + tier 环
                   <div
-                    className={`w-7 h-7 rounded-full ${TIER_COLOR[hist.tier]}`}
-                    title={hist.tier}
-                  />
+                    className={`w-9 h-9 rounded-full flex items-center justify-center ${TIER_RING[hist.tier]}`}
+                    title={`${hist.fireLevel} · ${hist.tier === 'perfect' ? '完美' : hist.tier === 'great' ? '美好' : hist.tier === 'nice' ? '奈斯' : ''}`}
+                  >
+                    <img
+                      src={asset(STREAK_ICON_FILE[hist.fireLevel])}
+                      alt={hist.fireLevel}
+                      className="w-6 h-6 object-contain"
+                    />
+                  </div>
+                ) : hist && hist.tier !== 'none' ? (
+                  // tier 但无等级 → 纯 tier 环 + 中央实心点
+                  <div className={`w-8 h-8 rounded-full ${TIER_RING[hist.tier]} flex items-center justify-center`}>
+                    <div className="w-2 h-2 rounded-full bg-ink/45" />
+                  </div>
                 ) : isChecked ? (
-                  <div className="w-7 h-7 rounded-full bg-ink/15" />
+                  // 已打卡但无 tier(老数据 fallback)→ 浅色填充
+                  <div className="w-7 h-7 rounded-full bg-ink/12" />
                 ) : (
-                  <div className="w-6 h-6 rounded-full border border-ink/15" />
+                  // 未打卡 → 虚边圆
+                  <div className="w-6 h-6 rounded-full border border-dashed border-ink/20" />
                 )}
               </div>
             </div>

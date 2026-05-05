@@ -22,6 +22,33 @@ import { InappRemindersBanner } from '../components/InappRemindersBanner';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
 import { track } from '../services/tracker';
 
+function WaterDropIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg viewBox="0 0 24 32" width="22" height="28" aria-hidden="true">
+      <path
+        d="M12 2 C 12 2, 4 12, 4 20 a 8 8 0 0 0 16 0 C 20 12, 12 2, 12 2 Z"
+        fill={filled ? '#4A8B6F' : '#F7F4EE'}
+        stroke={filled ? '#4A8B6F' : 'rgba(0,0,0,0.18)'}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      {filled && (
+        // 内部高光,让"已喝"的水滴更立体
+        <ellipse cx="9" cy="16" rx="1.8" ry="3.5" fill="#fff" fillOpacity="0.35" />
+      )}
+    </svg>
+  );
+}
+
+function SettingsIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
   微火: 'text-fire-mild',
@@ -107,10 +134,10 @@ export function Today() {
         </div>
         <Link
           href="/me"
-          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/60"
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/60 active:scale-95 transition-transform"
           aria-label="设置"
         >
-          ◆
+          <SettingsIcon />
         </Link>
       </header>
 
@@ -206,24 +233,27 @@ export function Today() {
         </section>
       )}
 
-      {/* 喝水快速 +/- */}
+      {/* 喝水快速 +/- — 8 个水滴图标 */}
       <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="water-tracker">
         <div className="flex items-center justify-between">
           <p className="text-sm text-ink">💧 喝水</p>
           <p className="text-xs text-ink/50">{dayEntry.waterCups} / 8 杯</p>
         </div>
-        <div className="mt-3 flex items-center gap-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => (i < dayEntry.waterCups ? removeWater(dateKey) : addWater(dateKey))}
-              className={`flex-1 h-9 rounded-md border ${
-                i < dayEntry.waterCups ? 'bg-fire-ping/15 border-fire-ping/30' : 'bg-paper border-ink/10'
-              }`}
-              aria-label={`第 ${i + 1} 杯`}
-            />
-          ))}
+        <div className="mt-3 flex items-center justify-between">
+          {Array.from({ length: 8 }).map((_, i) => {
+            const filled = i < dayEntry.waterCups;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => (filled ? removeWater(dateKey) : addWater(dateKey))}
+                className="flex-shrink-0 active:scale-90 transition-transform"
+                aria-label={`第 ${i + 1} 杯${filled ? '(已喝,点击撤销)' : ''}`}
+              >
+                <WaterDropIcon filled={filled} />
+              </button>
+            );
+          })}
         </div>
       </section>
 
