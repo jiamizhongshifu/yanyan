@@ -13,17 +13,25 @@ let pool: Pool | null = null;
 export function getPool(): Pool {
   if (!pool) {
     const cfg = getConfig();
-    const url = cfg.DATABASE_URL;
-    // Supabase Postgres 强制要求 SSL;DATABASE_URL 通常含 ?sslmode=require
-    // node-postgres 在 Vercel serverless 环境下需要显式 ssl: { rejectUnauthorized: false }(Supabase 自签 CA)
-    const useSSL = url.includes('supabase.co') || url.includes('sslmode=require');
+    let url = cfg.DATABASE_URL;
+    // Supabase Pooler 自签 CA。pg 在 URL 含 ?sslmode=require 时会强制
+    // 完整证书链验证(忽略 Pool 的 ssl 选项),导致
+    // "self-signed certificate in certificate chain"。
+    //
+    // 解法:从 URL 去掉 sslmode,改让 Pool 的 ssl: { rejectUnauthorized:false }
+    // 全权决定 TLS 行为(仍然加密,只是不验签)。
+    const isSupabase =
+      url.includes('supabase.com') || url.includes('supabase.co') || url.includes('sslmode=require');
+    if (isSupabase) {
+      url = url.replace(/[?&]sslmode=[^&]*/g, '').replace(/\?&/, '?').replace(/\?$/, '');
+    }
     pool = new Pool({
       connectionString: url,
       // Vercel 单 Function 容器寿命短;池子小,空闲快回收
       max: 5,
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 5_000,
-      ssl: useSSL ? { rejectUnauthorized: false } : undefined
+      ssl: isSupabase ? { rejectUnauthorized: false } : undefined
     });
     pool.on('error', (err) => {
       // eslint-disable-next-line no-console
