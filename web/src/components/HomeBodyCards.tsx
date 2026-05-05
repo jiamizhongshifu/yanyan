@@ -8,6 +8,7 @@
 
 import { Link } from 'wouter';
 import type { YanScoreToday } from '../services/symptoms';
+import { asset } from '../services/assets';
 
 interface Props {
   yanScore: YanScoreToday | null;
@@ -19,13 +20,14 @@ interface PartConfig {
   emptyHint: string;
   ctaLabel: string;
   ctaHref: string;
+  icon: string;
 }
 
 const PARTS: PartConfig[] = [
-  { key: 'food', title: '饮食', emptyHint: '今日还没拍餐', ctaLabel: '拍一张', ctaHref: '/camera' },
-  { key: 'symptom', title: '体感', emptyHint: '今日还没打卡', ctaLabel: '去打卡', ctaHref: '/check-in/step1' },
-  { key: 'env', title: '环境', emptyHint: '环境数据待接入', ctaLabel: '', ctaHref: '' },
-  { key: 'activity', title: '活动', emptyHint: '步数 / 心率待接入', ctaLabel: '', ctaHref: '' }
+  { key: 'food', title: '饮食', emptyHint: '今日还没拍餐', ctaLabel: '拍一张', ctaHref: '/camera', icon: 'body-food.png' },
+  { key: 'symptom', title: '体感', emptyHint: '今日还没打卡', ctaLabel: '去打卡', ctaHref: '/check-in/step1', icon: 'body-symptom.png' },
+  { key: 'env', title: '环境', emptyHint: '环境数据待接入', ctaLabel: '', ctaHref: '', icon: 'body-env.png' },
+  { key: 'activity', title: '活动', emptyHint: '步数 / 心率待接入', ctaLabel: '', ctaHref: '', icon: 'body-activity.png' }
 ];
 
 function partColor(score: number | null): string {
@@ -54,21 +56,27 @@ export function HomeBodyCards({ yanScore }: Props) {
         {PARTS.map((p) => {
           const score = yanScore?.partScores?.[p.key] ?? null;
           return (
-            <div key={p.key} className="rounded-2xl bg-white px-5 py-4 min-h-[140px] flex flex-col">
-              <p className="text-xs text-ink/50">{p.title}</p>
+            <div key={p.key} className="rounded-2xl bg-white px-5 py-4 min-h-[160px] flex flex-col relative overflow-hidden">
+              <img
+                src={asset(p.icon)}
+                alt=""
+                className="absolute -right-2 -top-2 w-16 h-16 object-contain opacity-60 pointer-events-none"
+                aria-hidden="true"
+              />
+              <p className="text-xs text-ink/50 relative z-10">{p.title}</p>
               {score !== null ? (
                 <>
-                  <p className={`mt-2 text-3xl font-medium ${partColor(score)}`}>{Math.round(score)}</p>
+                  <p className={`mt-2 text-3xl font-medium ${partColor(score)} relative z-10`}>{Math.round(score)}</p>
                   <p className="mt-auto text-xs text-ink/50">{partLabel(score)}</p>
                 </>
               ) : (
                 <>
-                  <p className="mt-2 text-2xl font-light text-ink/30">—</p>
-                  <p className="mt-1 text-xs text-ink/50 leading-relaxed">{p.emptyHint}</p>
+                  <p className="mt-2 text-2xl font-light text-ink/30 relative z-10">—</p>
+                  <p className="mt-1 text-xs text-ink/50 leading-relaxed relative z-10">{p.emptyHint}</p>
                   {p.ctaHref && (
                     <Link
                       href={p.ctaHref}
-                      className="mt-auto text-xs text-ink underline self-start"
+                      className="mt-auto text-xs text-ink underline self-start relative z-10"
                     >
                       {p.ctaLabel}
                     </Link>

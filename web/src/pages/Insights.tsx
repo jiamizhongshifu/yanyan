@@ -351,13 +351,21 @@ function AchievementCard({
 }) {
   const pct = Math.max(0, Math.min(1, progress));
   return (
-    <div className={`flex items-center gap-3 rounded-2xl px-4 py-3 ${unlocked ? 'bg-fire-mild/10' : 'bg-paper'}`}>
+    <div className={`relative flex items-center gap-3 rounded-2xl px-4 py-3 overflow-hidden ${unlocked ? 'bg-fire-mild/10' : 'bg-paper'}`}>
+      {unlocked && (
+        <img
+          src={asset('achievement-unlock.png')}
+          alt=""
+          aria-hidden="true"
+          className="absolute -right-4 -top-2 w-20 h-20 object-contain opacity-50 pointer-events-none"
+        />
+      )}
       <img
         src={asset(icon)}
         alt=""
-        className={`w-12 h-12 object-contain ${unlocked ? '' : 'opacity-30 grayscale'}`}
+        className={`relative z-10 w-12 h-12 object-contain ${unlocked ? '' : 'opacity-30 grayscale'}`}
       />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 relative z-10">
         <p className={`text-sm font-medium ${unlocked ? 'text-ink' : 'text-ink/55'}`}>
           {unlocked ? `✓ ${title}` : title}
         </p>

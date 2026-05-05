@@ -98,7 +98,7 @@ export function Today() {
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28" data-testid="today">
-      <header className="mb-5 flex items-center justify-between">
+      <header className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-xs text-ink/45">今天</p>
           <p className="mt-0.5 text-xl font-medium text-ink">
@@ -113,6 +113,16 @@ export function Today() {
           ◆
         </Link>
       </header>
+
+      {/* 顶部 hero 插画(水豚泡温泉)— ponchi-e 风格点缀 */}
+      <div className="mb-4 -mx-1 rounded-3xl overflow-hidden">
+        <img
+          src={asset('today-hero.png')}
+          alt="清晨的水豚"
+          className="w-full h-auto block"
+          loading="lazy"
+        />
+      </div>
 
       <InappRemindersBanner />
 

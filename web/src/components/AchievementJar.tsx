@@ -1,11 +1,11 @@
 /**
  * 玻璃瓶勋章罐 — Grow App 风格
  *
- * v1:展示 perfect/great/nice 三类天数计数,以及"糖分减少累计"占位区。
- *      糖分勋章(棒棒糖 / 可乐 / 奶茶 等)在下个 commit 接 LLM 真实糖分识别后注入。
- *
- * 视觉:渐变玻璃瓶 + 内部漂浮 emoji 表示当月累积的勋章。
+ * 视觉:gpt-image-2 ponchi-e 插画作背景瓶身,前景叠加当月真实勋章 emoji。
+ * 当用户没有勋章时,空瓶插画自然展示;有勋章时叠加 emoji 网格。
  */
+
+import { asset } from '../services/assets';
 
 interface BadgeItem {
   emoji: string;
@@ -41,31 +41,29 @@ export function AchievementJar({ monthLabel, perfect, great, nice, sugarBadges =
         <p className="text-xs text-ink/40">本月 {total} 枚</p>
       </div>
 
-      <div className="relative mx-auto w-56 h-72">
-        {/* 瓶盖 */}
-        <div className="absolute top-0 inset-x-4 h-7 rounded-t-md bg-gradient-to-b from-amber-300 to-amber-500" />
-        {/* 瓶身 */}
-        <div className="absolute top-7 inset-x-0 bottom-0 rounded-b-3xl rounded-t-xl bg-white/80 border border-ink/10 shadow-inner overflow-hidden">
-          {/* 瓶口反光 */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-ink/5" />
-          {/* 内容 */}
-          {badges.length === 0 ? (
-            <p className="absolute inset-0 flex items-center justify-center text-center px-4 text-xs text-ink/40 leading-relaxed">
-              本月还没收集到勋章哦,
-              <br />
-              完成今日挑战开始集勋章 :)
-            </p>
-          ) : (
-            <div className="absolute inset-3 flex flex-wrap content-end justify-center gap-1.5 pb-2">
-              {badges.slice(0, 60).map((b) => (
-                <span key={b.key} className="text-xl">{b.emoji}</span>
-              ))}
-              {badges.length > 60 && (
-                <span className="text-xs text-ink/40 self-end">+{badges.length - 60}</span>
-              )}
-            </div>
-          )}
-        </div>
+      <div className="relative mx-auto w-64 aspect-square">
+        {/* 玻璃瓶 ponchi-e 插画背景 */}
+        <img
+          src={asset('achievement-jar.png')}
+          alt="勋章玻璃瓶"
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+        {/* 真实勋章叠加(底部 1/2 区域,贴着瓶身底部漂) */}
+        {badges.length > 0 && (
+          <div className="absolute inset-x-6 bottom-6 top-1/2 flex flex-wrap content-end justify-center gap-1 pb-1">
+            {badges.slice(0, 30).map((b) => (
+              <span key={b.key} className="text-base drop-shadow-sm">{b.emoji}</span>
+            ))}
+            {badges.length > 30 && (
+              <span className="text-[10px] text-ink/55 self-end">+{badges.length - 30}</span>
+            )}
+          </div>
+        )}
+        {badges.length === 0 && (
+          <p className="absolute inset-x-0 bottom-3 text-center text-[11px] text-ink/45 leading-relaxed">
+            完成今日挑战开始集勋章
+          </p>
+        )}
       </div>
 
       {/* 三类一天计数 */}

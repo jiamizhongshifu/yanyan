@@ -22,7 +22,15 @@ const ASSETS = [
   { local: 'level-ping.png', remote: 'level-ping.png', contentType: 'image/png' },
   { local: 'level-weihuo.png', remote: 'level-weihuo.png', contentType: 'image/png' },
   { local: 'level-zhonghuo.png', remote: 'level-zhonghuo.png', contentType: 'image/png' },
-  { local: 'level-dahuo.png', remote: 'level-dahuo.png', contentType: 'image/png' }
+  { local: 'level-dahuo.png', remote: 'level-dahuo.png', contentType: 'image/png' },
+  // gpt-image-2 生成的新插画(2026-05-05 batch)
+  { local: 'today-hero.png', remote: 'today-hero.png', contentType: 'image/png' },
+  { local: 'achievement-jar.png', remote: 'achievement-jar.png', contentType: 'image/png' },
+  { local: 'achievement-unlock.png', remote: 'achievement-unlock.png', contentType: 'image/png' },
+  { local: 'body-food.png', remote: 'body-food.png', contentType: 'image/png' },
+  { local: 'body-symptom.png', remote: 'body-symptom.png', contentType: 'image/png' },
+  { local: 'body-env.png', remote: 'body-env.png', contentType: 'image/png' },
+  { local: 'body-activity.png', remote: 'body-activity.png', contentType: 'image/png' }
 ];
 
 async function main(): Promise<void> {
