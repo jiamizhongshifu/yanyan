@@ -9,7 +9,7 @@
  * 同意状态存 localStorage;登录回调后 step3 静默 postConsent + ensureUser + baseline。
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { getSupabase } from '../services/supabase';
 import { useAuth } from '../services/auth';
@@ -33,27 +33,32 @@ export function Login() {
   const setInitialFireLevel = useOnboarding((s) => s.setInitialFireLevel);
   const bootstrappingRef = useRef(false);
 
-  useEffect(() => {
-    if (!session) return;
-    if (bootstrappingRef.current) return;
+  // 注意:不再自动导航。Google OAuth 的 redirectTo 会把成功登录的用户带到
+  // /onboarding/step1,/login 永远不会接收登录回调。如果用户访问 /login 时
+  // 已经有 session(从前次会话残留),显示「继续 →」按钮,把控制权还给用户。
+  // 旧逻辑会让"点 checkbox 就跳走"看起来像 bug(实际是 getSession 异步解析触发 useEffect)。
 
+  const onContinue = async () => {
+    if (bootstrappingRef.current) return;
+    bootstrappingRef.current = true;
     if (quiz.completedAt && quiz.reverseFilterChoice) {
-      bootstrappingRef.current = true;
-      void bootstrapFromQuiz({
+      const r = await bootstrapFromQuiz({
         reverseFilterChoice: quiz.reverseFilterChoice,
         symptomsFrequency: quiz.symptomsFrequency
-      }).then((r) => {
-        if (r.ok) {
-          setInitialFireLevel(r.initialFireLevel);
-          navigate('/app');
-        } else {
-          navigate('/onboarding/step1');
-        }
       });
-      return;
+      if (r.ok) {
+        setInitialFireLevel(r.initialFireLevel);
+        navigate('/app');
+        return;
+      }
     }
-    navigate('/onboarding/step1');
-  }, [session, quiz.completedAt, quiz.reverseFilterChoice, quiz.symptomsFrequency, navigate, setInitialFireLevel]);
+    navigate('/app');
+  };
+
+  const onSignOut = async () => {
+    await getSupabase().auth.signOut();
+    setStatusMessage({ kind: 'info', text: '已登出。可重新选择账号登录。' });
+  };
 
   const toggleAgreed = (next: boolean) => {
     setAgreedPrivacy(next);
@@ -103,6 +108,31 @@ export function Login() {
         </div>
         <h1 className="mt-2 text-3xl font-semibold text-ink text-center">炎炎消防队</h1>
         <p className="mt-2 text-sm text-ink/60 text-center">控糖 × 炎症 × 次晨体感</p>
+
+        {/* 已登录状态:不自动跳转,显式给用户两个选项 */}
+        {session && (
+          <div className="mt-6 rounded-2xl bg-fire-ping/10 px-4 py-4" data-testid="already-signed-in">
+            <p className="text-sm text-ink/75 leading-relaxed">
+              你已登录(<span className="font-mono">{session.user?.email ?? session.user?.id?.slice(0, 8)}</span>)。
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => void onContinue()}
+                className="flex-1 rounded-full bg-ink text-white py-2.5 text-sm font-medium"
+              >
+                继续 →
+              </button>
+              <button
+                type="button"
+                onClick={() => void onSignOut()}
+                className="rounded-full border border-ink/15 bg-white text-ink/65 px-4 py-2.5 text-sm"
+              >
+                换账号
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Google 登录 */}
         <button

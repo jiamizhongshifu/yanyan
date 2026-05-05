@@ -17,6 +17,7 @@ import { Step3BaselineConsent } from '../pages/Onboarding/Step3BaselineConsent';
 import { Step4Welcome } from '../pages/Onboarding/Step4Welcome';
 import { Login } from '../pages/Login';
 import { useOnboarding } from '../store/onboarding';
+import { useQuiz } from '../store/quiz';
 
 // ---- mocks ----
 const navigateMock = vi.fn();
@@ -51,6 +52,7 @@ beforeEach(() => {
   onAuthStateChangeListeners.length = 0;
   supabaseMockState.session = { access_token: 'fake-jwt', user: { id: 'auth-uuid-1' } };
   useOnboarding.getState().reset();
+  useQuiz.getState().reset();
   // Step3 进页面会校验 PRIVACY_AGREED_KEY,这里默认设为已同意(模拟登录前已同意)
   if (typeof localStorage !== 'undefined') {
     localStorage.setItem('yanyan.privacy.agreed.v1', 'true');
@@ -191,10 +193,13 @@ describe('U4 redo Step 4', () => {
 });
 
 describe('U4 redo Login', () => {
-  test('已登录 → useEffect 自动跳 step1', () => {
+  test('已登录 → 不自动跳转,显示「继续」banner', async () => {
     supabaseMockState.session = { access_token: 'jwt', user: { id: 'u-1' } };
     render(<Login />);
-    return waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step1'));
+    // 等异步 getSession 解析完
+    await waitFor(() => expect(screen.queryByTestId('already-signed-in')).toBeInTheDocument());
+    // 不再自动 navigate
+    expect(navigateMock).not.toHaveBeenCalled();
   });
 
   test('未勾隐私同意 → Google 按钮 disabled', () => {
@@ -214,15 +219,25 @@ describe('U4 redo Login', () => {
     expect(googleBtn.disabled).toBe(false);
   });
 
-  test('登录后 onAuthStateChange 触发 → navigate step1', async () => {
+  test('登录后 onAuthStateChange 触发 → 显示「继续」banner(不自动跳)', async () => {
     supabaseMockState.session = null;
     render(<Login />);
-    // 模拟 Supabase 在 magic link 回调后触发 onAuthStateChange
     act(() => {
       onAuthStateChangeListeners.forEach((cb) =>
         cb('SIGNED_IN', { access_token: 'jwt', user: { id: 'u-x' } })
       );
     });
-    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/onboarding/step1'));
+    await waitFor(() => expect(screen.queryByTestId('already-signed-in')).toBeInTheDocument());
+    expect(navigateMock).not.toHaveBeenCalled();
+  });
+
+  test('已登录 banner 点击「继续」→ 走 bootstrap → /app', async () => {
+    supabaseMockState.session = { access_token: 'jwt', user: { id: 'u-1' } };
+    useQuiz.getState().setReverseFilterChoice('rhinitis');
+    useQuiz.getState().markCompleted();
+    render(<Login />);
+    await waitFor(() => expect(screen.queryByTestId('already-signed-in')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('继续 →'));
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/app'));
   });
 });
