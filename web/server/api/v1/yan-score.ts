@@ -19,7 +19,9 @@ import {
 } from '../../services/symptoms';
 import {
   computeYanScoreForDay,
+  fetchYanScoreHistory,
   type ScoreDeps,
+  type YanScoreHistoryEntry,
   type YanScoreResult
 } from '../../services/score';
 import type { ActivitySnapshot, DailyMealAggregate, EnvSnapshot } from '../../services/score/parts';
@@ -81,5 +83,35 @@ export async function registerYanScoreRoutes(app: FastifyInstance, opts: Registe
     if (!hasAny) body.unavailableReason = 'no_data';
     else if (!result) body.unavailableReason = 'insufficient_parts';
     return body;
+  });
+
+  /**
+   * GET /yan-score/history?since=YYYY-MM-DD&until=YYYY-MM-DD
+   * 默认 since = 今天往前 30 天,until = 今天。最大区间 60 天。
+   */
+  app.get<{ Querystring: { since?: string; until?: string } }>('/users/me/yan-score/history', async (req, reply) => {
+    const user = requireUser(req, reply);
+    if (!user) return;
+    const today = todayDateString();
+    const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+    const until = req.query.until && dateRe.test(req.query.until) ? req.query.until : today;
+    const defaultSince = (() => {
+      const d = new Date(`${until}T00:00:00Z`);
+      d.setUTCDate(d.getUTCDate() - 29);
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+    })();
+    const since = req.query.since && dateRe.test(req.query.since) ? req.query.since : defaultSince;
+
+    // 区间上限 60 天,防恶意大区间打挂 server
+    const sinceDate = new Date(`${since}T00:00:00Z`);
+    const untilDate = new Date(`${until}T00:00:00Z`);
+    const days = Math.floor((untilDate.getTime() - sinceDate.getTime()) / (24 * 60 * 60 * 1000)) + 1;
+    if (days > 60 || days < 1) {
+      reply.code(400);
+      return { ok: false, error: 'invalid_range', message: 'since/until 区间需 1-60 天' };
+    }
+
+    const entries: YanScoreHistoryEntry[] = await fetchYanScoreHistory(deps, user.userId, since, until);
+    return { ok: true, since, until, entries };
   });
 }

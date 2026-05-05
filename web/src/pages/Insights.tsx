@@ -14,7 +14,9 @@ import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } 
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
 import { fetchSugarToday, type SugarToday } from '../services/sugar';
 import { fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
+import { fetchYanScoreHistory, type YanScoreHistory } from '../services/yanScoreHistory';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
+import { InflammationTrendChart } from '../components/InflammationTrendChart';
 import { useWellness, todayKey } from '../store/wellness';
 import { MonthCalendarGrid } from '../components/MonthCalendarGrid';
 import { AchievementJar } from '../components/AchievementJar';
@@ -26,6 +28,7 @@ export function Insights() {
   const [progress, setProgress] = useState<UserProgress | null>(null);
   const [sugar, setSugar] = useState<SugarToday | null>(null);
   const [monthCh, setMonthCh] = useState<MonthChallenges | null>(null);
+  const [history, setHistory] = useState<YanScoreHistory | null>(null);
 
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };
@@ -38,14 +41,16 @@ export function Insights() {
       fetchHomeToday(),
       fetchProgress(),
       fetchSugarToday(),
-      fetchMonthChallenges()
-    ]).then(([y, h, p, s, m]) => {
+      fetchMonthChallenges(),
+      fetchYanScoreHistory() // 默认过去 30 天
+    ]).then(([y, h, p, s, m, hist]) => {
       if (!mounted) return;
       setYanScore(y);
       setMeals(h?.meals ?? []);
       setProgress(p);
       setSugar(s);
       setMonthCh(m);
+      setHistory(hist);
     });
     return () => {
       mounted = false;
@@ -112,7 +117,36 @@ export function Insights() {
         </p>
       )}
 
-      <section className="mt-6 rounded-3xl bg-white px-5 py-5">
+      {/* 炎症指数趋势 — 21 天阈值后展开 */}
+      {(() => {
+        const TREND_THRESHOLD = progress?.thresholds.trendLineDays ?? 21;
+        const canDraw = (progress?.flags.canDrawTrend ?? false) || cumulativeDays >= TREND_THRESHOLD;
+        if (!canDraw) {
+          return (
+            <section className="mt-6 rounded-3xl bg-white px-5 py-5" data-testid="trend-locked">
+              <h2 className="mb-2 text-base font-medium text-ink">炎症指数趋势</h2>
+              <p className="text-xs text-ink/55 leading-relaxed">
+                累计打卡 {TREND_THRESHOLD} 天后解锁。当前 {cumulativeDays} / {TREND_THRESHOLD}。
+              </p>
+              <div className="mt-3 h-2 rounded-full bg-paper overflow-hidden">
+                <div
+                  className="h-full bg-ink/40 transition-all"
+                  style={{ width: `${Math.min(1, cumulativeDays / TREND_THRESHOLD) * 100}%` }}
+                />
+              </div>
+            </section>
+          );
+        }
+        return (
+          <section className="mt-6 rounded-3xl bg-white px-5 py-5" data-testid="trend-chart-section">
+            <h2 className="mb-1 text-base font-medium text-ink">炎症指数趋势 · 近 30 天</h2>
+            <p className="text-xs text-ink/45 mb-3">每天一点;断层 = 当天没数据</p>
+            <InflammationTrendChart entries={history?.entries ?? []} />
+          </section>
+        );
+      })()}
+
+      <section className="mt-5 rounded-3xl bg-white px-5 py-5">
         <h2 className="mb-1 text-base font-medium text-ink">日历视图</h2>
         <p className="text-xs text-ink/45 mb-4">每天的小太阳记录今日炎症等级</p>
         <MonthCalendarGrid

@@ -15,12 +15,20 @@
     "api/cron/morning-checkin-reminder.ts": {
       "memory": 1024,
       "maxDuration": 60
+    },
+    "api/cron/snapshot-daily-challenges.ts": {
+      "memory": 512,
+      "maxDuration": 60
     }
   },
   "crons": [
     {
       "path": "/api/cron/morning-checkin-reminder",
       "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/snapshot-daily-challenges",
+      "schedule": "55 15 * * *"
     }
   ],
   "headers": [

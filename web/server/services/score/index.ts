@@ -89,3 +89,4 @@ export async function computeYanScoreForDay(
 export * from './types';
 export * from './parts';
 export { aggregate } from './aggregator';
+export { fetchYanScoreHistory, type YanScoreHistoryEntry } from './history';
