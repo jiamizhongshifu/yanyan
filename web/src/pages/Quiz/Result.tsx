@@ -17,6 +17,14 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
   大火: 'text-fire-high'
 };
 
+/** 对应 level-row.png 中 4 列(0-3)的索引,用于 CSS 背景定位 */
+const LEVEL_PANEL_INDEX: Record<FireLevel, number> = {
+  平: 0,
+  微火: 1,
+  中火: 2,
+  大火: 3
+};
+
 const UNLOCKED_FEATURES = [
   {
     title: '每餐拍照即时火分',
@@ -67,8 +75,18 @@ export function QuizResult() {
       <header className="text-xs text-ink/40 tracking-widest">炎炎消防队 · 初步评估</header>
 
       <section className="mt-6 rounded-3xl bg-white px-6 py-8 text-center">
-        <p className="text-xs text-ink/50">你当前的炎症指数</p>
-        <p className={`mt-3 text-7xl font-light ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
+        <div
+          className="mx-auto w-32 h-32 bg-no-repeat rounded-2xl"
+          style={{
+            backgroundImage: 'url(/level-row.png)',
+            backgroundSize: '400% 100%',
+            backgroundPosition: `${(LEVEL_PANEL_INDEX[index.level] / 3) * 100}% 0`
+          }}
+          aria-label={`等级:${index.level}`}
+          data-testid="level-illustration"
+        />
+        <p className="mt-4 text-xs text-ink/50">你当前的炎症指数</p>
+        <p className={`mt-2 text-7xl font-light ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
           {index.score}
         </p>
         <p className={`mt-2 text-2xl ${LEVEL_COLOR[index.level]}`} data-testid="result-level">
