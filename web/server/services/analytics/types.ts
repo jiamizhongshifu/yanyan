@@ -13,6 +13,9 @@ export const EVENT_NAMES = [
   'score_revealed',
   'tab_findings_visit',
   'tab_home_visit',
+  'tab_today_visit',
+  'tab_body_visit',
+  'tab_insights_visit',
   'push_subscribed',
   'push_unsubscribed'
 ] as const;
