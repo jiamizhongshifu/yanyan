@@ -17,21 +17,22 @@ import { CONSENT_SCOPES, fetchRequiredVersion, postConsent } from '../../service
 import { ensureUser, localEstimateFireLevel, postBaseline, type FireLevel } from '../../services/onboarding';
 import { useOnboarding } from '../../store/onboarding';
 import { asset } from '../../services/assets';
+import { LEVEL_TO_LABEL } from '../../services/score-display';
 
 const PRIVACY_AGREED_KEY = 'yanyan.privacy.agreed.v1';
 
 const FIRE_LEVEL_TO_HINT: Record<FireLevel, string> = {
-  平: '目前看起来很平和。这是基于你刚选的症状频次得出的初步判断。',
-  微火: '看起来近期略偏微火。',
-  中火: '看起来近期偏中火。',
-  大火: '看起来近期偏大火。'
+  平: '目前看起来很平和,这是基于你刚选的症状频次得出的初步判断。',
+  微火: '看起来近期略偏轻盈,后续打卡会让结果更准。',
+  中火: '看起来近期略偏微暖,后续打卡会让结果更准。',
+  大火: '看起来近期需要留心一下,后续打卡会让结果更准。'
 };
 
 const fireClass: Record<FireLevel, string> = {
   平: 'text-fire-ping',
-  微火: 'text-fire-mild',
-  中火: 'text-fire-mid',
-  大火: 'text-fire-high'
+  微火: 'text-fire-ping',
+  中火: 'text-fire-mild',
+  大火: 'text-fire-mid'
 };
 
 type Stage = 'preparing' | 'saving' | 'error';
@@ -109,7 +110,7 @@ export function Step3BaselineConsent() {
           className={`mt-2 text-7xl font-semibold leading-none ${fireClass[localLevel]}`}
           data-testid="local-fire-level"
         >
-          {localLevel}
+          {LEVEL_TO_LABEL[localLevel]}
         </div>
         <p className="mt-4 text-sm text-ink/70 leading-relaxed">{FIRE_LEVEL_TO_HINT[localLevel]}</p>
       </section>

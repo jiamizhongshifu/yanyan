@@ -115,7 +115,7 @@ export function Login() {
             loading="eager"
           />
         </div>
-        <p className="mt-2 text-sm text-ink/60 text-center">控糖 × 炎症 × 次晨体感</p>
+        <p className="mt-2 text-sm text-ink/60 text-center">控糖 × 抗炎 × 次晨体感</p>
 
         {/* 已登录状态:不自动跳转,显式给用户两个选项 */}
         {session && (

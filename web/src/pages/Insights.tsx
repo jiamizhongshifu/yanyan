@@ -24,6 +24,7 @@ import { AchievementJar } from '../components/AchievementJar';
 import { track } from '../services/tracker';
 import { asset } from '../services/assets';
 import { Icon, type IconName } from '../components/Icon';
+import { LEVEL_TO_LABEL, LEVEL_TO_STARS, scoreToStars } from '../services/score-display';
 import type { FireLevel } from '../services/symptoms';
 
 const LEVEL_ICON_FILE: Record<FireLevel, string> = {
@@ -35,9 +36,9 @@ const LEVEL_ICON_FILE: Record<FireLevel, string> = {
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
-  微火: 'text-fire-mild',
-  中火: 'text-fire-mid',
-  大火: 'text-fire-high'
+  微火: 'text-fire-ping',
+  中火: 'text-fire-mild',
+  大火: 'text-fire-mid'
 };
 
 export function Insights() {
@@ -166,7 +167,7 @@ export function Insights() {
             <p className="text-sm font-medium text-ink">这里还没什么可看</p>
             <p className="mt-1.5 text-xs text-ink/65 leading-relaxed">
               拍第一餐 + 完成今日挑战后,玻璃瓶会开始装勋章,日历会出现小太阳。
-              累计 21 天解锁炎症趋势线。
+              累计 21 天解锁抗炎趋势线。
             </p>
           </div>
         </section>
@@ -194,7 +195,7 @@ export function Insights() {
         </p>
       )}
 
-      {/* 炎症指数趋势 */}
+      {/* 抗炎指数趋势 */}
       {(() => {
         const TREND_THRESHOLD = progress?.thresholds.trendLineDays ?? 21;
         const canDraw = (progress?.flags.canDrawTrend ?? false) || cumulativeDays >= TREND_THRESHOLD;
@@ -212,7 +213,7 @@ export function Insights() {
               >
                 <div className="flex-1 min-w-0">
                   <h2 className="text-base font-medium text-ink flex items-center gap-1.5">
-                    炎症指数趋势
+                    抗炎指数趋势
                     <span className="text-xs text-ink/40">{trendExpanded ? '收起 ▴' : '展开 ▾'}</span>
                   </h2>
                   <p className="mt-1 text-xs text-ink/55 leading-relaxed">
@@ -255,7 +256,7 @@ export function Insights() {
         return (
           <section className="mt-6 rounded-3xl bg-white px-5 py-5" data-testid="trend-chart-section">
             <div className="flex items-baseline justify-between mb-1">
-              <h2 className="text-base font-medium text-ink">炎症指数趋势 · 近 30 天</h2>
+              <h2 className="text-base font-medium text-ink">抗炎指数趋势 · 近 30 天</h2>
               {selectedDate && (
                 <button
                   type="button"
@@ -287,7 +288,7 @@ export function Insights() {
 
       <section className="mt-5 rounded-3xl bg-white px-5 py-5">
         <h2 className="mb-1 text-base font-medium text-ink">日历视图</h2>
-        <p className="text-xs text-ink/45 mb-4">每天的小太阳记录今日炎症等级,点击趋势点回看当日</p>
+        <p className="text-xs text-ink/45 mb-4">每天的小太阳记录当日抗炎指数,点击趋势点回看当日</p>
         <MonthCalendarGrid
           cumulativeInMonth={Math.min(cumulativeDays, 31)}
           todayLevel={yanScore?.result?.level ?? null}
@@ -530,11 +531,11 @@ function DayDetailPanel({
           <div className="flex items-center gap-2">
             <img
               src={asset(LEVEL_ICON_FILE[entry.level])}
-              alt={entry.level}
+              alt={LEVEL_TO_LABEL[entry.level]}
               className="w-8 h-8 object-contain"
             />
             <span className={`text-base font-medium ${LEVEL_COLOR[entry.level]}`}>
-              {entry.level}
+              {LEVEL_TO_LABEL[entry.level]}
             </span>
           </div>
         )}
@@ -543,8 +544,12 @@ function DayDetailPanel({
       {hasScore ? (
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="rounded-xl bg-white px-3 py-2">
-            <p className="text-ink/45">炎症指数</p>
-            <p className="mt-0.5 text-base font-medium text-ink">{entry!.total}</p>
+            <p className="text-ink/45">抗炎指数</p>
+            <p className="mt-0.5 text-base font-medium text-ink">
+              {entry!.level
+                ? `${'★'.repeat(LEVEL_TO_STARS[entry!.level])} / 5`
+                : `${'★'.repeat(scoreToStars(entry!.total!))} / 5`}
+            </p>
           </div>
           {entry!.partScores.food !== null && (
             <div className="rounded-xl bg-white px-3 py-2">

@@ -1,20 +1,19 @@
 /**
- * 炎症指数趋势折线 — Grow App 风格小图
+ * 抗炎指数趋势折线
  *
- * 输入:过去 N 天的 [{date, total}],null 视为缺失(不连线,断点)
- * 视觉:浅灰背景刻度线(25/50/75 阈),分数走渐变 stroke;今日 dot 高亮
+ * Y 轴语义反转:高 = 健康(顶部 ★5),低 = 提醒(底部 ★2)
+ * 内部仍以后端 fireScore (0-100) 计算 y(0=顶,100=底),
+ * 节点标注与 tooltip 走 score-display 模块。
  */
 
 import { useMemo } from 'react';
 import type { YanScoreHistoryEntry } from '../services/yanScoreHistory';
+import { scoreToStars } from '../services/score-display';
 
 interface Props {
   entries: YanScoreHistoryEntry[];
-  /** 高度,默认 140 */
   height?: number;
-  /** 点击点 → 回调当日 date(YYYY-MM-DD);未传则不可点 */
   onSelectDate?: (date: string) => void;
-  /** 高亮选中日期 */
   selectedDate?: string | null;
 }
 
@@ -29,7 +28,11 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
     const stepX = entries.length > 1 ? drawW / (entries.length - 1) : 0;
     return entries.map((e, i) => {
       const x = pad.left + i * stepX;
-      const y = e.total === null ? null : pad.top + drawH - (Math.max(0, Math.min(100, e.total)) / 100) * drawH;
+      // 反转:fireScore 越小 = 抗炎指数越高 = y 越靠顶
+      const y =
+        e.total === null
+          ? null
+          : pad.top + (Math.max(0, Math.min(100, e.total)) / 100) * drawH;
       return { x, y, total: e.total, date: e.date, level: e.level };
     });
   }, [entries, height]);
@@ -46,8 +49,8 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
   const h = height;
   const pad = { top: 8, right: 12, bottom: 18, left: 22 };
   const drawW = w - pad.left - pad.right;
+  const drawH = h - pad.top - pad.bottom;
 
-  // 把连续非 null 段拼成 path
   const pathD: string[] = [];
   let inSegment = false;
   for (const p of points) {
@@ -55,20 +58,26 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
       inSegment = false;
       continue;
     }
-    pathD.push(inSegment ? `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}` : `M ${p.x.toFixed(1)} ${p.y.toFixed(1)}`);
+    pathD.push(
+      inSegment ? `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}` : `M ${p.x.toFixed(1)} ${p.y.toFixed(1)}`
+    );
     inSegment = true;
   }
 
-  // 阈值线 25 / 50 / 75
-  const yFor = (v: number) => pad.top + (h - pad.top - pad.bottom) - (v / 100) * (h - pad.top - pad.bottom);
+  // 阈值线:fireScore 25 / 50 / 75 ⇄ 抗炎指数 ★4 / ★3 / ★2 边界
+  const yFor = (v: number) => pad.top + (v / 100) * drawH;
   const thresholds = [
-    { v: 25, label: '25', color: '#4A8B6F' },
-    { v: 50, label: '50', color: '#C9A227' },
-    { v: 75, label: '75', color: '#D9762C' }
+    { v: 25, label: '★4', color: '#7BA56A' },
+    { v: 50, label: '★3', color: '#C9A227' },
+    { v: 75, label: '★2', color: '#D9762C' }
   ];
 
-  // 横轴 tick:首/中/末
-  const tickIdx = entries.length === 1 ? [0] : entries.length <= 7 ? entries.map((_, i) => i) : [0, Math.floor(entries.length / 2), entries.length - 1];
+  const tickIdx =
+    entries.length === 1
+      ? [0]
+      : entries.length <= 7
+      ? entries.map((_, i) => i)
+      : [0, Math.floor(entries.length / 2), entries.length - 1];
 
   const lastValid = [...points].reverse().find((p) => p.y !== null);
 
@@ -76,11 +85,12 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
     <div data-testid="inflammation-trend-chart">
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full">
         <defs>
+          {/* 0% 在 y1=100%(底),100% 在 y2=0%(顶):底=橙/红,顶=绿 */}
           <linearGradient id="trend-grad" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#4A8B6F" />
-            <stop offset="40%" stopColor="#C9A227" />
-            <stop offset="70%" stopColor="#D9762C" />
-            <stop offset="100%" stopColor="#B43A30" />
+            <stop offset="0%" stopColor="#D9762C" />
+            <stop offset="35%" stopColor="#C9A227" />
+            <stop offset="70%" stopColor="#7BA56A" />
+            <stop offset="100%" stopColor="#4A8B6F" />
           </linearGradient>
         </defs>
         {thresholds.map((t) => (
@@ -93,13 +103,20 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
               stroke="#0001"
               strokeDasharray="3 4"
             />
-            <text x={pad.left - 6} y={yFor(t.v) + 3} fontSize="9" textAnchor="end" fill="#0006">
+            <text x={pad.left - 4} y={yFor(t.v) + 3} fontSize="9" textAnchor="end" fill="#0006">
               {t.label}
             </text>
           </g>
         ))}
         {pathD.length > 0 && (
-          <path d={pathD.join(' ')} fill="none" stroke="url(#trend-grad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d={pathD.join(' ')}
+            fill="none"
+            stroke="url(#trend-grad)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         )}
         {points.map((p, i) => {
           if (p.y === null) return null;
@@ -108,7 +125,6 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
           const r = isSelected ? 5 : isLast ? 4 : 2.2;
           return (
             <g key={i}>
-              {/* 隐形大点击区域,扩大命中 */}
               {onSelectDate && (
                 <circle
                   cx={p.x}
@@ -132,14 +148,21 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
             </g>
           );
         })}
-        {lastValid && (
-          <text x={lastValid.x} y={lastValid.y! - 8} fontSize="11" textAnchor="middle" fill="#222" fontWeight="600">
-            {lastValid.total}
+        {lastValid && lastValid.total !== null && (
+          <text
+            x={lastValid.x}
+            y={lastValid.y! - 8}
+            fontSize="11"
+            textAnchor="middle"
+            fill="#222"
+            fontWeight="600"
+          >
+            ★{scoreToStars(lastValid.total)}
           </text>
         )}
         {tickIdx.map((i) => {
           const p = points[i];
-          const md = entries[i].date.slice(5); // MM-DD
+          const md = entries[i].date.slice(5);
           return (
             <text key={i} x={p.x} y={h - 4} fontSize="9" textAnchor="middle" fill="#0007">
               {md}
@@ -147,6 +170,7 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
           );
         })}
       </svg>
+      <p className="mt-1 text-[10px] text-ink/40 text-right pr-2">↑ 越高越清气</p>
     </div>
   );
 }

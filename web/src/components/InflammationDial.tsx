@@ -1,43 +1,55 @@
 /**
- * 炎症指数圆弧仪表盘 — Grow / Perfect Day 风格
+ * 抗炎指数圆弧仪表盘
  *
- * 270° 弧形(从 -135° 到 +135°),按 score / 100 填充,渐变色:绿 → 黄 → 橙 → 红。
- * 中央显示 score + level + 鼓励语;顶部小图标可放当前等级插画。
+ * 270° 弧形(-135° → +135°),填充比例 = 抗炎指数 / 100(高 = 健康)。
+ * 渐变 0%→100% 对应 红→绿,即"分数越高填得越满,颜色越往绿走"。
+ * 中心显示 5 颗星 + 等级中文标签(平 / 轻盈 / 微暖 / 留心)。
  */
 
 import type { FireLevel } from '../services/symptoms';
 import { asset } from '../services/assets';
+import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
 
 interface Props {
-  score: number; // 0-100
+  /** 后端 fireScore 0-100(0=最好);组件内部翻成抗炎指数 100-fireScore */
+  score: number;
   level: FireLevel;
-  /** 中心副标题(如 "今日炎症" / "当前指数") */
   caption?: string;
-  /** 等级插画(平 / 微火 / 中火 / 大火 4 张) */
+  /** 等级插画 — 视觉锚点保留 */
   levelIcon?: 'level-ping.png' | 'level-weihuo.png' | 'level-zhonghuo.png' | 'level-dahuo.png';
 }
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: '#4A8B6F',
-  微火: '#C9A227',
-  中火: '#D9762C',
-  大火: '#B43A30'
+  微火: '#7BA56A',
+  中火: '#C9A227',
+  大火: '#D9762C'
 };
 
-export function InflammationDial({ score, level, caption = '当前炎症指数', levelIcon }: Props) {
-  const clamped = Math.max(0, Math.min(100, score));
+const LABEL_TEXT_COLOR: Record<FireLevel, string> = {
+  平: 'text-fire-ping',
+  微火: 'text-fire-ping',
+  中火: 'text-fire-mild',
+  大火: 'text-fire-mid'
+};
+
+export function InflammationDial({ score, level, caption = '今日抗炎指数', levelIcon }: Props) {
+  const fireScore = Math.max(0, Math.min(100, score));
+  const antiInflam = 100 - fireScore; // 0-100,高 = 健康
+  const stars = LEVEL_TO_STARS[level];
+  const displayLabel = LEVEL_TO_LABEL[level];
+
   const radius = 120;
   const stroke = 18;
   const cx = 150;
   const cy = 150;
 
-  // 270° arc: -135° (左下) → +135° (右下),12 点钟为顶
-  const startAngle = 135; // 左下
-  const endAngle = 405; // 右下(+360 已绕过 0/12 点)
-  const totalSweep = endAngle - startAngle; // 270
+  const startAngle = 135;
+  const endAngle = 405;
+  const totalSweep = endAngle - startAngle;
 
   const polar = (deg: number): [number, number] => {
-    const r = ((deg - 90) * Math.PI) / 180; // 12 点钟 = 0°
+    const r = ((deg - 90) * Math.PI) / 180;
     return [cx + radius * Math.cos(r), cy + radius * Math.sin(r)];
   };
 
@@ -45,32 +57,25 @@ export function InflammationDial({ score, level, caption = '当前炎症指数',
   const [bgX2, bgY2] = polar(endAngle);
   const bgArc = `M ${bgX1} ${bgY1} A ${radius} ${radius} 0 1 1 ${bgX2} ${bgY2}`;
 
-  const fillEnd = startAngle + (totalSweep * clamped) / 100;
+  const fillEnd = startAngle + (totalSweep * antiInflam) / 100;
   const [fX2, fY2] = polar(fillEnd);
-  const fillLargeArc = (totalSweep * clamped) / 100 > 180 ? 1 : 0;
+  const fillLargeArc = (totalSweep * antiInflam) / 100 > 180 ? 1 : 0;
   const fillArc = `M ${bgX1} ${bgY1} A ${radius} ${radius} 0 ${fillLargeArc} 1 ${fX2} ${fY2}`;
-
-  const color = LEVEL_COLOR[level];
-  const labelColorMap: Record<FireLevel, string> = {
-    平: 'text-fire-ping',
-    微火: 'text-fire-mild',
-    中火: 'text-fire-mid',
-    大火: 'text-fire-high'
-  };
 
   return (
     <div className="relative w-full flex flex-col items-center" data-testid="inflammation-dial">
       <svg viewBox="0 0 300 300" className="w-72 h-72">
         <defs>
+          {/* 沿弧扫描方向 0%→100%:红 → 黄 → 绿 */}
           <linearGradient id="dial-grad" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#4A8B6F" />
-            <stop offset="40%" stopColor="#C9A227" />
-            <stop offset="70%" stopColor="#D9762C" />
-            <stop offset="100%" stopColor="#B43A30" />
+            <stop offset="0%" stopColor="#D9762C" />
+            <stop offset="35%" stopColor="#C9A227" />
+            <stop offset="70%" stopColor="#7BA56A" />
+            <stop offset="100%" stopColor="#4A8B6F" />
           </linearGradient>
         </defs>
         <path d={bgArc} fill="none" stroke="#E8E3D8" strokeWidth={stroke} strokeLinecap="round" />
-        {clamped > 0 && (
+        {antiInflam > 0 && (
           <path
             d={fillArc}
             fill="none"
@@ -81,24 +86,54 @@ export function InflammationDial({ score, level, caption = '当前炎症指数',
         )}
       </svg>
 
-      {/* 中心叠加 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         {levelIcon && (
           <img
             src={asset(levelIcon)}
-            alt={level}
+            alt={displayLabel}
             className="w-12 h-12 object-contain mb-1"
             loading="lazy"
           />
         )}
-        <p className={`text-6xl font-light leading-none ${labelColorMap[level]}`} data-testid="dial-score">
-          {clamped}
-        </p>
-        <p className="mt-2 text-xs text-ink/50 tracking-wide">{caption}</p>
-        <p className={`mt-1 text-base font-medium ${labelColorMap[level]}`} data-testid="dial-level" style={{ color }}>
-          {level}
+        <Stars filled={stars} className="text-3xl" testId="dial-stars" />
+        <p className="mt-1 text-xs text-ink/50 tracking-wide">{caption}</p>
+        <p
+          className={`mt-1 text-base font-medium ${LABEL_TEXT_COLOR[level]}`}
+          data-testid="dial-level"
+          style={{ color: LEVEL_COLOR[level] }}
+        >
+          {displayLabel}
         </p>
       </div>
     </div>
+  );
+}
+
+interface StarsProps {
+  /** 1-5 */
+  filled: number;
+  total?: number;
+  className?: string;
+  testId?: string;
+}
+
+/** 5 颗星显示 — 实心 + 空心,filled 之外用 ink/15 弱化 */
+export function Stars({ filled, total = 5, className = '', testId }: StarsProps) {
+  const f = Math.max(0, Math.min(total, Math.round(filled)));
+  return (
+    <span className={`inline-flex items-center gap-0.5 leading-none ${className}`} data-testid={testId}>
+      {Array.from({ length: total }).map((_, i) => (
+        <span
+          key={i}
+          className={i < f ? 'text-fire-ping' : 'text-ink/15'}
+          aria-hidden="true"
+        >
+          ★
+        </span>
+      ))}
+      <span className="sr-only">
+        {f} / {total} stars
+      </span>
+    </span>
   );
 }

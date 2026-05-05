@@ -184,7 +184,8 @@ describe('U10 MealHistoryList', () => {
     );
     expect(screen.getByText('今日餐食 · 2 餐')).toBeInTheDocument();
     expect(screen.getByTestId('meal-row-meal-a')).toHaveTextContent('平');
-    expect(screen.getByTestId('meal-row-meal-b')).toHaveTextContent('中火 60');
+    // 抗炎指数:中火 → 显示标签"微暖" + ★3
+    expect(screen.getByTestId('meal-row-meal-b')).toHaveTextContent('微暖');
   });
 });
 

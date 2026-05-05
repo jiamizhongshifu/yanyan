@@ -23,7 +23,7 @@ export function Landing() {
         <h1 className="mt-4 text-3xl font-semibold text-ink leading-snug">
           每餐拍一张,
           <br />
-          看身体的炎症与糖
+          看身体的抗炎与糖
         </h1>
 
         <p className="mt-5 text-base text-ink/70 leading-relaxed">
@@ -36,7 +36,7 @@ export function Landing() {
       <section className="px-4 pb-8 max-w-3xl mx-auto">
         <img
           src={asset('landing-hero.png')}
-          alt="拍照 → 炎症指数 → 30 天体质档案三步流程"
+          alt="拍照 → 抗炎指数 → 30 天体质档案三步流程"
           className="w-full rounded-2xl shadow-sm"
           loading="eager"
           data-testid="landing-hero-img"
@@ -49,7 +49,7 @@ export function Landing() {
           className="block w-full text-center rounded-full bg-ink text-white py-4 text-base font-medium"
           data-testid="cta-quiz"
         >
-          30 秒测一下你当前的炎症指数 →
+          30 秒测一下你当前的抗炎指数 →
         </Link>
         <p className="mt-3 text-xs text-ink/40 text-center">
           不需要注册。完成后给你一份初步评估。
@@ -73,7 +73,7 @@ export function Landing() {
             <div>
               <p className="text-sm font-medium text-ink">① 每餐拍一张照</p>
               <p className="mt-1.5 text-xs text-ink/60 leading-relaxed">
-                AI 识别食物,估算这一餐的添加糖与碳水,标三档反应程度,给当餐炎症分。
+                AI 识别食物,估算这一餐的添加糖与碳水,给当餐抗炎指数(★1-5)。
               </p>
             </div>
           </div>

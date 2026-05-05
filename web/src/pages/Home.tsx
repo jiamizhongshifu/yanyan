@@ -33,6 +33,7 @@ import { useQuiz } from '../store/quiz';
 import { useOnboarding } from '../store/onboarding';
 import { computeInflammationIndex } from '../services/quiz';
 import { track } from '../services/tracker';
+import { LEVEL_TO_HOME_ENCOURAGEMENT } from '../services/score-display';
 
 const LEVEL_ICON_FILE = {
   平: 'level-ping.png',
@@ -41,12 +42,7 @@ const LEVEL_ICON_FILE = {
   大火: 'level-dahuo.png'
 } as const;
 
-const ENCOURAGE: Record<FireLevel, string> = {
-  平: '状态平稳。继续保持现在的节奏,身体在替你存信用。',
-  微火: '有点微微偏热。挑一两餐清淡一下,睡前不熬夜,明早再看看。',
-  中火: '已经在上火了。接下来 1 周收一收辛辣油炸,加点白米粥 / 山药 / 绿叶蔬菜。',
-  大火: '炎症信号偏强。持续不缓解或体检异常时,建议同时咨询医生 / 注册营养师。'
-};
+// 走 score-display 模块的 LEVEL_TO_HOME_ENCOURAGEMENT;此处仅保留 import 锚
 
 export function Home() {
   const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
@@ -76,7 +72,7 @@ export function Home() {
   const dial = useMemo<{ score: number; level: FireLevel; caption: string } | null>(() => {
     // 1. server Yan-Score(数据齐)
     if (yanScore?.result) {
-      return { score: yanScore.result.score, level: yanScore.result.level, caption: '今日炎症指数' };
+      return { score: yanScore.result.score, level: yanScore.result.level, caption: '今日抗炎指数' };
     }
     // 2. quiz 公开炎症指数(刚登录,还没拍过餐 / 打过卡)
     if (quiz.completedAt && quiz.reverseFilterChoice) {
@@ -86,13 +82,13 @@ export function Home() {
         recentDiet: quiz.recentDiet,
         sleepPattern: quiz.sleepPattern
       });
-      return { score: idx.score, level: idx.level, caption: '初始炎症指数(基线)' };
+      return { score: idx.score, level: idx.level, caption: '初始抗炎指数(基线)' };
     }
     // 3. onboarding 算出的 initialFireLevel(无 quiz 时)
     if (initialFireLevel) {
       const fakeScore =
         initialFireLevel === '平' ? 12 : initialFireLevel === '微火' ? 38 : initialFireLevel === '中火' ? 62 : 85;
-      return { score: fakeScore, level: initialFireLevel, caption: '初始炎症指数(基线)' };
+      return { score: fakeScore, level: initialFireLevel, caption: '初始抗炎指数(基线)' };
     }
     return null;
   }, [yanScore, quiz, initialFireLevel]);
@@ -142,7 +138,7 @@ export function Home() {
               levelIcon={LEVEL_ICON_FILE[dial.level]}
             />
             <p className="mt-2 px-2 text-sm text-ink/65 text-center leading-relaxed" data-testid="dial-encourage">
-              {ENCOURAGE[dial.level]}
+              {LEVEL_TO_HOME_ENCOURAGEMENT[dial.level]}
             </p>
           </>
         ) : (

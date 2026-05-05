@@ -150,8 +150,9 @@ describe('U6 MealResult page', () => {
     });
 
     render(<MealResult />);
-    expect(screen.getByTestId('fire-level')).toHaveTextContent('微火');
-    expect(screen.getByTestId('fire-score')).toHaveTextContent('33.3');
+    // 抗炎指数:微火 → 显示标签"轻盈" + 4 星
+    expect(screen.getByTestId('fire-level')).toHaveTextContent('轻盈');
+    expect(screen.getByTestId('fire-score')).toHaveTextContent('4');
     expect(screen.getAllByTestId('food-item-card')).toHaveLength(2);
     expect(screen.getByText(/某神秘食物/)).toBeInTheDocument();
   });

@@ -107,9 +107,8 @@ describe('U-Quiz Result', () => {
       </Router>
     );
     expect(screen.getByTestId('quiz-result')).toBeInTheDocument();
-    const score = parseInt(screen.getByTestId('result-score').textContent ?? '0', 10);
-    expect(score).toBeGreaterThan(50); // heavy symptoms + bad lifestyle
-    expect(['中火', '大火']).toContain(screen.getByTestId('result-level').textContent);
+    // 抗炎指数:重症 + 生活差 → 微暖 / 留心
+    expect(['微暖', '留心']).toContain(screen.getByTestId('result-level').textContent);
     // CTA 现在是 button + onClick navigate(),不再是 Link
     const cta = screen.getByTestId('cta-login');
     expect(cta.tagName.toLowerCase()).toBe('button');

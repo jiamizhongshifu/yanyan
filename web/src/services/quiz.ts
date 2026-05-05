@@ -100,18 +100,18 @@ export function computeInflammationIndex(answers: QuizAnswers): InflammationInde
 export const LEVEL_HINT: Record<FireLevel, { headline: string; body: string }> = {
   平: {
     headline: '当前体感平稳',
-    body: '近期身体没什么明显发火的信号。继续保持现在的饮食和作息节奏。'
+    body: '近期身体没什么明显信号,继续保持现在的饮食和作息节奏就好。'
   },
   微火: {
-    headline: '有点偏热',
-    body: '出现了一些轻度信号(口干 / 起痘 / 大便偏干等)。先收一收辛辣 + 油炸,1-2 周看变化。'
+    headline: '整体清气',
+    body: '有一些轻度信号(口干 / 起痘 / 大便偏干等),挑一两餐清淡一下,1-2 周再看看。'
   },
   中火: {
-    headline: '已经在上火了',
-    body: '多个维度都有反应。建议接下来 1 周清淡为主,加白米粥 / 山药 / 绿叶蔬菜,睡够 7 小时。'
+    headline: '略偏微暖',
+    body: '多个维度都有反应,接下来一周以清淡为主,加白米粥 / 山药 / 绿叶蔬菜,睡够 7 小时会更舒服。'
   },
   大火: {
-    headline: '炎症信号强',
+    headline: '建议留心一下',
     body: '症状比较明显。如有体检异常或长期不缓解,建议同时咨询医生 / 注册营养师。本工具仅作生活方式参考。'
   }
 };

@@ -1,7 +1,7 @@
 /**
- * 公开 Quiz Result — 炎症指数 + 等级 + 建议 + 锁定功能预览 + 登录 CTA
+ * 公开 Quiz Result — 抗炎指数 + 等级 + 建议 + 锁定功能预览 + 登录 CTA
  *
- * 漏斗底部:用户看到自己的初步指数后,展示登录后能解锁什么(拍照炎症分 / 30 天档案 / 个体易诱炎食物清单)
+ * 漏斗底部:用户看到自己的初步指数后,展示登录后能解锁什么(每餐抗炎指数 / 30 天档案 / 个体易诱炎食物清单)
  */
 
 import { useEffect, useMemo } from 'react';
@@ -11,12 +11,13 @@ import { useQuiz } from '../../store/quiz';
 import { asset } from '../../services/assets';
 import { Icon } from '../../components/Icon';
 import type { FireLevel } from '../../services/onboarding';
+import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../../services/score-display';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
-  微火: 'text-fire-mild',
-  中火: 'text-fire-mid',
-  大火: 'text-fire-high'
+  微火: 'text-fire-ping',
+  中火: 'text-fire-mild',
+  大火: 'text-fire-mid'
 };
 
 /** 每档对应的独立插图(白底,可作 icon)— Supabase app-assets bucket */
@@ -29,8 +30,8 @@ const LEVEL_ICON_FILE: Record<FireLevel, string> = {
 
 const UNLOCKED_FEATURES = [
   {
-    title: '每餐拍照即时火分',
-    body: 'AI 识别食物 + 当餐火分,饭桌上 5 秒决定是不是现在该停。'
+    title: '每餐拍照即时抗炎指数',
+    body: 'AI 识别食物 + 当餐抗炎指数(★1-5),饭桌上 5 秒看清这一餐对身体友不友好。'
   },
   {
     title: '次晨 30 秒打卡',
@@ -42,7 +43,7 @@ const UNLOCKED_FEATURES = [
   },
   {
     title: '30 天体质档案 PDF',
-    body: '完整 30 天炎症指数趋势 + 个体易诱炎食物 + 体检对照(若上传)+ 引用,可下载 / 分享。'
+    body: '完整 30 天抗炎指数趋势 + 个体易诱炎食物 + 体检对照(若上传)+ 引用,可下载 / 分享。'
   }
 ];
 
@@ -79,16 +80,17 @@ export function QuizResult() {
       <section className="mt-6 rounded-3xl bg-white px-6 py-10 text-center">
         <img
           src={asset(LEVEL_ICON_FILE[index.level])}
-          alt={`等级:${index.level}`}
+          alt={`等级:${LEVEL_TO_LABEL[index.level]}`}
           className="mx-auto w-32 h-32 object-contain"
           data-testid="level-illustration"
         />
-        <p className="mt-5 text-xs text-ink/50 tracking-wide">你当前的炎症指数</p>
-        <p className={`mt-2 text-7xl font-light leading-none ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
-          {index.score}
+        <p className="mt-5 text-xs text-ink/50 tracking-wide">你当前的抗炎指数</p>
+        <p className={`mt-3 text-5xl leading-none ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
+          {'★'.repeat(LEVEL_TO_STARS[index.level])}
+          <span className="text-ink/15">{'★'.repeat(5 - LEVEL_TO_STARS[index.level])}</span>
         </p>
         <p className={`mt-3 text-2xl font-medium ${LEVEL_COLOR[index.level]}`} data-testid="result-level">
-          {index.level}
+          {LEVEL_TO_LABEL[index.level]}
         </p>
         <p className="mt-3 text-xs text-ink/40">基于 {Math.round(index.completeness * 100)}% 数据完整度</p>
       </section>
@@ -110,10 +112,10 @@ export function QuizResult() {
       </section>
 
       <section className="mt-5 rounded-2xl bg-white px-4 py-4" data-testid="result-scale-img">
-        <p className="text-xs text-ink/50 mb-3 px-2">炎症指数 4 档分级参考</p>
+        <p className="text-xs text-ink/50 mb-3 px-2">抗炎指数 4 档分级参考</p>
         <img
           src={asset('level-scale.png')}
-          alt="平 / 微火 / 中火 / 大火 4 档对照"
+          alt="平 / 轻盈 / 微暖 / 留心 4 档对照"
           className="w-full rounded-xl"
           loading="lazy"
         />

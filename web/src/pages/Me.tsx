@@ -270,7 +270,7 @@ export function Me() {
           className="h-4 w-auto object-contain opacity-60"
           loading="lazy"
         />
-        <p className="text-[11px] leading-relaxed">v1 私人 beta · 控糖 × 炎症 × 次晨体感</p>
+        <p className="text-[11px] leading-relaxed">v1 私人 beta · 控糖 × 抗炎 × 次晨体感</p>
       </footer>
     </main>
   );

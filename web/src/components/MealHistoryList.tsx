@@ -5,12 +5,13 @@
 import { Link } from 'wouter';
 import type { TodayMealItem } from '../services/home';
 import type { FireLevel } from '../services/symptoms';
+import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'bg-fire-ping/10 text-fire-ping',
-  微火: 'bg-fire-mild/10 text-fire-mild',
-  中火: 'bg-fire-mid/10 text-fire-mid',
-  大火: 'bg-fire-high/10 text-fire-high'
+  微火: 'bg-fire-ping/10 text-fire-ping',
+  中火: 'bg-fire-mild/10 text-fire-mild',
+  大火: 'bg-fire-mid/10 text-fire-mid'
 };
 
 interface Props {
@@ -49,7 +50,7 @@ export function MealHistoryList({ meals }: Props) {
               </div>
               {m.level && (
                 <span className={`text-xs px-2.5 py-1 rounded-full ${LEVEL_COLOR[m.level]}`}>
-                  {m.level} {m.fireScore}
+                  {LEVEL_TO_LABEL[m.level]} · {'★'.repeat(LEVEL_TO_STARS[m.level])}
                 </span>
               )}
             </li>

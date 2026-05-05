@@ -16,6 +16,7 @@ import { fetchHealthToday, postHealthSteps, type HealthDaily } from '../services
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { upsertTodayChallenges } from '../services/dailyChallenges';
 import { asset } from '../services/assets';
+import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
 import { useWellness, todayKey } from '../store/wellness';
 import { DailyChallengesCard } from '../components/DailyChallengesCard';
 import { InappRemindersBanner } from '../components/InappRemindersBanner';
@@ -52,9 +53,9 @@ function SettingsIcon({ className = 'w-5 h-5' }: { className?: string }) {
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
-  微火: 'text-fire-mild',
-  中火: 'text-fire-mid',
-  大火: 'text-fire-high'
+  微火: 'text-fire-ping',
+  中火: 'text-fire-mild',
+  大火: 'text-fire-mid'
 };
 
 export function Today() {
@@ -166,28 +167,29 @@ export function Today() {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-ink">第一次见!</p>
             <p className="mt-1 text-xs text-ink/65 leading-relaxed">
-              先拍中午这一餐,5 秒识别食物 + 添加糖估算,你就能看到第一份炎症分。
+              先拍中午这一餐,5 秒识别食物 + 添加糖估算,就能看到第一份抗炎指数。
             </p>
           </div>
         </section>
       )}
 
-      {/* 顶部炎症一句话 — 加 level 插画 */}
+      {/* 顶部抗炎指数一句话 — 加 level 插画 */}
       {yanScore?.result && (
         <section className="mb-5 rounded-2xl bg-white px-5 py-4 flex items-center gap-4" data-testid="today-fire-strip">
           <img
             src={asset(`level-${yanScore.result.level === '平' ? 'ping' : yanScore.result.level === '微火' ? 'weihuo' : yanScore.result.level === '中火' ? 'zhonghuo' : 'dahuo'}.png`)}
-            alt={yanScore.result.level}
+            alt={LEVEL_TO_LABEL[yanScore.result.level]}
             className="w-14 h-14 object-contain flex-shrink-0"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-ink/50">今日炎症指数</p>
+            <p className="text-xs text-ink/50">今日抗炎指数</p>
             <p className="mt-0.5">
-              <span className={`text-3xl font-light ${LEVEL_COLOR[yanScore.result.level]}`}>
-                {yanScore.result.score}
+              <span className={`text-2xl ${LEVEL_COLOR[yanScore.result.level]}`}>
+                {'★'.repeat(LEVEL_TO_STARS[yanScore.result.level])}
+                <span className="text-ink/15">{'★'.repeat(5 - LEVEL_TO_STARS[yanScore.result.level])}</span>
               </span>
               <span className={`ml-2 text-base ${LEVEL_COLOR[yanScore.result.level]}`}>
-                {yanScore.result.level}
+                {LEVEL_TO_LABEL[yanScore.result.level]}
               </span>
             </p>
           </div>

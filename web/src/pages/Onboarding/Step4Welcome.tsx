@@ -10,6 +10,7 @@
 import { useLocation } from 'wouter';
 import { useOnboarding } from '../../store/onboarding';
 import { asset } from '../../services/assets';
+import { LEVEL_TO_LABEL } from '../../services/score-display';
 
 export function Step4Welcome() {
   const [, navigate] = useLocation();
@@ -25,8 +26,8 @@ export function Step4Welcome() {
       <h1 className="text-2xl font-semibold text-ink text-center">就绪了。</h1>
       {initialFireLevel && (
         <p className="mt-3 text-sm text-ink/70 leading-relaxed text-center">
-          系统已为你建好初始档案,首份炎症指数:
-          <span className="font-medium text-ink">{initialFireLevel}</span>。
+          系统已为你建好初始档案,首份抗炎指数:
+          <span className="font-medium text-ink">{LEVEL_TO_LABEL[initialFireLevel]}</span>。
         </p>
       )}
 
@@ -40,7 +41,7 @@ export function Step4Welcome() {
         <div className="flex-1">
           <h2 className="text-base font-medium text-ink">中午吃饭时,拍一张</h2>
           <p className="mt-2 text-sm text-ink/65 leading-relaxed">
-            你拍的第一张餐照,会得到三档反应程度判断 + 添加糖估算,以及今晚 / 明早可以避开什么。
+            你拍的第一张餐照,会得到当餐抗炎指数(★1-5) + 添加糖估算,以及一句轻量陪伴语。
           </p>
         </div>
       </section>
@@ -54,7 +55,7 @@ export function Step4Welcome() {
       </button>
 
       <p className="mt-8 text-xs text-ink/40 text-center leading-relaxed">
-        步数 / 心率 接入需 iOS 快捷指令;炎症指数当前基于饮食 + 体感打卡。
+        步数 / 心率 接入需 iOS 快捷指令;抗炎指数当前基于饮食 + 体感打卡。
       </p>
     </main>
   );

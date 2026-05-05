@@ -84,7 +84,7 @@ export function QuizStep3Lifestyle() {
         className="mt-12 w-full rounded-full bg-ink text-white py-3 text-base font-medium disabled:opacity-40"
         data-testid="quiz-submit"
       >
-        看我的炎症指数
+        看我的抗炎指数
       </button>
     </main>
   );

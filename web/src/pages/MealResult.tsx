@@ -9,22 +9,22 @@
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { FoodItemCard } from '../components/FoodItemCard';
+import { Stars } from '../components/InflammationDial';
 import { postMealFeedback, type FireLevel } from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
 import { asset } from '../services/assets';
+import {
+  LEVEL_TO_ENCOURAGEMENT,
+  LEVEL_TO_LABEL,
+  LEVEL_TO_STARS,
+  SCORE_LABEL
+} from '../services/score-display';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
-  微火: 'text-fire-mild',
-  中火: 'text-fire-mid',
-  大火: 'text-fire-high'
-};
-
-const LEVEL_HINT: Record<FireLevel, string> = {
-  平: '这一餐很清气。继续保持。',
-  微火: '微微偏火,下一餐稍清淡。',
-  中火: '偏中火,今晚 / 明早建议避开高糖与高反应食物。',
-  大火: '这一餐反应食物偏多。下一餐建议清蒸 / 凉拌为主。'
+  微火: 'text-fire-ping',
+  中火: 'text-fire-mild',
+  大火: 'text-fire-mid'
 };
 
 export function MealResult() {
@@ -57,30 +57,29 @@ export function MealResult() {
       </div>
       <header className="mb-8 text-center">
         <p className="text-sm text-ink/60">这一餐</p>
-        <div
-          className={`mt-2 text-7xl font-semibold leading-none ${LEVEL_COLOR[result.level]}`}
+        <div className="mt-3 flex justify-center" data-testid="fire-stars">
+          <Stars filled={LEVEL_TO_STARS[result.level]} className="text-5xl" />
+        </div>
+        <p
+          className={`mt-2 text-2xl font-medium ${LEVEL_COLOR[result.level]}`}
           data-testid="fire-level"
         >
-          {result.level}
-        </div>
-        <p className="mt-1 text-xs text-ink/40">
-          炎症分 <span data-testid="fire-score">{result.fireScore}</span> / 100
+          {LEVEL_TO_LABEL[result.level]}
         </p>
-        {/* mascot 反应:平/微火 → happy / 中火 → thinking / 大火 → worried */}
+        <p className="mt-0.5 text-xs text-ink/40">
+          {SCORE_LABEL} ★<span data-testid="fire-score">{LEVEL_TO_STARS[result.level]}</span> / 5
+        </p>
+        {/* 全部用 happy mascot — 不再用 worried 给用户造成焦虑 */}
         <div className="mt-5 flex items-center justify-center gap-3 px-2">
           <img
-            src={asset(
-              result.level === '平' || result.level === '微火'
-                ? 'mascot-happy.png'
-                : result.level === '中火'
-                ? 'mascot-thinking.png'
-                : 'mascot-worried.png'
-            )}
+            src={asset('mascot-happy.png')}
             alt=""
             className="w-16 h-16 object-contain flex-shrink-0"
             loading="lazy"
           />
-          <p className="text-sm text-ink/70 leading-relaxed text-left">{LEVEL_HINT[result.level]}</p>
+          <p className="text-sm text-ink/70 leading-relaxed text-left">
+            {LEVEL_TO_ENCOURAGEMENT[result.level]}
+          </p>
         </div>
       </header>
 

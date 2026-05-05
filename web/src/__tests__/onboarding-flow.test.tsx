@@ -133,7 +133,8 @@ describe('U4 redo Step 3', () => {
       throat_itch: 'often'
     });
     render(<Step3BaselineConsent />);
-    expect(screen.getByTestId('local-fire-level')).toHaveTextContent('大火');
+    // 大火 → 显示标签"留心"
+    expect(screen.getByTestId('local-fire-level')).toHaveTextContent('留心');
   });
 
   test('Happy: 自动触发 ensure → consent → baseline → 跳 step4(无须点击)', async () => {
@@ -181,10 +182,11 @@ describe('U4 redo Step 3', () => {
 });
 
 describe('U4 redo Step 4', () => {
-  test('显示初始火分(若 store 有)+ CTA 跳主页', () => {
+  test('显示初始抗炎指数(若 store 有)+ CTA 跳主页', () => {
     useOnboarding.getState().setInitialFireLevel('中火');
     render(<Step4Welcome />);
-    expect(screen.getByText(/中火/)).toBeInTheDocument();
+    // 中火 → 显示标签"微暖"
+    expect(screen.getByText(/微暖/)).toBeInTheDocument();
     fireEvent.click(screen.getByText(/完成,稍后我会拍第一张/));
     expect(navigateMock).toHaveBeenCalledWith('/app');
   });
