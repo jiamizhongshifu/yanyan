@@ -44,8 +44,11 @@ export async function request<T>(opts: RequestOptions): Promise<ApiResult<T>> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   try {
+    // POST 无 body 时不要写 Content-Type: application/json,否则 Fastify
+    // JSON parser 会因为空 body 返回 400(empty_body)。如 /users/me/ensure。
+    const hasBody = opts.data !== undefined;
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
       ...(opts.headers ?? {})
     };
     if (opts.authToken) headers['Authorization'] = `Bearer ${opts.authToken}`;
@@ -53,7 +56,7 @@ export async function request<T>(opts: RequestOptions): Promise<ApiResult<T>> {
     const res = await fetch(getApiBase() + opts.url, {
       method: opts.method ?? 'GET',
       headers,
-      body: opts.data === undefined ? undefined : JSON.stringify(opts.data),
+      body: hasBody ? JSON.stringify(opts.data) : undefined,
       signal: ctrl.signal
     });
 

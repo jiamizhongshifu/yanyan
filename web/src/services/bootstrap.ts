@@ -7,7 +7,7 @@
  *   2. postConsent(5 个 scope,版本号取 server 当前要求)
  *   3. postBaseline(quiz 答案)
  *
- * 任一步失败 → 返回 false,Login.tsx 退化到 /onboarding/step1 的标准引导。
+ * 任一步失败 → 返回 {ok:false, failedAt} 让上层决定 UI(重试 / 退到引导)。
  */
 import { CONSENT_SCOPES, fetchRequiredVersion, postConsent } from './consents';
 import { ensureUser, postBaseline, type ReverseFilterChoice, type SymptomDimension, type SymptomFrequency, type FireLevel } from './onboarding';
@@ -17,15 +17,33 @@ interface QuizPayload {
   symptomsFrequency: Partial<Record<SymptomDimension, SymptomFrequency>>;
 }
 
-export async function bootstrapFromQuiz(quiz: QuizPayload): Promise<{ ok: true; initialFireLevel: FireLevel } | { ok: false }> {
+export type BootstrapStep = 'ensure' | 'consent' | 'baseline';
+
+export type BootstrapResult =
+  | { ok: true; initialFireLevel: FireLevel }
+  | { ok: false; failedAt: BootstrapStep };
+
+export async function bootstrapFromQuiz(quiz: QuizPayload): Promise<BootstrapResult> {
   const ensured = await ensureUser();
-  if (!ensured.ok) return { ok: false };
+  if (!ensured.ok) {
+    // eslint-disable-next-line no-console
+    console.error('[bootstrap] ensureUser failed');
+    return { ok: false, failedAt: 'ensure' };
+  }
 
   const version = (await fetchRequiredVersion()) ?? 1;
   const consentOk = await postConsent([...CONSENT_SCOPES], version);
-  if (!consentOk) return { ok: false };
+  if (!consentOk) {
+    // eslint-disable-next-line no-console
+    console.error('[bootstrap] postConsent failed');
+    return { ok: false, failedAt: 'consent' };
+  }
 
   const baseline = await postBaseline(quiz.reverseFilterChoice, quiz.symptomsFrequency);
-  if (!baseline) return { ok: false };
+  if (!baseline) {
+    // eslint-disable-next-line no-console
+    console.error('[bootstrap] postBaseline failed');
+    return { ok: false, failedAt: 'baseline' };
+  }
   return { ok: true, initialFireLevel: baseline.initialFireLevel };
 }

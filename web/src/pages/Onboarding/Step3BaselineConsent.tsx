@@ -144,13 +144,22 @@ export function Step3BaselineConsent() {
       )}
 
       {stage === 'error' ? (
-        <button
-          type="button"
-          onClick={() => void runBaseline()}
-          className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
-        >
-          重试
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={() => void runBaseline()}
+            className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
+          >
+            重试
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/me')}
+            className="mt-3 w-full rounded-full border border-ink/15 bg-white text-ink/65 py-3 text-sm"
+          >
+            去「我的」重新登录
+          </button>
+        </>
       ) : (
         <p className="mt-8 text-xs text-ink/40 text-center leading-relaxed">
           {stage === 'saving' ? '保存完成后会自动进入下一步' : '正在准备…'}
