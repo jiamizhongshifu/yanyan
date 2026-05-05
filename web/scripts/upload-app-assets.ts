@@ -54,7 +54,10 @@ const ASSETS = [
   // 第六批:Landing 三步流程
   { local: 'landing-step-photo.png', remote: 'landing-step-photo.png', contentType: 'image/png' },
   { local: 'landing-step-checkin.png', remote: 'landing-step-checkin.png', contentType: 'image/png' },
-  { local: 'landing-step-archive.png', remote: 'landing-step-archive.png', contentType: 'image/png' }
+  { local: 'landing-step-archive.png', remote: 'landing-step-archive.png', contentType: 'image/png' },
+  // 第七批
+  { local: 'quiz-result-hero.png', remote: 'quiz-result-hero.png', contentType: 'image/png' },
+  { local: 'install-banner.png', remote: 'install-banner.png', contentType: 'image/png' }
 ];
 
 async function main(): Promise<void> {

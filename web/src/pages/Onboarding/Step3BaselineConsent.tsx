@@ -121,8 +121,9 @@ export function Step3BaselineConsent() {
       </section>
 
       {errorMessage && (
-        <div role="alert" className="mt-6 rounded-xl bg-fire-high/10 px-4 py-3 text-sm text-fire-high">
-          {errorMessage}
+        <div role="alert" className="mt-6 rounded-2xl bg-fire-high/10 px-4 py-3 flex items-center gap-3">
+          <img src={asset('mascot-worried.png')} alt="" className="w-12 h-12 object-contain flex-shrink-0" />
+          <span className="text-sm text-fire-high">{errorMessage}</span>
         </div>
       )}
 

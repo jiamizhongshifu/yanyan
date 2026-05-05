@@ -78,19 +78,32 @@ export function Camera() {
     }
   };
 
+  // 头部插画:idle/done = 餐桌邀请图;识别中 = thinking;有错 = worried
+  const headerImg = errorMessage
+    ? 'mascot-worried.png'
+    : busy
+    ? 'mascot-thinking.png'
+    : 'camera-tabletop.png';
+
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
       <div className="flex justify-center mb-2">
         <img
-          src={asset('camera-tabletop.png')}
+          src={asset(headerImg)}
           alt=""
-          className="w-44 h-44 object-contain"
+          className={`object-contain transition-all ${busy || errorMessage ? 'w-32 h-32' : 'w-44 h-44'}`}
           loading="lazy"
         />
       </div>
-      <h1 className="text-2xl font-semibold text-ink text-center">拍下这一餐</h1>
+      <h1 className="text-2xl font-semibold text-ink text-center">
+        {errorMessage ? '出了点小问题' : busy ? STAGE_HINT[stage as keyof typeof STAGE_HINT] : '拍下这一餐'}
+      </h1>
       <p className="mt-3 text-sm text-ink/60 leading-relaxed text-center">
-        AI 会估算这一餐的添加糖与碳水,标三档反应程度,出当餐炎症分。识别后你可以标记错的,我们会修正。
+        {errorMessage
+          ? errorMessage
+          : busy
+          ? '别走开,水豚正在帮你看这一餐里有什么。'
+          : 'AI 会估算这一餐的添加糖与碳水,标三档反应程度,出当餐炎症分。识别后你可以标记错的,我们会修正。'}
       </p>
 
       <input
@@ -114,13 +127,13 @@ export function Camera() {
       </button>
 
       {errorMessage && (
-        <div role="alert" className="mt-6 rounded-xl bg-fire-high/10 px-4 py-3 text-sm text-fire-high">
+        <div role="alert" className="sr-only">
           {errorMessage}
         </div>
       )}
 
       <p className="mt-12 text-xs text-ink/40 leading-relaxed text-center">
-        v1 阶段 LLM 识别走境内豆包多模态;<br />
+        v1 阶段 LLM 识别走境内多模态服务;<br />
         识别结果不出境,照片仅在你的账号下保留。
       </p>
     </main>

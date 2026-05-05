@@ -25,6 +25,7 @@ import { Step3Reveal } from './pages/MorningCheckin/Step3Reveal';
 import { ProfilePdf } from './pages/ProfilePdf';
 import { RequireAuth } from './components/RequireAuth';
 import { BottomTabs } from './components/BottomTabs';
+import { InstallPrompt } from './components/InstallPrompt';
 
 /** 登录后主屏 + 3 tab 在以下前缀显示 */
 const TAB_VISIBLE_PREFIXES = ['/app', '/findings', '/me'];
@@ -148,6 +149,7 @@ export function App() {
         </Route>
       </Switch>
       <MaybeBottomTabs />
+      <InstallPrompt />
     </>
   );
 }

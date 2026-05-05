@@ -125,7 +125,7 @@ export function Login() {
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10">
       <div className="flex justify-center mb-2">
         <img
-          src={asset('login-hero.png')}
+          src={asset(statusMessage?.kind === 'error' ? 'mascot-worried.png' : 'login-hero.png')}
           alt=""
           className="w-44 h-44 object-contain"
           loading="lazy"
