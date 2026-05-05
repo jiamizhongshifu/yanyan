@@ -4,9 +4,11 @@
  * 当前阶段没有日级别 yan_score 历史 API,先用累计打卡天数表达进度:
  *   - 已累计的天数显示彩色"小太阳",未到的灰色
  *   - 中间一个高亮(蓝)= 今天
+ *   - 过去日期可点击跳到 /day/:date 查看历史详情
  */
 
 import { useMemo } from 'react';
+import { Link } from 'wouter';
 import { asset } from '../services/assets';
 import type { FireLevel } from '../services/symptoms';
 
@@ -23,6 +25,13 @@ const LEVEL_ICON_FILE: Record<FireLevel, string> = {
   中火: 'level-zhonghuo.png',
   大火: 'level-dahuo.png'
 };
+
+function toIso(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 export function HomeStreakStrip({ cumulativeDays, todayLevel }: Props) {
   const today = useMemo(() => new Date(), []);
@@ -47,8 +56,8 @@ export function HomeStreakStrip({ cumulativeDays, todayLevel }: Props) {
       {days.map((d, i) => {
         const dayNum = d.date.getDate();
         const showLevel = d.isToday && todayLevel !== null;
-        return (
-          <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
+        const inner = (
+          <>
             <span
               className={`text-[10px] tracking-wide ${
                 d.isToday ? 'text-ink font-medium' : 'text-ink/35'
@@ -79,6 +88,26 @@ export function HomeStreakStrip({ cumulativeDays, todayLevel }: Props) {
                 />
               )}
             </div>
+          </>
+        );
+
+        if (d.isPast) {
+          const iso = toIso(d.date);
+          return (
+            <Link
+              key={i}
+              href={`/day/${iso}`}
+              className="flex flex-col items-center gap-1.5 flex-1"
+              data-testid={`streak-day-${iso}`}
+            >
+              {inner}
+            </Link>
+          );
+        }
+
+        return (
+          <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
+            {inner}
           </div>
         );
       })}

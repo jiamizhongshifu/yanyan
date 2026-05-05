@@ -25,6 +25,7 @@ import { Step1Blind } from './pages/MorningCheckin/Step1Blind';
 import { Step2Compare } from './pages/MorningCheckin/Step2Compare';
 import { Step3Reveal } from './pages/MorningCheckin/Step3Reveal';
 import { ProfilePdf } from './pages/ProfilePdf';
+import { DayDetail } from './pages/DayDetail';
 import { RequireAuth } from './components/RequireAuth';
 import { BottomTabs } from './components/BottomTabs';
 import { InstallPrompt } from './components/InstallPrompt';
@@ -140,6 +141,13 @@ export function App() {
           <RequireAuth>
             <Me />
           </RequireAuth>
+        </Route>
+        <Route path="/day/:date">
+          {(params) => (
+            <RequireAuth>
+              <DayDetail date={params.date} />
+            </RequireAuth>
+          )}
         </Route>
         <Route path="/me/health-shortcut">
           <RequireAuth>

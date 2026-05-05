@@ -32,10 +32,11 @@ async function authHeader() {
   return t ? { authToken: t } : null;
 }
 
-export async function fetchHomeToday(): Promise<HomeToday | null> {
+export async function fetchHomeToday(date?: string): Promise<HomeToday | null> {
   const auth = await authHeader();
   if (!auth) return null;
-  const res = await request<{ ok: true } & HomeToday>({ url: '/home/today', ...auth });
+  const url = date ? `/home/today?date=${date}` : '/home/today';
+  const res = await request<{ ok: true } & HomeToday>({ url, ...auth });
   if (!res.ok) return null;
   return { date: res.data.date, meals: res.data.meals };
 }
