@@ -1,13 +1,11 @@
 /**
- * 登录页 — Supabase Auth 邮箱 magic link
+ * 登录页 — Supabase Auth(邮箱 magic link + Google OAuth)
  *
- * v1 简化:用 email magic link(Supabase 默认支持,无需配置 SMS provider)
- * Phase 2 加微信 OAuth Web + 短信 OTP(plan U4 deferred)
+ * 两种入口:
+ *   1. Google OAuth(优先 / 推荐):signInWithOAuth({ provider: 'google' }) → Google 授权 → 自动建账户 + 跳回
+ *   2. 邮箱 magic link:signInWithOtp → 邮箱链接 → 点击 → 跳回
  *
- * 流程:
- *   1. 用户输入邮箱 → 调 supabase.auth.signInWithOtp
- *   2. Supabase 发 magic link 到邮箱
- *   3. 用户点链接 → Supabase 跳回 / 带 access_token → onAuthStateChange 触发 → 自动跳 onboarding
+ * 共同后置:onAuthStateChange 触发 → 跳 /onboarding/step1(quiz 答案 prefill)
  */
 
 import { useEffect, useState } from 'react';
@@ -19,6 +17,7 @@ export function Login() {
   const [, navigate] = useLocation();
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ kind: 'info' | 'error'; text: string } | null>(null);
   const { session } = useAuth();
 
@@ -27,6 +26,29 @@ export function Login() {
       navigate('/onboarding/step1');
     }
   }, [session, navigate]);
+
+  const onGoogleSignIn = async () => {
+    if (googleSubmitting) return;
+    setGoogleSubmitting(true);
+    setStatusMessage(null);
+    const { error } = await getSupabase().auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/onboarding/step1',
+        queryParams: { access_type: 'offline', prompt: 'select_account' }
+      }
+    });
+    if (error) {
+      setGoogleSubmitting(false);
+      setStatusMessage({
+        kind: 'error',
+        text: error.message?.includes('not enabled')
+          ? 'Google 登录暂未启用,请用邮箱登录或稍后再试。'
+          : 'Google 登录失败,请稍后再试或改用邮箱。'
+      });
+    }
+    // 成功 → 浏览器自动跳到 Google,不需要 setSubmitting(false)
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +79,41 @@ export function Login() {
       <h1 className="text-3xl font-semibold text-ink">炎炎消防队</h1>
       <p className="mt-3 text-sm text-ink/60">中医发物 × 次晨体感</p>
 
-      <form onSubmit={onSubmit} noValidate className="mt-12 space-y-4">
+      <button
+        type="button"
+        onClick={onGoogleSignIn}
+        disabled={googleSubmitting || submitting}
+        className="mt-12 w-full rounded-full border border-ink/15 bg-white py-3 text-base font-medium text-ink flex items-center justify-center gap-3 disabled:opacity-50"
+        data-testid="btn-google-signin"
+      >
+        <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
+          <path
+            d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"
+            fill="#4285F4"
+          />
+          <path
+            d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"
+            fill="#34A853"
+          />
+          <path
+            d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
+            fill="#FBBC05"
+          />
+          <path
+            d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"
+            fill="#EA4335"
+          />
+        </svg>
+        <span>{googleSubmitting ? '正在跳转 Google…' : '用 Google 账号继续'}</span>
+      </button>
+
+      <div className="mt-6 flex items-center gap-3 text-xs text-ink/40">
+        <span className="flex-1 h-px bg-ink/10" />
+        <span>或用邮箱</span>
+        <span className="flex-1 h-px bg-ink/10" />
+      </div>
+
+      <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
         <label className="block">
           <span className="text-sm text-ink">邮箱</span>
           <input
@@ -77,6 +133,7 @@ export function Login() {
             className={`rounded-xl px-4 py-3 text-sm ${
               statusMessage.kind === 'error' ? 'bg-fire-high/10 text-fire-high' : 'bg-fire-ping/10 text-fire-ping'
             }`}
+            data-testid="login-status"
           >
             {statusMessage.text}
           </div>
@@ -84,7 +141,7 @@ export function Login() {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || googleSubmitting}
           className="w-full rounded-full bg-ink text-white py-3 text-base font-medium disabled:opacity-50"
         >
           {submitting ? '发送中...' : '发送登录链接'}
