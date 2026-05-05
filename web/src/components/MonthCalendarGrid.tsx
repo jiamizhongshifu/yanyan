@@ -1,9 +1,14 @@
 /**
- * 月历网格 — Grow App 洞悉页风格
+ * 月历网格 — 统一三态橘子图标(与水豚头顶橘子呼应)
  *
- * 7 列(周日 → 周六),每格一个等级太阳图标。
- * v1:用 cumulativeDays + 当日 level 推断已打卡的天数,未打卡显示空太阳。
- *      下版接 server 端"按日 level 历史"接口后做精确填色。
+ * 状态对应:
+ *   - 已点亮(过去日 + 有数据 / 今天 + 有等级)→ orange-filled 实色饱满
+ *   - 未点亮(过去日 但 无数据)              → orange-filled grayscale opacity-40
+ *   - 未到来(未来日)                          → orange-outline 描边空心
+ *   - 今日                                      → 橘子 + 黑色 ring 高光
+ *
+ * 不再用 streak/level/tier 图区分:统一橘子,降低识别成本。
+ * tier(完美/美好/奈斯)+ fireLevel 通过 title 提示可见,不占视觉。
  */
 
 import { useMemo } from 'react';
@@ -19,28 +24,19 @@ interface DayInfo {
 interface Props {
   /** 当月内已打卡的累计天数(粗略 fallback,在 server 历史拿到前用) */
   cumulativeInMonth: number;
-  /** 今日等级,用于高亮今天 */
+  /** 今日等级,用于 title 提示 */
   todayLevel: FireLevel | null;
   /** 月份基准日期(默认今天) */
   monthBase?: Date;
-  /** 来自 server 的当月每日挑战快照 — 优先用这个着色 */
+  /** 来自 server 的当月每日挑战快照 — 优先用这个判断"是否已点亮" */
   daysHistory?: DayInfo[];
 }
 
-// streak-* 是为小尺寸圆环设计的极简单色等级图标(28×28 仍清晰)
-const STREAK_ICON_FILE: Record<FireLevel, string> = {
-  平: 'streak-ping.png',
-  微火: 'streak-weihuo.png',
-  中火: 'streak-zhonghuo.png',
-  大火: 'streak-dahuo.png'
-};
-
-// tier 状态视觉差异化 — 完美/美好/奈斯/无,不同环色 + 阴影深度
-const TIER_RING: Record<DayInfo['tier'], string> = {
-  perfect: 'ring-2 ring-fire-mild bg-fire-mild/15',
-  great: 'ring-2 ring-fire-ping/70 bg-fire-ping/10',
-  nice: 'ring-1 ring-ink/30 bg-ink/5',
-  none: 'bg-ink/10'
+const TIER_LABEL: Record<DayInfo['tier'], string> = {
+  perfect: '完美一天',
+  great: '美好一天',
+  nice: '奈斯一天',
+  none: ''
 };
 
 export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = new Date(), daysHistory }: Props) {
@@ -50,25 +46,28 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
     const month = monthBase.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-    const startWeekday = firstDay.getDay(); // 0=Sun
+    const startWeekday = firstDay.getDay();
     const totalDays = lastDay.getDate();
     const today = new Date();
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
     const todayDate = today.getDate();
 
-    type Cell = { day: number | null; isToday: boolean; isPast: boolean };
+    type Cell = { day: number | null; isToday: boolean; isPast: boolean; isFuture: boolean };
     const arr: Cell[] = [];
-    for (let i = 0; i < startWeekday; i++) arr.push({ day: null, isToday: false, isPast: false });
+    for (let i = 0; i < startWeekday; i++) arr.push({ day: null, isToday: false, isPast: false, isFuture: false });
     for (let d = 1; d <= totalDays; d++) {
       const isToday = isCurrentMonth && d === todayDate;
-      const isPast = isCurrentMonth ? d < todayDate : new Date(year, month, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      arr.push({ day: d, isToday, isPast });
+      const cellDate = new Date(year, month, d);
+      const isPast = cellDate < todayMidnight;
+      const isFuture = cellDate > todayMidnight;
+      arr.push({ day: d, isToday, isPast, isFuture });
     }
-    while (arr.length % 7 !== 0) arr.push({ day: null, isToday: false, isPast: false });
+    while (arr.length % 7 !== 0) arr.push({ day: null, isToday: false, isPast: false, isFuture: false });
     return arr;
   }, [monthBase]);
 
-  // 已打卡天的位置:从今天倒推 cumulativeInMonth 个 past day(粗略可视化)
+  // fallback:server 没历史时,用 cumulativeInMonth 倒推已点亮的天
   const checkedDays = useMemo(() => {
     const set = new Set<number>();
     const past = cells.filter((c) => c.day !== null && c.isPast).map((c) => c.day!);
@@ -76,6 +75,9 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
     tail.forEach((d) => set.add(d));
     return set;
   }, [cells, cumulativeInMonth]);
+
+  const filledSrc = asset('orange-filled.png');
+  const outlineSrc = asset('orange-outline.png');
 
   return (
     <section data-testid="month-calendar">
@@ -89,14 +91,28 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
           if (c.day === null) return <div key={i} />;
           const dateStr = `${monthBase.getFullYear()}-${String(monthBase.getMonth() + 1).padStart(2, '0')}-${String(c.day).padStart(2, '0')}`;
           const hist = historyByDate.get(dateStr);
-          const showTodayLevel = c.isToday && (hist?.fireLevel ?? todayLevel) !== null;
-          const todayDisplayLevel = hist?.fireLevel ?? todayLevel;
-          const isChecked = checkedDays.has(c.day);
+          const hasData = !!hist && (hist.fireLevel !== null || hist.tier !== 'none');
+          // 三态判定
+          const isLit = c.isToday
+            ? hasData || todayLevel !== null
+            : c.isPast
+            ? hasData || checkedDays.has(c.day)
+            : false;
+
+          // title 提示:已点亮显示等级 + tier 中文
+          const tierLabel = hist ? TIER_LABEL[hist.tier] : '';
+          const levelLabel = hist?.fireLevel ?? (c.isToday ? todayLevel : null);
+          const title = isLit
+            ? [levelLabel, tierLabel].filter(Boolean).join(' · ') || '已点亮'
+            : c.isFuture
+            ? '未到来'
+            : '未点亮';
+
           return (
             <div key={i} className="flex flex-col items-center gap-1">
               <span
                 className={`text-[11px] ${
-                  c.isToday ? 'text-fire-ping font-medium' : 'text-ink/55'
+                  c.isToday ? 'text-ink font-medium' : 'text-ink/55'
                 }`}
               >
                 {c.day}
@@ -105,39 +121,14 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
                 className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                   c.isToday ? 'ring-2 ring-ink ring-offset-2 ring-offset-white' : ''
                 }`}
+                title={title}
               >
-                {showTodayLevel && todayDisplayLevel ? (
-                  // 今天 + 已知等级 → streak 图标(高亮)
-                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
-                    <img
-                      src={asset(STREAK_ICON_FILE[todayDisplayLevel])}
-                      alt={todayDisplayLevel}
-                      className="w-7 h-7 object-contain"
-                    />
-                  </div>
-                ) : hist && hist.fireLevel ? (
-                  // 历史日 + 有等级 → streak 图标 + tier 环
-                  <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center ${TIER_RING[hist.tier]}`}
-                    title={`${hist.fireLevel} · ${hist.tier === 'perfect' ? '完美' : hist.tier === 'great' ? '美好' : hist.tier === 'nice' ? '奈斯' : ''}`}
-                  >
-                    <img
-                      src={asset(STREAK_ICON_FILE[hist.fireLevel])}
-                      alt={hist.fireLevel}
-                      className="w-6 h-6 object-contain"
-                    />
-                  </div>
-                ) : hist && hist.tier !== 'none' ? (
-                  // tier 但无等级 → 纯 tier 环 + 中央实心点
-                  <div className={`w-8 h-8 rounded-full ${TIER_RING[hist.tier]} flex items-center justify-center`}>
-                    <div className="w-2 h-2 rounded-full bg-ink/45" />
-                  </div>
-                ) : isChecked ? (
-                  // 已打卡但无 tier(老数据 fallback)→ 浅色填充
-                  <div className="w-7 h-7 rounded-full bg-ink/12" />
+                {c.isFuture ? (
+                  <img src={outlineSrc} alt="未到来" className="w-7 h-7 object-contain opacity-50" />
+                ) : isLit ? (
+                  <img src={filledSrc} alt="已点亮" className="w-7 h-7 object-contain" />
                 ) : (
-                  // 未打卡 → 虚边圆
-                  <div className="w-6 h-6 rounded-full border border-dashed border-ink/20" />
+                  <img src={filledSrc} alt="未点亮" className="w-7 h-7 object-contain grayscale opacity-40" />
                 )}
               </div>
             </div>

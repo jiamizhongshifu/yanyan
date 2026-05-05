@@ -70,6 +70,9 @@ const ASSETS = [
   { local: 'achievement-trend-unlock.png', remote: 'achievement-trend-unlock.png', contentType: 'image/png' },
   { local: 'achievement-month-archive.png', remote: 'achievement-month-archive.png', contentType: 'image/png' },
   { local: 'achievement-sugar-master.png', remote: 'achievement-sugar-master.png', contentType: 'image/png' },
+  // 第十批:日历视图统一橘子图标
+  { local: 'orange-filled.png', remote: 'orange-filled.png', contentType: 'image/png' },
+  { local: 'orange-outline.png', remote: 'orange-outline.png', contentType: 'image/png' },
   // 第八批:次晨打卡 3 步配图
   { local: 'checkin-blind.png', remote: 'checkin-blind.png', contentType: 'image/png' },
   { local: 'checkin-compare.png', remote: 'checkin-compare.png', contentType: 'image/png' },
