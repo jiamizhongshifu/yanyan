@@ -107,7 +107,14 @@ export function Login() {
             loading="lazy"
           />
         </div>
-        <h1 className="mt-2 text-3xl font-semibold text-ink text-center">Soak</h1>
+        <div className="mt-2 flex justify-center">
+          <img
+            src={asset('soak-wordmark.png')}
+            alt="Soak"
+            className="h-12 sm:h-14 w-auto object-contain"
+            loading="eager"
+          />
+        </div>
         <p className="mt-2 text-sm text-ink/60 text-center">控糖 × 炎症 × 次晨体感</p>
 
         {/* 已登录状态:不自动跳转,显式给用户两个选项 */}

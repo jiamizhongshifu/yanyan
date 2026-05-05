@@ -63,6 +63,13 @@ const ASSETS = [
   { local: 'streak-weihuo.png', remote: 'streak-weihuo.png', contentType: 'image/png' },
   { local: 'streak-zhonghuo.png', remote: 'streak-zhonghuo.png', contentType: 'image/png' },
   { local: 'streak-dahuo.png', remote: 'streak-dahuo.png', contentType: 'image/png' },
+  // 第九批:Soak 品牌 + 成就勋章
+  { local: 'soak-wordmark.png', remote: 'soak-wordmark.png', contentType: 'image/png' },
+  { local: 'soak-emblem.png', remote: 'soak-emblem.png', contentType: 'image/png' },
+  { local: 'achievement-week-streak.png', remote: 'achievement-week-streak.png', contentType: 'image/png' },
+  { local: 'achievement-trend-unlock.png', remote: 'achievement-trend-unlock.png', contentType: 'image/png' },
+  { local: 'achievement-month-archive.png', remote: 'achievement-month-archive.png', contentType: 'image/png' },
+  { local: 'achievement-sugar-master.png', remote: 'achievement-sugar-master.png', contentType: 'image/png' },
   // 第八批:次晨打卡 3 步配图
   { local: 'checkin-blind.png', remote: 'checkin-blind.png', contentType: 'image/png' },
   { local: 'checkin-compare.png', remote: 'checkin-compare.png', contentType: 'image/png' },

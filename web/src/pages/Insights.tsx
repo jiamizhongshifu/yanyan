@@ -328,28 +328,28 @@ export function Insights() {
         <div className="space-y-2.5">
           <AchievementCard
             unlocked={cumulativeDays >= 7}
-            icon="level-ping.png"
+            icon="achievement-week-streak.png"
             title="坚持一周"
             requirement="累计打卡 7 天"
             progress={cumulativeDays / 7}
           />
           <AchievementCard
             unlocked={(progress?.flags.canDrawTrend ?? false) || cumulativeDays >= 21}
-            icon="level-weihuo.png"
+            icon="achievement-trend-unlock.png"
             title="趋势线解锁"
             requirement={`累计打卡 ${progress?.thresholds.trendLineDays ?? 21} 天`}
             progress={cumulativeDays / (progress?.thresholds.trendLineDays ?? 21)}
           />
           <AchievementCard
             unlocked={progress?.flags.eligibleForProfilePdf ?? false}
-            icon="level-zhonghuo.png"
+            icon="achievement-month-archive.png"
             title="30 天体质档案"
             requirement={`累计打卡 ${progress?.thresholds.profilePdfDay ?? 30} 天`}
             progress={cumulativeDays / (progress?.thresholds.profilePdfDay ?? 30)}
           />
           <AchievementCard
             unlocked={(sugar?.monthSavedG ?? 0) >= 50}
-            icon="level-dahuo.png"
+            icon="achievement-sugar-master.png"
             title="减糖小达人"
             requirement="本月累计减糖 50 g"
             progress={(sugar?.monthSavedG ?? 0) / 50}
