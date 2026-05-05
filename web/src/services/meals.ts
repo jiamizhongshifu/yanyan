@@ -14,8 +14,8 @@ import { request } from './api';
 import { getCurrentAccessToken } from './auth';
 
 const FOOD_PHOTOS_BUCKET = 'food-photos';
-const MAX_DIMENSION = 1024;
-const JPG_QUALITY = 0.85;
+const MAX_DIMENSION = 768; // 跨境上传 + base64 给 LLM,小一点更稳
+const JPG_QUALITY = 0.82;
 
 export interface MealItem {
   name: string;

@@ -25,8 +25,8 @@ import type { RecognitionResult, RecognizedItem } from '../recognition/types';
 import { getConfig } from '../../config';
 
 const VISION_ENDPOINT = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-const TIMEOUT_MS = 25_000;
-const RETRY_BACKOFF_MS = [800]; // 1 次重试,Vercel 60s function 上限内
+const TIMEOUT_MS = 45_000;
+const RETRY_BACKOFF_MS: number[] = []; // 不重试,跨境单次给足时间,失败让用户重拍
 
 const SYSTEM_PROMPT = `你是中餐食物识别 + 添加糖估算专家。给定一张餐桌照片,识别其中所有可见食物条目,
 并对每一条估算"典型一份"的添加糖克数(自由糖,不含天然存在于水果 / 牛奶中的糖)。
@@ -154,7 +154,7 @@ export class QwenVisionClient implements LlmFoodRecognizer {
     };
 
     let lastErr: LlmCallError | null = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt < 1; attempt++) {
       if (attempt > 0) await new Promise((r) => setTimeout(r, RETRY_BACKOFF_MS[attempt - 1]));
       try {
         const res = await this.callOnce(body);
