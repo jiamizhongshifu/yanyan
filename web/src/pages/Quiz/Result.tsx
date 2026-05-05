@@ -75,32 +75,21 @@ export function QuizResult() {
     <main className="min-h-screen bg-paper px-6 pt-12 pb-20 max-w-md mx-auto" data-testid="quiz-result">
       <header className="text-xs text-ink/40 tracking-widest">炎炎消防队 · 初步评估</header>
 
-      {/* hero — 水豚捧仪表盘 */}
-      <div className="mt-4 -mx-2 rounded-3xl overflow-hidden">
+      <section className="mt-6 rounded-3xl bg-white px-6 py-10 text-center">
         <img
-          src={asset('quiz-result-hero.png')}
-          alt=""
-          className="w-full h-auto block"
-          loading="eager"
+          src={asset(LEVEL_ICON_FILE[index.level])}
+          alt={`等级:${index.level}`}
+          className="mx-auto w-32 h-32 object-contain"
+          data-testid="level-illustration"
         />
-      </div>
-
-      <section className="mt-3 rounded-3xl bg-white px-6 py-7 text-center">
-        <div className="flex items-center justify-center gap-3">
-          <img
-            src={asset(LEVEL_ICON_FILE[index.level])}
-            alt={`等级:${index.level}`}
-            className="w-16 h-16 object-contain"
-            data-testid="level-illustration"
-          />
-          <p className={`text-7xl font-light ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
-            {index.score}
-          </p>
-        </div>
-        <p className={`mt-2 text-2xl ${LEVEL_COLOR[index.level]}`} data-testid="result-level">
+        <p className="mt-5 text-xs text-ink/50 tracking-wide">你当前的炎症指数</p>
+        <p className={`mt-2 text-7xl font-light leading-none ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
+          {index.score}
+        </p>
+        <p className={`mt-3 text-2xl font-medium ${LEVEL_COLOR[index.level]}`} data-testid="result-level">
           {index.level}
         </p>
-        <p className="mt-1 text-xs text-ink/40">你当前的炎症指数 · 基于 {Math.round(index.completeness * 100)}% 数据完整度</p>
+        <p className="mt-3 text-xs text-ink/40">基于 {Math.round(index.completeness * 100)}% 数据完整度</p>
       </section>
 
       <section className="mt-5 rounded-2xl bg-white px-6 py-5">
