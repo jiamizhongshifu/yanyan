@@ -20,6 +20,7 @@ import { useWellness, todayKey } from '../store/wellness';
 import { DailyChallengesCard } from '../components/DailyChallengesCard';
 import { InappRemindersBanner } from '../components/InappRemindersBanner';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
+import { Icon } from '../components/Icon';
 import { track } from '../services/tracker';
 
 function WaterDropIcon({ filled }: { filled: boolean }) {
@@ -200,7 +201,10 @@ export function Today() {
       {sugar && (
         <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="sugar-tracker">
           <div className="flex items-baseline justify-between">
-            <p className="text-sm text-ink">🍬 控糖</p>
+            <p className="text-sm text-ink flex items-center gap-1.5">
+              <Icon name="sugar" className="w-4 h-4 text-ink/65" />
+              控糖
+            </p>
             <p className="text-xs text-ink/45">基线 {sugar.baselineDailyG} g / 天</p>
           </div>
           <p className="mt-2">
@@ -209,8 +213,9 @@ export function Today() {
             </span>
             <span className="ml-1 text-sm text-ink/55">g 今日添加糖</span>
             {sugar.todaySavedG > 0 && (
-              <span className="ml-3 text-xs text-fire-ping font-medium">
-                ✓ 减糖 {sugar.todaySavedG} g
+              <span className="ml-3 text-xs text-fire-ping font-medium inline-flex items-center gap-0.5">
+                <Icon name="check" className="w-3 h-3" />
+                减糖 {sugar.todaySavedG} g
               </span>
             )}
           </p>
@@ -236,7 +241,10 @@ export function Today() {
       {/* 喝水快速 +/- — 8 个水滴图标 */}
       <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="water-tracker">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-ink">💧 喝水</p>
+          <p className="text-sm text-ink flex items-center gap-1.5">
+            <Icon name="drop" className="w-4 h-4 text-ink/65" />
+            喝水
+          </p>
           <p className="text-xs text-ink/50">{dayEntry.waterCups} / 8 杯</p>
         </div>
         <div className="mt-3 flex items-center justify-between">
@@ -260,7 +268,10 @@ export function Today() {
       {/* 步数:server 优先(快捷指令同步)+ 手动录入兜底 */}
       <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="steps-tracker">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-ink">🚶 步数</p>
+          <p className="text-sm text-ink flex items-center gap-1.5">
+            <Icon name="steps" className="w-4 h-4 text-ink/65" />
+            步数
+          </p>
           <div className="flex items-center gap-2">
             {serverHealth?.source === 'shortcut' && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-fire-ping/15 text-fire-ping">
@@ -317,10 +328,11 @@ export function Today() {
       </div>
       <Link
         href="/camera"
-        className="mt-4 block w-full text-center rounded-full bg-ink text-white py-3.5 text-base font-medium"
+        className="mt-4 flex items-center justify-center gap-2 w-full rounded-full bg-ink text-white py-3.5 text-base font-medium"
         data-testid="today-camera-cta"
       >
-        📷 拍这一餐
+        <Icon name="camera" className="w-5 h-5" />
+        拍这一餐
       </Link>
     </main>
   );

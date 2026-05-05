@@ -9,6 +9,7 @@ import { useLocation } from 'wouter';
 import { computeInflammationIndex, LEVEL_HINT, type InflammationIndex } from '../../services/quiz';
 import { useQuiz } from '../../store/quiz';
 import { asset } from '../../services/assets';
+import { Icon } from '../../components/Icon';
 import type { FireLevel } from '../../services/onboarding';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
@@ -123,7 +124,9 @@ export function QuizResult() {
         <div className="space-y-3">
           {UNLOCKED_FEATURES.map((f, i) => (
             <div key={i} className="rounded-2xl bg-white px-5 py-4 relative">
-              <div className="absolute top-4 right-4 text-xs text-ink/30">🔒</div>
+              <div className="absolute top-4 right-4 text-ink/30">
+                <Icon name="lock" className="w-3.5 h-3.5" />
+              </div>
               <h3 className="text-sm font-medium text-ink pr-8">{f.title}</h3>
               <p className="mt-1 text-xs text-ink/60 leading-relaxed">{f.body}</p>
             </div>

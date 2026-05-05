@@ -5,11 +5,12 @@
  */
 
 import { Link, useLocation } from 'wouter';
+import { Icon, type IconName } from './Icon';
 
-const TABS: Array<{ key: string; label: string; href: string; icon: string; matchPrefix: string; exact?: boolean }> = [
-  { key: 'today', label: '今天', href: '/app', icon: '☀', matchPrefix: '/app', exact: true },
-  { key: 'body', label: '身体', href: '/app/body', icon: '◐', matchPrefix: '/app/body' },
-  { key: 'insights', label: '洞悉', href: '/app/insights', icon: '✦', matchPrefix: '/app/insights' }
+const TABS: Array<{ key: string; label: string; href: string; icon: IconName; matchPrefix: string; exact?: boolean }> = [
+  { key: 'today', label: '今天', href: '/app', icon: 'sun', matchPrefix: '/app', exact: true },
+  { key: 'body', label: '身体', href: '/app/body', icon: 'body', matchPrefix: '/app/body' },
+  { key: 'insights', label: '洞悉', href: '/app/insights', icon: 'sparkle', matchPrefix: '/app/insights' }
 ];
 
 export function BottomTabs() {
@@ -32,8 +33,8 @@ export function BottomTabs() {
                 aria-current={active ? 'page' : undefined}
                 data-testid={`tab-${t.key}`}
               >
-                <span className="text-base">{t.icon}</span>
-                <span>{t.label}</span>
+                <Icon name={t.icon} className="w-5 h-5" />
+                <span className="mt-0.5">{t.label}</span>
               </Link>
             </li>
           );

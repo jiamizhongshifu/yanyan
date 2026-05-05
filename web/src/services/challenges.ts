@@ -26,6 +26,8 @@ export type ChallengeKey = (typeof CHALLENGE_KEYS)[number];
 export interface ChallengeProgress {
   key: ChallengeKey;
   title: string;
+  /** SVG 图标名(优先);emoji 仍保留作为 fallback */
+  iconName: 'meal' | 'sugar' | 'drop' | 'moon' | 'steps';
   emoji: string;
   /** 0..1 */
   progress: number;
@@ -54,16 +56,17 @@ export function evaluateChallenges(inp: Inputs): ChallengeProgress[] {
   const meals: ChallengeProgress = {
     key: 'meals',
     title: '拍餐',
+    iconName: 'meal',
     emoji: '🍱',
     progress: Math.min(1, mealsCount / 2),
     done: mealsCount >= 2,
     status: `${mealsCount} / 2 餐`
   };
-  // 控糖:有餐照数据且累计 ≤ 25 g 视作完成。无数据时 progress=0,保留行动激励
   const sugarDone = sugarMeals.length > 0 && sugarRounded <= DAILY_SUGAR_GOAL_G;
   const lowSugar: ChallengeProgress = {
     key: 'low_sugar',
     title: '控糖',
+    iconName: 'sugar',
     emoji: '🍬',
     progress:
       sugarMeals.length === 0
@@ -82,6 +85,7 @@ export function evaluateChallenges(inp: Inputs): ChallengeProgress[] {
   const water: ChallengeProgress = {
     key: 'water',
     title: '喝水',
+    iconName: 'drop',
     emoji: '💧',
     progress: Math.min(1, inp.waterCups / 8),
     done: inp.waterCups >= 8,
@@ -90,6 +94,7 @@ export function evaluateChallenges(inp: Inputs): ChallengeProgress[] {
   const checkin: ChallengeProgress = {
     key: 'checkin',
     title: '次晨打卡',
+    iconName: 'moon',
     emoji: '🌙',
     progress: checkinDone ? 1 : 0,
     done: checkinDone,
@@ -98,6 +103,7 @@ export function evaluateChallenges(inp: Inputs): ChallengeProgress[] {
   const steps: ChallengeProgress = {
     key: 'steps',
     title: '步数',
+    iconName: 'steps',
     emoji: '🚶',
     progress: Math.min(1, inp.steps / 6000),
     done: inp.steps >= 6000,

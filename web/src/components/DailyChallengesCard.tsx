@@ -8,6 +8,7 @@
 import type { ChallengeProgress, DayTier } from '../services/challenges';
 import { TIER_LABEL } from '../services/challenges';
 import { asset } from '../services/assets';
+import { Icon } from './Icon';
 
 const TIER_ICON: Record<DayTier, string | null> = {
   perfect: 'level-ping.png', // 完美一天 = 平,绿
@@ -44,12 +45,19 @@ export function DailyChallengesCard({ progresses, tier }: Props) {
       {remainingForPerfect > 0 && tier !== 'perfect' && (
         <p className="mt-1 text-xs text-ink/50">距离 完美一天 还差 {remainingForPerfect} 项</p>
       )}
-      {tier === 'perfect' && <p className="mt-1 text-xs text-fire-ping">今日已达成 完美一天 ✨</p>}
+      {tier === 'perfect' && (
+        <p className="mt-1 text-xs text-fire-ping flex items-center gap-1">
+          今日已达成 完美一天
+          <Icon name="sparkle" className="w-3.5 h-3.5" />
+        </p>
+      )}
 
       <ul className="mt-4 space-y-3">
         {progresses.map((p) => (
           <li key={p.key} className="flex items-center gap-3" data-testid={`challenge-${p.key}`}>
-            <span className="text-lg w-6 text-center">{p.emoji}</span>
+            <span className={`w-6 flex justify-center ${p.done ? 'text-fire-ping' : 'text-ink/65'}`}>
+              <Icon name={p.iconName} className="w-5 h-5" />
+            </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline justify-between gap-2">
                 <span className={`text-sm ${p.done ? 'text-ink' : 'text-ink/80'} font-medium`}>
@@ -66,7 +74,9 @@ export function DailyChallengesCard({ progresses, tier }: Props) {
                 />
               </div>
             </div>
-            <span className={`text-xs w-4 ${p.done ? 'text-fire-ping' : 'text-transparent'}`}>✓</span>
+            <span className={`w-4 flex justify-center ${p.done ? 'text-fire-ping' : 'text-transparent'}`}>
+              <Icon name="check" className="w-4 h-4" />
+            </span>
           </li>
         ))}
       </ul>

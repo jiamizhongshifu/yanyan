@@ -23,6 +23,7 @@ import { MonthCalendarGrid } from '../components/MonthCalendarGrid';
 import { AchievementJar } from '../components/AchievementJar';
 import { track } from '../services/tracker';
 import { asset } from '../services/assets';
+import { Icon, type IconName } from '../components/Icon';
 import type { FireLevel } from '../services/symptoms';
 
 const LEVEL_ICON_FILE: Record<FireLevel, string> = {
@@ -302,18 +303,18 @@ export function Insights() {
       <section className="mt-5 rounded-3xl bg-white px-5 py-5" data-testid="month-stats">
         <h2 className="mb-3 text-base font-medium text-ink">每月统计</h2>
         <div className="grid grid-cols-2 gap-3">
-          <StatTile emoji="🍱" label="本月拍餐" value={`${monthAgg?.totalMeals ?? 0}`} unit="餐" />
-          <StatTile emoji="📷" label="拍餐天数" value={`${monthAgg?.photoDays ?? 0}`} unit="天" />
-          <StatTile emoji="🌙" label="次晨打卡" value={`${monthAgg?.checkinDays ?? 0}`} unit="天" />
-          <StatTile emoji="🚶" label="累计步数" value={fmtSteps(monthAgg?.totalSteps ?? 0)} unit="" />
+          <StatTile icon="meal" label="本月拍餐" value={`${monthAgg?.totalMeals ?? 0}`} unit="餐" />
+          <StatTile icon="camera" label="拍餐天数" value={`${monthAgg?.photoDays ?? 0}`} unit="天" />
+          <StatTile icon="moon" label="次晨打卡" value={`${monthAgg?.checkinDays ?? 0}`} unit="天" />
+          <StatTile icon="steps" label="累计步数" value={fmtSteps(monthAgg?.totalSteps ?? 0)} unit="" />
           <StatTile
-            emoji="💧"
+            icon="drop"
             label="今日喝水"
             value={`${dayEntry.waterCups}`}
             unit="/ 8 杯"
           />
           <StatTile
-            emoji="🍬"
+            icon="sugar"
             label="本月减糖"
             value={`${sugar?.monthSavedG ?? 0}`}
             unit="g"
@@ -361,13 +362,13 @@ export function Insights() {
 }
 
 function StatTile({
-  emoji,
+  icon,
   label,
   value,
   unit,
   highlight
 }: {
-  emoji: string;
+  icon: IconName;
   label: string;
   value: string;
   unit: string;
@@ -376,7 +377,9 @@ function StatTile({
   return (
     <div className={`rounded-2xl px-4 py-3 ${highlight ? 'bg-fire-ping/10' : 'bg-paper'}`}>
       <div className="flex items-center gap-1.5">
-        <span className="text-base">{emoji}</span>
+        <span className={highlight ? 'text-fire-ping' : 'text-ink/65'}>
+          <Icon name={icon} className="w-4 h-4" />
+        </span>
         <span className="text-xs text-ink/55">{label}</span>
       </div>
       <p className="mt-1.5">
@@ -428,8 +431,9 @@ function AchievementCard({
         )}
       </div>
       <div className="flex-1 min-w-0 relative z-10">
-        <p className={`text-sm font-medium ${unlocked ? 'text-ink' : 'text-ink/45'}`}>
-          {unlocked ? `✓ ${title}` : title}
+        <p className={`text-sm font-medium flex items-center gap-1 ${unlocked ? 'text-ink' : 'text-ink/45'}`}>
+          {unlocked && <Icon name="check" className="w-3.5 h-3.5 text-fire-ping" />}
+          {title}
         </p>
         <p className="text-[11px] text-ink/45 mt-0.5">{requirement}</p>
         {!unlocked && (

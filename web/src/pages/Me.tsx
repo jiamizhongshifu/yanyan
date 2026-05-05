@@ -22,6 +22,7 @@ import {
 } from '../services/push';
 import { track } from '../services/tracker';
 import { asset } from '../services/assets';
+import { Icon } from '../components/Icon';
 
 export function Me() {
   const [, navigate] = useLocation();
@@ -163,7 +164,10 @@ export function Me() {
           href="/me/health-shortcut"
           className="flex items-center justify-between px-5 py-4 text-sm text-ink"
         >
-          <span>🍎 Apple Health 步数同步</span>
+          <span className="flex items-center gap-2">
+            <Icon name="steps" className="w-4 h-4 text-ink/65" />
+            Apple Health 步数同步
+          </span>
           <span className="text-ink/30">→</span>
         </Link>
       </section>
@@ -175,7 +179,10 @@ export function Me() {
           href="/findings"
           className="flex items-center justify-between px-5 py-4 text-sm text-ink"
         >
-          <span>🔥 易诱炎食物档案</span>
+          <span className="flex items-center gap-2">
+            <Icon name="sparkle" className="w-4 h-4 text-fire-ping" />
+            易诱炎食物档案
+          </span>
           <span className="text-ink/30">→</span>
         </Link>
         <button
@@ -184,7 +191,10 @@ export function Me() {
           className="w-full flex items-center justify-between px-5 py-4 text-sm text-ink/55"
           data-testid="link-checkup-upload"
         >
-          <span>📋 上传体检报告</span>
+          <span className="flex items-center gap-2">
+            <Icon name="document" className="w-4 h-4 text-ink/45" />
+            上传体检报告
+          </span>
           <span className="text-ink/30 text-xs">Phase 2</span>
         </button>
         <button
@@ -194,14 +204,20 @@ export function Me() {
           className="w-full flex items-center justify-between px-5 py-4 text-sm text-ink disabled:opacity-50"
           data-testid="btn-export-csv"
         >
-          <span>📥 导出我的数据(CSV)</span>
-          <span className="text-ink/30 text-xs">{exporting ? '导出中…' : '↓'}</span>
+          <span className="flex items-center gap-2">
+            <Icon name="download" className="w-4 h-4 text-ink/65" />
+            导出我的数据(CSV)
+          </span>
+          <span className="text-ink/30 text-xs">{exporting ? '导出中…' : ''}</span>
         </button>
         <Link
           href="/privacy-policy"
           className="flex items-center justify-between px-5 py-4 text-sm text-ink"
         >
-          <span>📜 隐私政策</span>
+          <span className="flex items-center gap-2">
+            <Icon name="document" className="w-4 h-4 text-ink/65" />
+            隐私政策
+          </span>
           <span className="text-ink/30">→</span>
         </Link>
       </section>
@@ -211,7 +227,10 @@ export function Me() {
       <section className="rounded-2xl bg-white px-5 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-ink">🌅 次晨打卡推送</p>
+            <p className="text-sm text-ink flex items-center gap-2">
+              <Icon name="bell" className="w-4 h-4 text-ink/65" />
+              次晨打卡推送
+            </p>
             <p className="mt-0.5 text-[11px] text-ink/45">每天早上 7:00 提醒</p>
           </div>
           <button
