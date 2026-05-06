@@ -12,7 +12,6 @@
  */
 
 import type { DayTier } from '../services/challenges';
-import { TIER_LABEL } from '../services/challenges';
 import { OrangeIcon } from './OrangeIcon';
 
 interface Props {
@@ -88,14 +87,7 @@ export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
             {pct}
             <span className="text-xl font-light ml-0.5">%</span>
           </p>
-          <p className="mt-1.5 text-[11px] text-ink/55 tracking-wide">
-            完美一天 · {doneCount}/{total}
-            {tier !== 'none' && (
-              <span className="ml-1" style={{ color: TIER_COLOR[tier] }}>
-                {TIER_LABEL[tier]}
-              </span>
-            )}
-          </p>
+          <p className="mt-1.5 text-[11px] text-ink/55 tracking-wide">完美一天</p>
         </div>
       </div>
 

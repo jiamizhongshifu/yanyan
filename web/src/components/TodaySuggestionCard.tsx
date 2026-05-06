@@ -8,20 +8,20 @@
 import { useEffect, useState } from 'react';
 import { fetchTodayRecommendation, SLOT_LABELS, type TodayRecommendation } from '../services/recommend';
 
-/** citation 排序优先级:现代营养 > 论文 > 典籍。让用户先看到现代语言的来源。 */
-const CITATION_PRIORITY: Record<string, number> = {
-  modern_nutrition: 0,
-  paper: 1,
-  canon: 2
-};
-
+/**
+ * 推荐卡上只显示"现代营养 / 论文"来源,典籍(canon=本草纲目等)的引用
+ * 在卡片层面隐藏,避免给到用户脱离现代饮食习惯的暗示。
+ *
+ * 食物详情卡仍可看到典籍引用作为深度参考(MealResult/FoodItemCard)。
+ */
 function preferModernCitation<T extends { source: string; reference: string }>(
   citations: T[]
 ): T | undefined {
-  if (citations.length === 0) return undefined;
-  return [...citations].sort(
-    (a, b) => (CITATION_PRIORITY[a.source] ?? 9) - (CITATION_PRIORITY[b.source] ?? 9)
-  )[0];
+  const modern = citations.find((c) => c.source === 'modern_nutrition');
+  if (modern) return modern;
+  const paper = citations.find((c) => c.source === 'paper');
+  if (paper) return paper;
+  return undefined; // 只有 canon 时不渲染来源行
 }
 
 export function TodaySuggestionCard() {

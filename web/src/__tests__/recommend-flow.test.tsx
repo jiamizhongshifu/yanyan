@@ -26,7 +26,7 @@ const FA_HEAVY: TodayRecommendation = {
     { name: '虾', citations: [] }
   ],
   meals: [
-    { slot: 'breakfast', items: ['白米粥', '南瓜'], citations: [{ source: 'canon', reference: '《饮膳正要》' }] },
+    { slot: 'breakfast', items: ['白米粥', '南瓜'], citations: [{ source: 'modern_nutrition', reference: 'USDA FoodData Central' }] },
     { slot: 'lunch', items: ['山药', '鸡肉'], citations: [] },
     { slot: 'dinner', items: ['豆腐', '小米粥'], citations: [] }
   ],
@@ -64,7 +64,8 @@ describe('U13a TodaySuggestionCard', () => {
     expect(screen.getByText('虾')).toBeInTheDocument();
     expect(screen.getByTestId('suggestion-meals')).toBeInTheDocument();
     expect(screen.getByText(/白米粥/)).toBeInTheDocument();
-    expect(screen.getByText(/《饮膳正要》/)).toBeInTheDocument();
+    // 推荐卡只渲染 modern_nutrition / paper 来源,canon 典籍隐藏
+    expect(screen.getByText(/USDA FoodData Central/)).toBeInTheDocument();
   });
 
   test('insufficient_data:无 avoid 区块,只渲染 3 餐 + 通用文案', async () => {
