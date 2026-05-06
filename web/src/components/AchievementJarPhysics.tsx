@@ -62,6 +62,10 @@ export function AchievementJarPhysics({
   const engineRef = useRef<Matter.Engine | null>(null);
   const renderRef = useRef<Matter.Render | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
+  /** 已加进世界的橘子 body — 切换月份重建橘子时,只清这些不动瓶壁 */
+  const orangeBodiesRef = useRef<Matter.Body[]>([]);
+  /** 还没释放的延时 timer(切月/卸载时清掉,避免对已 dispose 引擎写入) */
+  const dropTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [needsPerm, setNeedsPerm] = useState(false);
 
   // 全部要进瓶子的勋章 specs(图片 url + 大小)
@@ -74,6 +78,9 @@ export function AchievementJarPhysics({
     return list.slice(0, 24);
   }, [perfect, great, nice]);
 
+  // ─── Effect A:引擎 / 瓶壁 / runner 只在挂载时 setup 一次 ───
+  // 之前 deps=[badges],导致每次月份切换 / 数据 fetch 完成都把引擎销毁重建,
+  // 加上每枚橘子 90ms 错开下落,看着像"重新加载",现改成只跑一次。
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
 
@@ -145,31 +152,6 @@ export function AchievementJarPhysics({
     runnerRef.current = runner;
     Matter.Runner.run(runner, engine);
 
-    // 把每个 badge 加进世界(交错下落,看着自然)
-    // 投放范围:瓶口宽度 70-210(在 viewBox 280 中)
-    const dropLeft = (W * 80) / 280;
-    const dropRight = (W * 200) / 280;
-    badges.forEach((b, i) => {
-      setTimeout(() => {
-        const x = dropLeft + Math.random() * (dropRight - dropLeft);
-        const y = (H * 90) / 360 + Math.random() * 10; // 瓶肩稍下方掉入
-        const body = Matter.Bodies.circle(x, y, b.size / 2, {
-          restitution: 0.4,
-          friction: 0.05,
-          density: 0.0009,
-          render: {
-            sprite: {
-              texture: b.iconUrl,
-              // SVG dataURL 的 natural size 是 viewBox 的 64;sprite scale = display / natural
-              xScale: b.size / 64,
-              yScale: b.size / 64
-            }
-          }
-        });
-        Matter.Composite.add(engine.world, body);
-      }, i * 90);
-    });
-
     // 设备方向 → gravity.x
     const handleOrient = (ev: DeviceOrientationEvent) => {
       const gamma = ev.gamma; // -90..90
@@ -184,14 +166,66 @@ export function AchievementJarPhysics({
     }
 
     return () => {
+      // 清掉还没触发的下落 timer,避免之后对已 dispose 引擎 add body
+      for (const t of dropTimersRef.current) clearTimeout(t);
+      dropTimersRef.current = [];
+      orangeBodiesRef.current = [];
       window.removeEventListener('deviceorientation', handleOrient);
       Matter.Render.stop(render);
       Matter.Runner.stop(runner);
       Matter.World.clear(engine.world, false);
       Matter.Engine.clear(engine);
       render.canvas.replaceWith(render.canvas.cloneNode(true) as HTMLCanvasElement);
+      engineRef.current = null;
+      renderRef.current = null;
+      runnerRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Effect B:badges 变化时只增减橘子 body,不重建引擎 ───
+  useEffect(() => {
+    const engine = engineRef.current;
+    const container = containerRef.current;
+    if (!engine || !container) return;
+
+    const W = container.clientWidth;
+    const H = container.clientHeight;
+
+    // 先清掉上一批橘子(切月或重渲染时)
+    for (const t of dropTimersRef.current) clearTimeout(t);
+    dropTimersRef.current = [];
+    if (orangeBodiesRef.current.length > 0) {
+      Matter.Composite.remove(engine.world, orangeBodiesRef.current);
+      orangeBodiesRef.current = [];
+    }
+
+    // 投放范围:瓶口宽度 70-210(在 viewBox 280 中)
+    const dropLeft = (W * 80) / 280;
+    const dropRight = (W * 200) / 280;
+    const STAGGER_MS = 25; // 之前 90ms,体感慢;25ms 仍有错落感但 ~0.5s 就完成
+
+    badges.forEach((b, i) => {
+      const timer = setTimeout(() => {
+        if (!engineRef.current) return; // effect 已 cleanup
+        const x = dropLeft + Math.random() * (dropRight - dropLeft);
+        const y = (H * 90) / 360 + Math.random() * 10;
+        const body = Matter.Bodies.circle(x, y, b.size / 2, {
+          restitution: 0.4,
+          friction: 0.05,
+          density: 0.0009,
+          render: {
+            sprite: {
+              texture: b.iconUrl,
+              xScale: b.size / 64,
+              yScale: b.size / 64
+            }
+          }
+        });
+        Matter.Composite.add(engine.world, body);
+        orangeBodiesRef.current.push(body);
+      }, i * STAGGER_MS);
+      dropTimersRef.current.push(timer);
+    });
   }, [badges]);
 
   const askPermission = async () => {
