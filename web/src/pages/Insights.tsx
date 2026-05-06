@@ -509,27 +509,21 @@ function AchievementCard({
 function MiniTrendPreview({ entries }: { entries: import('../services/yanScoreHistory').YanScoreHistoryEntry[] }) {
   const W = 112;
   const H = 36;
-  // 没数据 → 画一条示意性的"理想趋势"虚线波浪,告诉用户解锁后会看到什么
-  if (entries.length < 2) {
-    return (
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-9">
-        <path
-          d={`M 0 ${H * 0.7} Q ${W * 0.25} ${H * 0.25}, ${W * 0.5} ${H * 0.5} T ${W} ${H * 0.4}`}
-          fill="none"
-          stroke="#0002"
-          strokeWidth="2"
-          strokeDasharray="3 3"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-  // 真实曲线 — 把所有 total 标准化到 viewBox
   const valid = entries.filter((e) => e.total !== null);
+
+  // 数据不足 2 个有效点 → 画一条水平直线(占位也是"基线"的意思),不再画波浪/单点
   if (valid.length < 2) {
     return (
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-9">
-        <circle cx={W / 2} cy={H / 2} r="2.5" fill="#999" />
+        <line
+          x1={2}
+          y1={H / 2}
+          x2={W - 2}
+          y2={H / 2}
+          stroke="#0002"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }

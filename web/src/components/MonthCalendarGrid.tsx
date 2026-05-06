@@ -125,19 +125,17 @@ export function MonthCalendarGrid({
               data-testid={`calendar-cell-${dateStr}`}
               aria-label={title}
             >
+              {/* 选中态(今日)放在日期数字上 — 深色圆形背景,不再绕橘子加 ring */}
               <span
-                className={`text-[11px] ${
-                  c.isToday ? 'text-ink font-medium' : 'text-ink/55'
+                className={`text-[11px] flex items-center justify-center ${
+                  c.isToday
+                    ? 'w-5 h-5 rounded-full bg-ink text-paper font-medium'
+                    : 'text-ink/55'
                 }`}
               >
                 {c.day}
               </span>
-              <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                  c.isToday ? 'ring-2 ring-ink ring-offset-2 ring-offset-white' : ''
-                }`}
-                title={title}
-              >
+              <div className="w-9 h-9 rounded-full flex items-center justify-center" title={title}>
                 {(() => {
                   // 未来 → outline 空心;过去/今日 + 有 tier → 金/银/铜;过去/今日无 tier → gray
                   const variant: OrangeVariant = c.isFuture

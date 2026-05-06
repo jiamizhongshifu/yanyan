@@ -37,19 +37,35 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
     });
   }, [entries, height]);
 
-  if (entries.length === 0) {
-    return (
-      <div className="text-center text-sm text-ink/45 py-10" data-testid="trend-empty">
-        还没有足够的历史数据。
-      </div>
-    );
-  }
-
   const w = 600;
   const h = height;
   const pad = { top: 8, right: 12, bottom: 18, left: 22 };
   const drawW = w - pad.left - pad.right;
   const drawH = h - pad.top - pad.bottom;
+
+  // 数据不足 2 个有效点 → 渲染一条占位直线 + 提示;不再返回"还没有足够数据"文字块
+  const validCount = entries.filter((e) => e.total !== null).length;
+  if (validCount < 2) {
+    const midY = pad.top + drawH / 2;
+    return (
+      <div data-testid="inflammation-trend-chart">
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full">
+          <line
+            x1={pad.left}
+            y1={midY}
+            x2={pad.left + drawW}
+            y2={midY}
+            stroke="#0002"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+        <p className="mt-1 text-[10px] text-ink/40 text-center">
+          还需多打卡几天才能看到趋势
+        </p>
+      </div>
+    );
+  }
 
   const pathD: string[] = [];
   let inSegment = false;
