@@ -54,7 +54,7 @@ describe('U1 web api wrapper', () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
       new Response(JSON.stringify({ error: 'overloaded' }), { status: 503 })
     );
-    const res = await request({ url: '/health' });
+    const res = await request({ url: '/health', noRetry: true });
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.fallbackMessage).toBe('服务忙,请稍后再试');
@@ -83,12 +83,39 @@ describe('U1 web api wrapper', () => {
         });
       });
     });
-    const res = await request({ url: '/slow', timeoutMs: 50 });
+    const res = await request({ url: '/slow', timeoutMs: 50, noRetry: true });
     expect(res.ok).toBe(false);
     if (!res.ok) {
       expect(res.error).toBe('timeout');
       expect(res.fallbackMessage).toBe('请求超时,请检查网络后重试');
     }
+  });
+
+  test('retry: GET 5xx 自动重试 2 次,共 3 次调用', async () => {
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch
+      .mockResolvedValueOnce(new Response('{}', { status: 503 }))
+      .mockResolvedValueOnce(new Response('{}', { status: 503 }))
+      .mockResolvedValueOnce(new Response('{"ok":true}', { status: 200 }));
+    const res = await request({ url: '/flaky' });
+    expect(res.ok).toBe(true);
+    expect(mockFetch.mock.calls.length).toBe(3);
+  });
+
+  test('retry: 4xx 不重试', async () => {
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch.mockResolvedValueOnce(new Response('{}', { status: 400 }));
+    const res = await request({ url: '/bad' });
+    expect(res.ok).toBe(false);
+    expect(mockFetch.mock.calls.length).toBe(1);
+  });
+
+  test('retry: POST 不重试(防 mutation 重复)', async () => {
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch.mockResolvedValueOnce(new Response('{}', { status: 503 }));
+    const res = await request({ url: '/mutate', method: 'POST', data: { x: 1 } });
+    expect(res.ok).toBe(false);
+    expect(mockFetch.mock.calls.length).toBe(1);
   });
 
   test('authToken header is added when present', async () => {
