@@ -155,6 +155,26 @@ export async function fetchMealIllustration(mealId: string, foodNames: string[])
   return null;
 }
 
+/**
+ * 用户编辑后整体提交 items,server 重新分类 + 算分 + 落库,返回新的 MealResult
+ */
+export async function updateMealItems(
+  mealId: string,
+  items: Array<{ name: string; confidence?: number; ingredients?: string[] }>
+): Promise<MealResult | null> {
+  const token = await getCurrentAccessToken();
+  if (!token) return null;
+  const res = await request<MealResult & { ok: true }>({
+    url: `/meals/${mealId}/items`,
+    method: 'PUT',
+    authToken: token,
+    data: { items, modelVersion: 'user-edited' },
+    timeoutMs: 30_000
+  });
+  if (res.ok) return res.data;
+  return null;
+}
+
 export async function postMealFeedback(
   mealId: string,
   itemName: string,

@@ -18,6 +18,10 @@ interface Props {
   item: MealItem;
   onFlagMisrecognized: (name: string) => void;
   onFlagNoReaction: (name: string) => void;
+  /** 用户编辑主料(添加 / 删除)— 父组件负责 server 重算 */
+  onEditIngredients?: (newIngredients: string[]) => void;
+  /** 父在 server 调用进行中时锁定按钮 */
+  isSaving?: boolean;
 }
 
 const TCM_LABEL_COLOR: Record<'发' | '温和' | '平', string> = {
@@ -32,11 +36,36 @@ const TONE_PILL: Record<'good' | 'mild' | 'neutral', string> = {
   mild: 'bg-fire-mild/12 text-fire-mild'
 };
 
-export function FoodItemCard({ item, onFlagMisrecognized, onFlagNoReaction }: Props) {
+export function FoodItemCard({
+  item,
+  onFlagMisrecognized,
+  onFlagNoReaction,
+  onEditIngredients,
+  isSaving = false
+}: Props) {
   const [flagged, setFlagged] = useState<'misrecognized' | 'no_reaction' | null>(null);
   const [showAllCitations, setShowAllCitations] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [newIngredient, setNewIngredient] = useState('');
   const cls = item.classification;
   const ingredients = item.ingredients ?? [];
+
+  const submitAdd = () => {
+    const trimmed = newIngredient.trim();
+    if (!trimmed) return;
+    if (ingredients.includes(trimmed)) {
+      setNewIngredient('');
+      setAdding(false);
+      return;
+    }
+    onEditIngredients?.([...ingredients, trimmed]);
+    setNewIngredient('');
+    setAdding(false);
+  };
+
+  const removeIngredient = (name: string) => {
+    onEditIngredients?.(ingredients.filter((x) => x !== name));
+  };
 
   const dii = cls ? diiToLabel(cls.diiScore) : null;
   const gi = cls ? giToLabel(cls.gi) : null;
@@ -67,7 +96,7 @@ export function FoodItemCard({ item, onFlagMisrecognized, onFlagNoReaction }: Pr
       </div>
 
       {/* 主料明细行:每个食材带它自己的成分(matched 显示数据,未匹配标"待补录") */}
-      {showIngredients && (
+      {(showIngredients || onEditIngredients) && (
         <div className="mt-3">
           <p className="text-[11px] text-ink/45 mb-1.5">食材成分</p>
           <div className="space-y-1">
@@ -79,7 +108,20 @@ export function FoodItemCard({ item, onFlagMisrecognized, onFlagNoReaction }: Pr
                   key={ing}
                   className="flex items-baseline justify-between gap-2 py-1 border-b border-paper last:border-0"
                 >
-                  <span className="text-xs text-ink/80 flex-shrink-0">{ing}</span>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <span className="text-xs text-ink/80">{ing}</span>
+                    {onEditIngredients && (
+                      <button
+                        type="button"
+                        onClick={() => removeIngredient(ing)}
+                        disabled={isSaving}
+                        className="text-ink/30 active:text-fire-mild text-xs disabled:opacity-40"
+                        aria-label={`删除主料 ${ing}`}
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                   <div className="flex flex-wrap items-center justify-end gap-1 text-[10px]">
                     {c ? (
                       <>
@@ -123,6 +165,49 @@ export function FoodItemCard({ item, onFlagMisrecognized, onFlagNoReaction }: Pr
               );
             })}
           </div>
+
+          {/* 添加食材入口 */}
+          {onEditIngredients && (
+            <div className="mt-2">
+              {adding ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    autoFocus
+                    value={newIngredient}
+                    onChange={(e) => setNewIngredient(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') submitAdd();
+                      else if (e.key === 'Escape') {
+                        setAdding(false);
+                        setNewIngredient('');
+                      }
+                    }}
+                    placeholder="食材名(如:牛肉)"
+                    className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-1.5 text-xs focus:border-ink focus:outline-none"
+                    maxLength={32}
+                  />
+                  <button
+                    type="button"
+                    onClick={submitAdd}
+                    disabled={isSaving || !newIngredient.trim()}
+                    className="px-3 py-1.5 rounded-lg bg-ink text-paper text-xs disabled:opacity-40"
+                  >
+                    {isSaving ? '保存…' : '添加'}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setAdding(true)}
+                  disabled={isSaving}
+                  className="text-xs text-ink/55 active:text-ink underline disabled:opacity-40"
+                >
+                  + 添加食材
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 

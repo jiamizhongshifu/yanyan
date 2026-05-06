@@ -17,6 +17,7 @@ import {
   appendMealFeedback,
   createMeal,
   PgMealStore,
+  updateMealItems,
   type MealStore
 } from '../../services/meals';
 import {
@@ -43,6 +44,21 @@ const FeedbackBody = z.object({
 
 const IllustrationBody = z.object({
   foodNames: z.array(z.string().min(1)).min(1).max(10)
+});
+
+const UpdateItemsBody = z.object({
+  items: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(64),
+        confidence: z.number().min(0).max(1).default(1),
+        ingredients: z.array(z.string().min(1).max(32)).max(12).optional(),
+        addedSugarGEstimate: z.number().min(0).max(200).nullable().optional()
+      })
+    )
+    .min(1)
+    .max(10),
+  modelVersion: z.string().min(1).max(64).default('user-edited')
 });
 
 export interface RegisterMealsOptions {
@@ -185,6 +201,52 @@ export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMe
       return { ok: false, error: 'generation_failed' };
     }
     return { ok: true, url: illustrationPublicUrl(req.params.id) };
+  });
+
+  app.put<{ Params: { id: string } }>('/meals/:id/items', async (req, reply) => {
+    const user = requireUser(req, reply);
+    if (!user) return;
+    const parsed = UpdateItemsBody.safeParse(req.body);
+    if (!parsed.success) {
+      reply.code(400);
+      return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
+    }
+    const dekCiphertextB64 = await getUserDek(user.userId);
+    if (!dekCiphertextB64) {
+      reply.code(403);
+      return { ok: false, error: 'user_not_initialized' };
+    }
+    const owns = await withClient(async (c) => {
+      const r = await c.query<{ id: string }>(
+        'SELECT id FROM meals WHERE id = $1 AND user_id = $2 LIMIT 1',
+        [req.params.id, user.userId]
+      );
+      return r.rowCount > 0;
+    });
+    if (!owns) {
+      reply.code(404);
+      return { ok: false, error: 'not_found' };
+    }
+    const result = await updateMealItems(
+      { mealStore, classifierStore, recognizer, onMissingFood },
+      {
+        userId: user.userId,
+        userDekCiphertextB64: dekCiphertextB64,
+        mealId: req.params.id,
+        items: parsed.data.items.map((it) => ({
+          name: it.name,
+          confidence: it.confidence,
+          ingredients: it.ingredients,
+          addedSugarGEstimate: it.addedSugarGEstimate ?? null
+        })),
+        modelVersion: parsed.data.modelVersion
+      }
+    );
+    if (!result) {
+      reply.code(400);
+      return { ok: false, error: 'empty_items' };
+    }
+    return { ok: true, ...result };
   });
 
   app.post<{ Params: { id: string } }>('/meals/:id/feedback', async (req, reply) => {

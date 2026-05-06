@@ -11,11 +11,15 @@
  * 下方:每条食物的 FoodItemCard(成分分析 + 评价)
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { FoodItemCard } from '../components/FoodItemCard';
 import { Stars } from '../components/InflammationDial';
-import { postMealFeedback, type FireLevel } from '../services/meals';
+import {
+  postMealFeedback,
+  updateMealItems,
+  type FireLevel
+} from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
 import { asset } from '../services/assets';
 import {
@@ -42,6 +46,10 @@ const LEVEL_DECOR_COLOR: Record<FireLevel, string> = {
 export function MealResult() {
   const [, navigate] = useLocation();
   const result = useLastMeal((s) => s.result);
+  const setLastMeal = useLastMeal((s) => s.set);
+  const [savingIdx, setSavingIdx] = useState<number | null>(null);
+  const [showAlgorithm, setShowAlgorithm] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!result) {
@@ -61,6 +69,24 @@ export function MealResult() {
 
   const handleFlag = async (itemName: string, kind: 'misrecognized' | 'no_reaction') => {
     await postMealFeedback(result.mealId, itemName, kind);
+  };
+
+  const handleEditIngredients = async (itemIdx: number, newIngredients: string[]) => {
+    if (savingIdx !== null) return;
+    setSavingIdx(itemIdx);
+    setEditError(null);
+    const newItems = result.items.map((it, i) => ({
+      name: it.name,
+      confidence: it.confidence,
+      ingredients: i === itemIdx ? newIngredients : it.ingredients
+    }));
+    const updated = await updateMealItems(result.mealId, newItems);
+    if (updated) {
+      setLastMeal(updated);
+    } else {
+      setEditError('保存失败,请重试。');
+    }
+    setSavingIdx(null);
   };
 
   return (
@@ -97,6 +123,15 @@ export function MealResult() {
               {antiInflam}
             </span>
             <span className="text-xs text-ink/40 ml-1">/ 100</span>
+            <button
+              type="button"
+              onClick={() => setShowAlgorithm(true)}
+              className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-ink/8 text-ink/55 text-[11px] active:bg-ink/15 align-middle"
+              aria-label="查看抗炎指数算法"
+              data-testid="algorithm-btn"
+            >
+              ?
+            </button>
           </p>
         </div>
       </section>
@@ -119,14 +154,21 @@ export function MealResult() {
         <h2 className="text-sm font-medium text-ink/70 mb-3">
           食物分析 · {result.items.length} 项
         </h2>
-        {result.items.map((item) => (
+        {result.items.map((item, idx) => (
           <FoodItemCard
-            key={item.name}
+            key={`${item.name}-${idx}`}
             item={item}
             onFlagMisrecognized={(name) => void handleFlag(name, 'misrecognized')}
             onFlagNoReaction={(name) => void handleFlag(name, 'no_reaction')}
+            onEditIngredients={(newIngredients) => void handleEditIngredients(idx, newIngredients)}
+            isSaving={savingIdx === idx}
           />
         ))}
+        {editError && (
+          <p className="mt-2 text-xs text-fire-mid" role="alert">
+            {editError}
+          </p>
+        )}
       </section>
 
       {result.unrecognizedNames.length > 0 && (
@@ -152,7 +194,95 @@ export function MealResult() {
           回主页
         </button>
       </footer>
+
+      {showAlgorithm && (
+        <AlgorithmSheet onClose={() => setShowAlgorithm(false)} />
+      )}
     </main>
+  );
+}
+
+/**
+ * 抗炎指数算法说明弹层(底部 sheet 风格)
+ */
+function AlgorithmSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+      onClick={onClose}
+      role="dialog"
+      aria-label="抗炎指数算法说明"
+    >
+      <div
+        className="w-full max-w-md rounded-t-3xl bg-paper px-6 pt-6 pb-8 max-h-[85vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-3">
+          <h2 className="text-lg font-medium text-ink">抗炎指数算法</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-ink/45 active:text-ink text-sm"
+            aria-label="关闭"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p className="text-sm text-ink/70 leading-relaxed">
+          每一餐我们用<span className="font-medium text-ink">中医发物分类</span>(发 / 温和 / 平)
+          + <span className="font-medium text-ink">现代营养学 DII</span>(膳食炎症指数)
+          + GI(升糖指数)三层数据,折算出 0-100 的抗炎指数,数字越高代表越清气。
+        </p>
+
+        <h3 className="mt-5 text-sm font-medium text-ink">第 1 步:每条食物找分类</h3>
+        <ul className="mt-2 text-xs text-ink/65 leading-relaxed space-y-1 pl-4 list-disc">
+          <li>菜名直接命中 DB(如"白米饭")→ 用该条目数据</li>
+          <li>命中失败时(如"野生菌火锅"这类复合菜)→ 用 LLM 返回的主料数组逐个查 DB,投票合成</li>
+          <li>仍未匹配 → 标"未收录",入回填队列,后续人工补录</li>
+        </ul>
+
+        <h3 className="mt-5 text-sm font-medium text-ink">第 2 步:整餐打火分</h3>
+        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+          每条 item 按 TCM 标签计权重:
+          <span className="ml-1 px-1.5 py-0.5 rounded bg-fire-mild/15 text-fire-mild">发=5</span>
+          <span className="ml-1 px-1.5 py-0.5 rounded bg-fire-ping/15 text-fire-ping">温和=2</span>
+          <span className="ml-1 px-1.5 py-0.5 rounded bg-fire-ping/15 text-fire-ping">平=0</span>
+        </p>
+        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+          fireScore = (Σ 权重) / (条目数 × 5) × 100,得 0-100 的"火分"。
+        </p>
+
+        <h3 className="mt-5 text-sm font-medium text-ink">第 3 步:翻成抗炎指数</h3>
+        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+          抗炎指数 = 100 − fireScore,数字越高越清气。
+        </p>
+        <ul className="mt-2 text-[11px] text-ink/55 leading-relaxed space-y-0.5">
+          <li>★★★★★ 平 — 抗炎 75-100,这一餐很清气</li>
+          <li>★★★★ 轻盈 — 抗炎 50-75,整体不错</li>
+          <li>★★★ 微暖 — 抗炎 25-50,稍微浓一点</li>
+          <li>★★ 留心 — 抗炎 0-25,下一餐换轻盈的</li>
+        </ul>
+
+        <h3 className="mt-5 text-sm font-medium text-ink">合成投票规则(复合菜)</h3>
+        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+          复合菜的合成 TCM 标签按主料投票决定。已匹配的主料按真实标签算,
+          <span className="font-medium">未匹配主料默认按"温和"计入投票</span> ——
+          避免单个发物食材一票否决整道菜,也不假装一切都"平"。并列时偏向温和。
+        </p>
+
+        <h3 className="mt-5 text-sm font-medium text-ink">数据来源</h3>
+        <ul className="mt-2 text-[11px] text-ink/55 leading-relaxed space-y-0.5">
+          <li>• 发物分类:《本草纲目》《中华本草》等典籍</li>
+          <li>• DII:Shivappa et al. 2014 膳食炎症指数</li>
+          <li>• GI / 营养:USDA FoodData Central + 中国食物成分表 2018</li>
+        </ul>
+
+        <p className="mt-6 text-[11px] text-ink/40 leading-relaxed">
+          本指数是生活方式参考,不构成医疗建议。
+        </p>
+      </div>
+    </div>
   );
 }
 

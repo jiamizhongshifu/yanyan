@@ -42,6 +42,18 @@ export interface MealStore {
   /** U13b 30 天档案:列出 [sinceDate, untilDate] 之间的全部餐食(按 ate_at 升序) */
   listInRange(userId: string, sinceDate: string, untilDate: string): Promise<MealRow[]>;
   appendFeedback(mealId: string, userId: string, entry: MealRow['feedback'][number]): Promise<void>;
+  /** 用户编辑后整体覆写 items + 重算后的字段 */
+  updateAfterRecompute(
+    mealId: string,
+    userId: string,
+    params: {
+      recognizedItemsCiphertext: string;
+      tcmLabelsSummary: MealRow['tcmLabelsSummary'];
+      westernNutritionSummary: Record<string, unknown>;
+      fireScore: number;
+      sugarGrams: number | null;
+    }
+  ): Promise<void>;
 }
 
 export class PgMealStore implements MealStore {
@@ -189,6 +201,39 @@ export class PgMealStore implements MealStore {
             SET feedback = feedback || $3::jsonb
           WHERE id = $1 AND user_id = $2`,
         [mealId, userId, JSON.stringify([entry])]
+      )
+    );
+  }
+
+  async updateAfterRecompute(
+    mealId: string,
+    userId: string,
+    params: {
+      recognizedItemsCiphertext: string;
+      tcmLabelsSummary: MealRow['tcmLabelsSummary'];
+      westernNutritionSummary: Record<string, unknown>;
+      fireScore: number;
+      sugarGrams: number | null;
+    }
+  ): Promise<void> {
+    await withClient((c) =>
+      c.query(
+        `UPDATE meals
+            SET recognized_items_ciphertext = $3,
+                tcm_labels_summary = $4::jsonb,
+                western_nutrition_summary = $5::jsonb,
+                fire_score = $6,
+                sugar_grams = $7
+          WHERE id = $1 AND user_id = $2`,
+        [
+          mealId,
+          userId,
+          params.recognizedItemsCiphertext,
+          JSON.stringify(params.tcmLabelsSummary),
+          JSON.stringify(params.westernNutritionSummary),
+          params.fireScore,
+          params.sugarGrams
+        ]
       )
     );
   }

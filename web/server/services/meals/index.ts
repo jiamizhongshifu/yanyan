@@ -65,26 +65,22 @@ export interface CreateMealParams {
   ateAt?: Date;
 }
 
-export async function createMeal(deps: MealsDeps, params: CreateMealParams): Promise<CreateMealOutcome> {
-  if (!params.storageKey.startsWith(`users/${params.userId}/`)) {
-    throw new Error(`storageKey 必须以 users/${params.userId}/ 开头,防越权`);
-  }
-
-  const recognition = await deps.recognizer.recognize(params.storageKey);
-  if (!recognition || recognition.items.length === 0) {
-    return { kind: 'recognition_failed' };
-  }
-  if (recognition.overallConfidence < LOW_CONFIDENCE_THRESHOLD) {
-    return { kind: 'low_confidence', overallConfidence: recognition.overallConfidence };
-  }
-
-  // 查每个识别项的双层分类。
-  // 复合菜(如"野生菌火锅")在 DB 里通常没有 dish 级条目 → 命中 null,
-  // 此时用 LLM 返回的 ingredients 主料数组逐个查、再合成 classification。
-  // 同时收集每个 ingredient 的逐个分类(matched 或 null),给前端做明细展示。
+/**
+ * 给定一组 RecognizedItem,跑 dish-level + ingredient-level 分类查库 + synth + aggregate
+ * 复用于 createMeal 与 updateMealItems(用户编辑后的修正)
+ */
+async function classifyAndAggregate(
+  deps: Pick<MealsDeps, 'classifierStore' | 'onMissingFood'>,
+  items: import('../recognition/types').RecognizedItem[]
+): Promise<{
+  classifications: Array<FoodClassification | null>;
+  ingredientClassifications: Array<Array<{ name: string; classification: FoodClassification | null }>>;
+  agg: MealAggregate;
+  western: ReturnType<typeof westernSummary>;
+}> {
   const classifications: Array<FoodClassification | null> = [];
   const ingredientClassifications: Array<Array<{ name: string; classification: FoodClassification | null }>> = [];
-  for (const item of recognition.items) {
+  for (const item of items) {
     let cls = await deps.classifierStore.findByName(item.name);
     const ingDetails: Array<{ name: string; classification: FoodClassification | null }> = [];
     if (item.ingredients && item.ingredients.length > 0) {
@@ -104,13 +100,29 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
       try {
         deps.onMissingFood(item.name);
       } catch {
-        /* 队列入队失败不阻塞 */
+        /* 入队失败不阻塞 */
       }
     }
   }
-
-  const agg: MealAggregate = aggregateMeal(recognition.items, classifications);
+  const agg = aggregateMeal(items, classifications);
   const western = westernSummary(classifications);
+  return { classifications, ingredientClassifications, agg, western };
+}
+
+export async function createMeal(deps: MealsDeps, params: CreateMealParams): Promise<CreateMealOutcome> {
+  if (!params.storageKey.startsWith(`users/${params.userId}/`)) {
+    throw new Error(`storageKey 必须以 users/${params.userId}/ 开头,防越权`);
+  }
+
+  const recognition = await deps.recognizer.recognize(params.storageKey);
+  if (!recognition || recognition.items.length === 0) {
+    return { kind: 'recognition_failed' };
+  }
+  if (recognition.overallConfidence < LOW_CONFIDENCE_THRESHOLD) {
+    return { kind: 'low_confidence', overallConfidence: recognition.overallConfidence };
+  }
+
+  const { classifications, ingredientClassifications, agg, western } = await classifyAndAggregate(deps, recognition.items);
 
   // envelope-encrypt 用户原始识别项(发物档案需要保留个人吃了什么)
   const ciphertext = await encryptField(params.userId, params.userDekCiphertextB64, {
@@ -149,6 +161,64 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
       lowConfidence: false,
       modelVersion: recognition.modelVersion
     }
+  };
+}
+
+export interface UpdateMealItemsParams {
+  userId: string;
+  userDekCiphertextB64: string;
+  mealId: string;
+  /** 用户编辑后的全量 items;server 会跑 classify + synth + aggregate + 落库 */
+  items: import('../recognition/types').RecognizedItem[];
+  /** 保留原 modelVersion 用于审计 */
+  modelVersion: string;
+}
+
+/**
+ * 用户在结果页编辑(增删主料 / 加新菜)后调用
+ * 全量替换 recognized items,重新跑 classify + synth + aggregate,UPDATE 落库
+ */
+export async function updateMealItems(
+  deps: MealsDeps,
+  params: UpdateMealItemsParams
+): Promise<CreateMealResult | null> {
+  if (params.items.length === 0) return null;
+
+  const { classifications, ingredientClassifications, agg, western } = await classifyAndAggregate(
+    deps,
+    params.items
+  );
+
+  const ciphertext = await encryptField(params.userId, params.userDekCiphertextB64, {
+    items: params.items,
+    modelVersion: params.modelVersion,
+    overallConfidence: 1, // 用户编辑过的视为高置信
+    editedAt: new Date().toISOString()
+  });
+
+  await deps.mealStore.updateAfterRecompute(params.mealId, params.userId, {
+    recognizedItemsCiphertext: ciphertext,
+    tcmLabelsSummary: summaryFromCounts(agg.counts),
+    westernNutritionSummary: western,
+    fireScore: agg.fireScore,
+    sugarGrams: agg.sugarGrams
+  });
+
+  return {
+    mealId: params.mealId,
+    fireScore: agg.fireScore,
+    level: agg.level,
+    sugarGrams: agg.sugarGrams,
+    items: params.items.map((it, i) => ({
+      name: it.name,
+      confidence: it.confidence,
+      ingredients: it.ingredients,
+      ingredientDetails: ingredientClassifications[i],
+      classification: classifications[i]
+    })),
+    unrecognizedNames: agg.unrecognizedNames,
+    lowConfidence: false,
+    modelVersion: params.modelVersion
   };
 }
 
