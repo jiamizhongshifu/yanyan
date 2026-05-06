@@ -8,6 +8,22 @@
 import { useEffect, useState } from 'react';
 import { fetchTodayRecommendation, SLOT_LABELS, type TodayRecommendation } from '../services/recommend';
 
+/** citation 排序优先级:现代营养 > 论文 > 典籍。让用户先看到现代语言的来源。 */
+const CITATION_PRIORITY: Record<string, number> = {
+  modern_nutrition: 0,
+  paper: 1,
+  canon: 2
+};
+
+function preferModernCitation<T extends { source: string; reference: string }>(
+  citations: T[]
+): T | undefined {
+  if (citations.length === 0) return undefined;
+  return [...citations].sort(
+    (a, b) => (CITATION_PRIORITY[a.source] ?? 9) - (CITATION_PRIORITY[b.source] ?? 9)
+  )[0];
+}
+
 export function TodaySuggestionCard() {
   const [rec, setRec] = useState<TodayRecommendation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,17 +79,20 @@ export function TodaySuggestionCard() {
       <div data-testid="suggestion-meals">
         <p className="text-xs text-ink/50 mb-2">推荐 3 餐</p>
         <ul className="space-y-2">
-          {rec.meals.map((m) => (
-            <li key={m.slot} className="flex items-start gap-3 text-sm text-ink">
-              <span className="shrink-0 text-ink/50 w-12">{SLOT_LABELS[m.slot]}</span>
-              <span className="flex-1">
-                {m.items.join(' / ')}
-                {m.citations[0] && (
-                  <span className="ml-2 text-xs text-ink/40">— {m.citations[0].reference}</span>
-                )}
-              </span>
-            </li>
-          ))}
+          {rec.meals.map((m) => {
+            const cite = preferModernCitation(m.citations);
+            return (
+              <li key={m.slot} className="flex items-start gap-3 text-sm text-ink">
+                <span className="shrink-0 text-ink/50 w-12">{SLOT_LABELS[m.slot]}</span>
+                <span className="flex-1">
+                  {m.items.join(' / ')}
+                  {cite && (
+                    <span className="ml-2 text-xs text-ink/40">— {cite.reference}</span>
+                  )}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>

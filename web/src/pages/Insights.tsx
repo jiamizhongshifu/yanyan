@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
 import { fetchSugarToday, SUGAR_BADGE_ICON, type SugarToday } from '../services/sugar';
@@ -20,7 +21,7 @@ import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { InflammationTrendChart } from '../components/InflammationTrendChart';
 import { useWellness, todayKey } from '../store/wellness';
 import { MonthCalendarGrid } from '../components/MonthCalendarGrid';
-import { AchievementJar } from '../components/AchievementJar';
+import { AchievementJarPhysics as AchievementJar } from '../components/AchievementJarPhysics';
 import { track } from '../services/tracker';
 import { asset } from '../services/assets';
 import { Icon, type IconName } from '../components/Icon';
@@ -42,6 +43,7 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
 };
 
 export function Insights() {
+  const [, navigate] = useLocation();
   const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
   const [meals, setMeals] = useState<TodayMealItem[]>([]);
   const [progress, setProgress] = useState<UserProgress | null>(null);
@@ -297,7 +299,19 @@ export function Insights() {
             tier: d.tier,
             fireLevel: d.fireLevel
           }))}
+          onSelectDate={(date, intent) => {
+            if (intent === 'navigate') navigate('/app');
+            else setSelectedDate(date);
+          }}
         />
+        {selectedDate && (
+          <DayDetailPanel
+            date={selectedDate}
+            entry={selectedDay}
+            snapshot={selectedSnapshot}
+            meals={selectedDateMeals}
+          />
+        )}
       </section>
 
       {/* 月度统计 — 真实数据 */}

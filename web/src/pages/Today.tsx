@@ -14,13 +14,16 @@ import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../servi
 import { fetchSugarToday, SUGAR_BADGE_ICON, type SugarToday } from '../services/sugar';
 import { fetchHealthToday, postHealthSteps, type HealthDaily } from '../services/health';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
-import { upsertTodayChallenges } from '../services/dailyChallenges';
+import { upsertTodayChallenges, fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { asset } from '../services/assets';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
+import { todayHeroAsset } from '../services/heroSelector';
 import { useWellness, todayKey } from '../store/wellness';
 import { DailyChallengesCard } from '../components/DailyChallengesCard';
 import { InappRemindersBanner } from '../components/InappRemindersBanner';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
+import { TodayWeekStrip } from '../components/TodayWeekStrip';
+import { PerfectDayRing } from '../components/PerfectDayRing';
 import { Icon } from '../components/Icon';
 import { track } from '../services/tracker';
 
@@ -64,6 +67,7 @@ export function Today() {
   const [_progress, setProgress] = useState<UserProgress | null>(null);
   const [sugar, setSugar] = useState<SugarToday | null>(null);
   const [serverHealth, setServerHealth] = useState<HealthDaily | null>(null);
+  const [monthCh, setMonthCh] = useState<MonthChallenges | null>(null);
 
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };
@@ -79,14 +83,16 @@ export function Today() {
       fetchHomeToday(),
       fetchProgress(),
       fetchSugarToday(),
-      fetchHealthToday()
-    ]).then(([y, h, p, s, hd]) => {
+      fetchHealthToday(),
+      fetchMonthChallenges()
+    ]).then(([y, h, p, s, hd, mc]) => {
       if (!mounted) return;
       setYanScore(y);
       setMeals(h?.meals ?? []);
       setProgress(p);
       setSugar(s);
       setServerHealth(hd);
+      setMonthCh(mc);
     });
     return () => {
       mounted = false;
@@ -127,7 +133,7 @@ export function Today() {
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="today">
-      <header className="mb-4 flex items-center justify-between">
+      <header className="mb-3 flex items-center justify-between">
         <div>
           <p className="text-xs text-ink/45">今天</p>
           <p className="mt-0.5 text-xl font-medium text-ink">
@@ -143,11 +149,22 @@ export function Today() {
         </Link>
       </header>
 
-      {/* 顶部 hero 插画(水豚泡温泉)— ponchi-e 风格点缀 */}
+      {/* 7 天日期条 + 完美一天进度环(Grow App 风格) */}
+      <section className="mb-4 rounded-3xl bg-white px-5 py-5">
+        <TodayWeekStrip
+          daysHistory={(monthCh?.days ?? []).map((d) => ({ date: d.date, tier: d.tier }))}
+          todayTier={tier}
+        />
+        <div className="mt-4 flex justify-center">
+          <PerfectDayRing doneCount={completedCount} total={5} tier={tier} />
+        </div>
+      </section>
+
+      {/* 时段 hero 插画(早晨/中午/黄昏/夜晚自动切换) */}
       <div className="mb-4 -mx-1 rounded-3xl overflow-hidden">
         <img
-          src={asset('today-hero.png')}
-          alt="清晨的水豚"
+          src={asset(todayHeroAsset())}
+          alt=""
           className="w-full h-auto block"
           loading="lazy"
         />

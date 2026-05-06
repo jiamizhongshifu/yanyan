@@ -22,7 +22,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'wouter';
 import { InflammationDial } from '../components/InflammationDial';
-import { HomeStreakStrip } from '../components/HomeStreakStrip';
 import { HomeBodyCards } from '../components/HomeBodyCards';
 import { MealHistoryList } from '../components/MealHistoryList';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
@@ -121,10 +120,6 @@ export function Home() {
           </svg>
         </Link>
       </header>
-
-      <div className="mb-6">
-        <HomeStreakStrip cumulativeDays={progress?.cumulativeCheckinDays ?? 0} todayLevel={dial?.level ?? null} />
-      </div>
 
       <InappRemindersBanner />
 

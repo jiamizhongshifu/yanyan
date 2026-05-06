@@ -30,6 +30,8 @@ interface Props {
   monthBase?: Date;
   /** 来自 server 的当月每日挑战快照 — 优先用这个判断"是否已点亮" */
   daysHistory?: DayInfo[];
+  /** 点击某一天:今天/未来 → navigate;过去 → expand 内嵌详情面板 */
+  onSelectDate?: (date: string, intent: 'navigate' | 'expand') => void;
 }
 
 const TIER_LABEL: Record<DayInfo['tier'], string> = {
@@ -39,7 +41,13 @@ const TIER_LABEL: Record<DayInfo['tier'], string> = {
   none: ''
 };
 
-export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = new Date(), daysHistory }: Props) {
+export function MonthCalendarGrid({
+  cumulativeInMonth,
+  todayLevel,
+  monthBase = new Date(),
+  daysHistory,
+  onSelectDate
+}: Props) {
   const historyByDate = new Map((daysHistory ?? []).map((d) => [d.date, d]));
   const cells = useMemo(() => {
     const year = monthBase.getFullYear();
@@ -108,8 +116,19 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
             ? '未到来'
             : '未点亮';
 
+          const intent: 'navigate' | 'expand' = c.isPast ? 'expand' : 'navigate';
+          const handleClick = () => onSelectDate?.(dateStr, intent);
+
           return (
-            <div key={i} className="flex flex-col items-center gap-1">
+            <button
+              type="button"
+              key={i}
+              onClick={handleClick}
+              disabled={!onSelectDate}
+              className="flex flex-col items-center gap-1 active:opacity-60 disabled:opacity-100 disabled:cursor-default"
+              data-testid={`calendar-cell-${dateStr}`}
+              aria-label={title}
+            >
               <span
                 className={`text-[11px] ${
                   c.isToday ? 'text-ink font-medium' : 'text-ink/55'
@@ -123,15 +142,18 @@ export function MonthCalendarGrid({ cumulativeInMonth, todayLevel, monthBase = n
                 }`}
                 title={title}
               >
-                {c.isFuture ? (
-                  <img src={outlineSrc} alt="未到来" className="w-7 h-7 object-contain opacity-50" />
-                ) : isLit ? (
-                  <img src={filledSrc} alt="已点亮" className="w-7 h-7 object-contain" />
+                {c.isFuture || (!isLit && c.isPast) ? (
+                  // 过去未拿勋章 + 未来:都用空心橘子(过去更深一点,未来更淡)
+                  <img
+                    src={outlineSrc}
+                    alt={c.isFuture ? '未到来' : '未点亮'}
+                    className={`w-7 h-7 object-contain ${c.isFuture ? 'opacity-40' : 'opacity-65'}`}
+                  />
                 ) : (
-                  <img src={filledSrc} alt="未点亮" className="w-7 h-7 object-contain grayscale opacity-40" />
+                  <img src={filledSrc} alt="已点亮" className="w-7 h-7 object-contain" />
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

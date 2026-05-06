@@ -61,20 +61,20 @@ export function classify(agg: Aggregate): RecommendMode {
 
 const MODE_COPY: Record<RecommendMode, { headline: string; tagline: string }> = {
   fa_heavy: {
-    headline: '近 3 天偏热,先收一收',
-    tagline: '下面是常见的发物,可以先避开 1-2 项;同时给你 3 餐平和组合作参考。'
+    headline: '近 3 天饮食偏炎症',
+    tagline: '常见促炎食材先少吃 1-2 项;下面给你 3 餐抗炎组合参考(低 GI · 高纤维 · 优质蛋白)。'
   },
   mild_balanced: {
     headline: '节奏不错,继续保持',
-    tagline: '今天可以照下面 3 餐组合走,温和食材打底，少踩发物即可。'
+    tagline: '今天照下面 3 餐组合走,清淡食材打底,少踩高糖与高 GI 即可。'
   },
   all_calm: {
     headline: '近 3 天很平稳',
-    tagline: '继续保持现在的搭配方式;偶尔加一点温补也无妨。'
+    tagline: '继续保持现在的搭配方式;补充优质蛋白与膳食纤维让身体更舒服。'
   },
   insufficient_data: {
     headline: '今天先吃得平稳一些',
-    tagline: '资料还不够个性化,先用通用平和模板,坚持 1-2 天我们就能给到更准的建议。'
+    tagline: '资料还不够个性化,先用通用清淡模板,坚持 1-2 天我们就能给到更准的建议。'
   }
 };
 
