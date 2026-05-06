@@ -42,8 +42,12 @@ const ConfigSchema = z.object({
 
   // 视觉端(阿里云百炼 DashScope = Qwen-VL;Phase 2 U8 真实接入)
   DASHSCOPE_API_KEY: z.string().optional(),
-  // qwen3.6-plus 是阿里云百炼最新统一多模态(支持文本 + 视觉)
-  DASHSCOPE_VISION_MODEL: z.string().default('qwen3.6-plus'),
+  // qwen-vl-plus-latest:跨境延迟下比 qwen-vl-max 快 2-3 倍,餐照识别精度足够。
+  // optional + transform:undefined 或 '' 都兜底,避免 Vercel env 留空字符串绕过 default。
+  DASHSCOPE_VISION_MODEL: z
+    .string()
+    .optional()
+    .transform((v) => (v && v.trim() !== '' ? v.trim() : 'qwen-vl-plus-latest')),
   // 豆包(火山引擎)key 未配齐时走 stub
   DOUBAO_VISION_API_KEY: z.string().optional(),
   DOUBAO_VISION_ENDPOINT: z.string().url().default('https://ark.cn-beijing.volces.com/api/v3/chat/completions'),
