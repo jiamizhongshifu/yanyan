@@ -9,7 +9,7 @@
  *   - 点击趋势点 → 拉 /home/today?date=X(餐食列表)
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
@@ -21,7 +21,10 @@ import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { InflammationTrendChart } from '../components/InflammationTrendChart';
 import { useWellness, todayKey } from '../store/wellness';
 import { MonthCalendarGrid } from '../components/MonthCalendarGrid';
-import { AchievementJarPhysics as AchievementJar } from '../components/AchievementJarPhysics';
+// matter.js (~80KB) 只在显示勋章瓶时才加载;Insights 页空状态 / 月历 不需要
+const AchievementJar = lazy(() =>
+  import('../components/AchievementJarPhysics').then((m) => ({ default: m.AchievementJarPhysics }))
+);
 import { track } from '../services/tracker';
 import { asset } from '../services/assets';
 import { Icon, type IconName } from '../components/Icon';
@@ -165,19 +168,27 @@ export function Insights() {
           </div>
         </section>
       ) : (
-        <AchievementJar
-          monthLabel={monthLabel}
-          perfect={perfect}
-          great={great}
-          nice={nice}
-          sugarBadges={(sugar?.monthlyBadges ?? []).map((b) => ({
-            emoji: b.emoji,
-            label: b.label,
-            count: b.count,
-            iconFile: SUGAR_BADGE_ICON[b.kind],
-            kind: b.kind
-          }))}
-        />
+        <Suspense
+          fallback={
+            <div className="rounded-2xl bg-white px-6 py-10 flex items-center justify-center">
+              <span className="text-xs text-ink/40">勋章瓶加载中…</span>
+            </div>
+          }
+        >
+          <AchievementJar
+            monthLabel={monthLabel}
+            perfect={perfect}
+            great={great}
+            nice={nice}
+            sugarBadges={(sugar?.monthlyBadges ?? []).map((b) => ({
+              emoji: b.emoji,
+              label: b.label,
+              count: b.count,
+              iconFile: SUGAR_BADGE_ICON[b.kind],
+              kind: b.kind
+            }))}
+          />
+        </Suspense>
       )}
 
       {sugar && (
