@@ -127,23 +127,18 @@ describe('U8 QwenVisionClient', () => {
     expect(calls).toBe(1);
   });
 
-  test('429 rate_limit 退避重试', async () => {
+  test('429 rate_limit → 不重试,直接 throw rate_limit(跨境 60s 预算下重试不划算)', async () => {
     let calls = 0;
     const fakeFetch = makeFetch(() => {
       calls++;
-      if (calls < 2) return new Response('rl', { status: 429 });
-      return new Response(
-        JSON.stringify({ choices: [{ message: { content: '{"items":[{"name":"白粥"}]}' } }], model: 'm' }),
-        { status: 200 }
-      );
+      return new Response('rl', { status: 429 });
     });
     const client = makeClient({ fetchImpl: fakeFetch });
-    const r = await client.recognize('k');
-    expect(r!.items[0].name).toBe('白粥');
-    expect(calls).toBe(2);
+    await expect(client.recognize('k')).rejects.toMatchObject({ kind: 'rate_limit' });
+    expect(calls).toBe(1);
   });
 
-  test('5xx 重试 3 次仍失败 → throw server', async () => {
+  test('5xx 单次失败 → throw server', async () => {
     let calls = 0;
     const fakeFetch = makeFetch(() => {
       calls++;
@@ -151,7 +146,7 @@ describe('U8 QwenVisionClient', () => {
     });
     const client = makeClient({ fetchImpl: fakeFetch });
     await expect(client.recognize('k')).rejects.toMatchObject({ kind: 'server' });
-    expect(calls).toBe(3);
+    expect(calls).toBe(1);
   });
 
   test('LLM 返回非 JSON → 返回 null', async () => {

@@ -29,17 +29,23 @@ const TIMEOUT_MS = 45_000;
 const RETRY_BACKOFF_MS: number[] = []; // 不重试,跨境单次给足时间,失败让用户重拍
 
 const SYSTEM_PROMPT = `你是中餐食物识别 + 添加糖估算专家。给定一张餐桌照片,识别其中所有可见食物条目,
-并对每一条估算"典型一份"的添加糖克数(自由糖,不含天然存在于水果 / 牛奶中的糖)。
+并对每一条估算"典型一份"的添加糖克数(自由糖,不含天然存在于水果 / 牛奶中的糖),
+同时列出该条目主料食材(2-6 个 canonical 中文食材名)。
 
 输出严格 JSON,无 markdown 包装:
 {
   "items": [
-    {"name": "<食物中文名,canonical>", "confidence": 0.0-1.0, "addedSugarG": <number|null>}
+    {
+      "name": "<食物中文名,canonical>",
+      "confidence": 0.0-1.0,
+      "addedSugarG": <number|null>,
+      "ingredients": ["<主料1>", "<主料2>", ...]
+    }
   ],
   "overallConfidence": 0.0-1.0
 }
 要求:
-1. name 用最常见的菜名(如"清蒸鲈鱼"、"白米饭"、"麻婆豆腐"),不写品牌或厨师姓名
+1. name 用最常见的菜名(如"清蒸鲈鱼"、"白米饭"、"麻婆豆腐"、"野生菌火锅"),不写品牌或厨师姓名
 2. 每个独立菜品 1 条 item;主食和菜分开识别
 3. 不可识别 / 模糊 → confidence < 0.6
 4. addedSugarG 估算参考(典型一份):
@@ -50,8 +56,11 @@ const SYSTEM_PROMPT = `你是中餐食物识别 + 添加糖估算专家。给定
    - 主食(米饭 / 面条 / 馒头)≈ 0(碳水高但无添加糖)
    - 真不确定 → 用 null,不要瞎猜
 5. addedSugarG 单位克(0..200 范围),不写百分比或描述
-6. 整张图整体可信度 → overallConfidence
-7. 只 JSON 输出,无其他文字`;
+6. ingredients 列 2-6 个最具代表性的主料(用最常见的食材名,如"猪肉"、"白菜"、"鸡蛋"、"金针菇"、"豆腐"),
+   不写调味料(盐/油/酱油/葱姜蒜),不写做法
+   - 单一食材直接重复:白米饭 → ingredients = ["白米饭"];煮鸡蛋 → ["鸡蛋"]
+7. 整张图整体可信度 → overallConfidence
+8. 只 JSON 输出,无其他文字`;
 
 interface ChatChoice {
   message?: { content?: string };
@@ -168,7 +177,13 @@ export class QwenVisionClient implements LlmFoodRecognizer {
           .map((it) => ({
             name: (it.name as string).trim(),
             confidence: clamp01(typeof it.confidence === 'number' ? it.confidence : 0.6),
-            addedSugarGEstimate: parseSugarG(it.addedSugarG)
+            addedSugarGEstimate: parseSugarG(it.addedSugarG),
+            ingredients: Array.isArray(it.ingredients)
+              ? (it.ingredients as unknown[])
+                  .filter((x): x is string => typeof x === 'string' && x.trim().length > 0)
+                  .map((x) => x.trim())
+                  .slice(0, 6)
+              : undefined
           }));
 
         const overallConfidence = clamp01(

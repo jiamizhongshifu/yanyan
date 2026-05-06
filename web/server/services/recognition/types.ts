@@ -13,6 +13,12 @@ export interface RecognizedItem {
    * 没命中时回落到这里,确保未入库食物也能拿到糖分估值。
    */
   addedSugarGEstimate?: number | null;
+  /**
+   * 复合菜的主料食材数组(2-6 项)。复合菜 / 火锅 / 汤等组合菜在 DB 中
+   * 通常没有 dish 级条目,server 用这些主料逐个查 food_classifications 后
+   * 聚合(均值 DII,最大 GI 等)合成本条目的 classification。
+   */
+  ingredients?: string[];
 }
 
 export interface RecognitionResult {

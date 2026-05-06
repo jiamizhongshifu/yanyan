@@ -74,10 +74,22 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
     return { kind: 'low_confidence', overallConfidence: recognition.overallConfidence };
   }
 
-  // 查每个识别项的双层分类
+  // 查每个识别项的双层分类。
+  // 复合菜(如"野生菌火锅")在 DB 里通常没有 dish 级条目 → 命中 null,
+  // 此时用 LLM 返回的 ingredients 主料数组逐个查、再合成 classification。
   const classifications: Array<FoodClassification | null> = [];
   for (const item of recognition.items) {
-    const cls = await deps.classifierStore.findByName(item.name);
+    let cls = await deps.classifierStore.findByName(item.name);
+    if (!cls && item.ingredients && item.ingredients.length > 0) {
+      const ingClasses: FoodClassification[] = [];
+      for (const ing of item.ingredients) {
+        const ingCls = await deps.classifierStore.findByName(ing);
+        if (ingCls) ingClasses.push(ingCls);
+      }
+      if (ingClasses.length > 0) {
+        cls = synthesizeFromIngredients(item.name, ingClasses);
+      }
+    }
     classifications.push(cls);
     if (!cls && deps.onMissingFood) {
       try {
@@ -144,6 +156,59 @@ export async function appendMealFeedback(deps: MealsDeps, params: AppendFeedback
   };
   await deps.mealStore.appendFeedback(params.mealId, params.userId, entry);
   return entry;
+}
+
+/**
+ * 从主料 classifications 合成 dish 级 FoodClassification。
+ * 用于"野生菌火锅"这类 DB 没收录但主料(野生菌、白菜、豆腐)收录了的复合菜。
+ *
+ * 聚合规则:
+ *   - tcmLabel:取最警示的(发 > 温和 > 平),让用户对发物食材有觉察
+ *   - tcmProperty:取最常见的(投票)
+ *   - diiScore / agesScore / gi:数值列取均值(忽略 null)
+ *   - addedSugarG / carbsG:取均值(代表"一份典型量"的口感)
+ *   - citations:每个主料挑第 1 条,最多 3 条
+ *   - sourceVersions.canon = 'synthesized-from-ingredients-v1'
+ */
+export function synthesizeFromIngredients(
+  dishName: string,
+  ingClasses: FoodClassification[]
+): FoodClassification {
+  const labelPriority: Record<string, number> = { 发: 3, 温和: 2, 平: 1 };
+  const tcmLabel =
+    ingClasses
+      .map((c) => c.tcmLabel)
+      .reduce((best, l) => (labelPriority[l] > labelPriority[best] ? l : best),
+        ingClasses[0].tcmLabel);
+
+  const propCounts: Record<string, number> = {};
+  for (const c of ingClasses) propCounts[c.tcmProperty] = (propCounts[c.tcmProperty] ?? 0) + 1;
+  const tcmProperty = (Object.entries(propCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ??
+    ingClasses[0].tcmProperty) as FoodClassification['tcmProperty'];
+
+  const meanOf = (vals: Array<number | null>): number | null => {
+    const xs = vals.filter((v): v is number => typeof v === 'number');
+    if (xs.length === 0) return null;
+    return Math.round((xs.reduce((s, v) => s + v, 0) / xs.length) * 100) / 100;
+  };
+
+  const citations = ingClasses
+    .flatMap((c) => (c.citations.length > 0 ? [{ ...c.citations[0], reference: `${c.foodCanonicalName} · ${c.citations[0].reference}` }] : []))
+    .slice(0, 3);
+
+  return {
+    id: `synth-${dishName}`,
+    foodCanonicalName: dishName,
+    tcmLabel,
+    tcmProperty,
+    diiScore: meanOf(ingClasses.map((c) => c.diiScore)),
+    agesScore: meanOf(ingClasses.map((c) => c.agesScore)),
+    gi: meanOf(ingClasses.map((c) => c.gi)),
+    addedSugarG: meanOf(ingClasses.map((c) => c.addedSugarG)),
+    carbsG: meanOf(ingClasses.map((c) => c.carbsG)),
+    citations,
+    sourceVersions: { canon: 'synthesized-from-ingredients-v1' }
+  };
 }
 
 export { scoreToLevel };
