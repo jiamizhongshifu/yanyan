@@ -41,6 +41,17 @@ export interface MealItem {
 
 export type FireLevel = '平' | '微火' | '中火' | '大火';
 
+export interface ScoreBreakdown {
+  baseline: number;
+  tcmLabel: number;
+  tcmProperty: number;
+  dii: number;
+  gi: number;
+  sugar: number;
+  ages: number;
+  unmatched: number;
+}
+
 export interface MealResult {
   mealId: string;
   fireScore: number;
@@ -48,6 +59,7 @@ export interface MealResult {
   items: MealItem[];
   unrecognizedNames: string[];
   modelVersion: string;
+  breakdown?: ScoreBreakdown;
 }
 
 /**

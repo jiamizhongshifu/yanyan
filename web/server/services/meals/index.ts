@@ -21,7 +21,7 @@ import { encryptField } from '../../crypto/envelope';
 import type { LlmFoodRecognizer } from '../recognition';
 import { LOW_CONFIDENCE_THRESHOLD } from '../recognition/types';
 import type { MealRow, MealStore } from './store';
-import { aggregateMeal, scoreToLevel, type FireLevel, type MealAggregate } from './aggregator';
+import { aggregateMeal, scoreToLevel, type FireLevel, type MealAggregate, type ScoreBreakdown } from './aggregator';
 import { summaryFromCounts, westernSummary } from './store';
 
 /** auto-derive 入库的最低 confidence 阈值;低于此只用作本次显示,不持久化 */
@@ -59,6 +59,8 @@ export interface CreateMealResult {
   /** LLM 整体置信度低于阈值时,UI 提示用户补拍 */
   lowConfidence: boolean;
   modelVersion: string;
+  /** 餐级火分构成,前端可显示 "+ X 中医 + Y DII + ..." 透明拆解 */
+  breakdown: ScoreBreakdown;
 }
 
 export type CreateMealOutcome =
@@ -239,7 +241,8 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
       })),
       unrecognizedNames: agg.unrecognizedNames,
       lowConfidence: false,
-      modelVersion: recognition.modelVersion
+      modelVersion: recognition.modelVersion,
+      breakdown: agg.breakdown
     }
   };
 }
@@ -298,7 +301,8 @@ export async function updateMealItems(
     })),
     unrecognizedNames: agg.unrecognizedNames,
     lowConfidence: false,
-    modelVersion: params.modelVersion
+    modelVersion: params.modelVersion,
+    breakdown: agg.breakdown
   };
 }
 

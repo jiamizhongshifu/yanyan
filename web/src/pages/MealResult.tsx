@@ -19,7 +19,8 @@ import {
   postMealFeedback,
   updateMealItems,
   type FireLevel,
-  type MealFeedbackKind
+  type MealFeedbackKind,
+  type ScoreBreakdown
 } from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
 import { asset } from '../services/assets';
@@ -134,20 +135,35 @@ export function MealResult() {
               ?
             </button>
           </p>
+          {result.breakdown && (
+            <p
+              className="mt-2 text-center text-[11px] text-ink/45 leading-relaxed px-3"
+              data-testid="score-breakdown"
+            >
+              {formatBreakdown(result.breakdown)}
+            </p>
+          )}
         </div>
       </section>
 
-      {/* mascot + 陪伴语 */}
-      <section className="mb-5 px-2 flex items-center gap-3">
+      {/* mascot + 陪伴对话气泡 */}
+      <section className="mb-5 px-1 flex items-center gap-2.5">
         <img
           src={asset('mascot-happy.png')}
           alt=""
           className="w-14 h-14 object-contain flex-shrink-0"
           loading="lazy"
         />
-        <p className="text-sm text-ink/70 leading-relaxed">
-          {LEVEL_TO_ENCOURAGEMENT[result.level]}
-        </p>
+        <div className="relative flex-1 rounded-2xl bg-white px-4 py-3">
+          {/* 气泡尾部三角 */}
+          <span
+            aria-hidden="true"
+            className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rotate-45"
+          />
+          <p className="relative text-sm text-ink/75 leading-relaxed">
+            {LEVEL_TO_ENCOURAGEMENT[result.level]}
+          </p>
+        </div>
       </section>
 
       {/* 食物分析与评价 */}
@@ -288,6 +304,30 @@ function AlgorithmSheet({ onClose }: { onClose: () => void }) {
       </div>
     </div>
   );
+}
+
+const BREAKDOWN_LABELS: Array<{ key: keyof ScoreBreakdown; label: string }> = [
+  { key: 'tcmLabel', label: '中医' },
+  { key: 'tcmProperty', label: '性味' },
+  { key: 'dii', label: 'DII' },
+  { key: 'gi', label: '升糖' },
+  { key: 'sugar', label: '糖' },
+  { key: 'ages', label: 'AGEs' },
+  { key: 'unmatched', label: '未识别' },
+  { key: 'baseline', label: '基线' }
+];
+
+function formatBreakdown(b: ScoreBreakdown): string {
+  // 仅显示绝对值 ≥ 1 的分量,用「+」前缀,负值用「−」(DII 抗炎奖励)
+  const parts = BREAKDOWN_LABELS.flatMap(({ key, label }) => {
+    const v = b[key];
+    if (Math.abs(v) < 1) return [];
+    const sign = v < 0 ? '−' : '+';
+    const abs = Math.abs(v);
+    return [`${sign}${abs % 1 === 0 ? abs.toFixed(0) : abs.toFixed(1)} ${label}`];
+  });
+  if (parts.length === 0) return '基线 0(完美无瑕)';
+  return `构成:${parts.join(' · ')}`;
 }
 
 /**
