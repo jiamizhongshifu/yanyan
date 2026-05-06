@@ -17,7 +17,6 @@ import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { upsertTodayChallenges, fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { asset } from '../services/assets';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
-import { todayHeroAsset } from '../services/heroSelector';
 import { useWellness, todayKey } from '../store/wellness';
 import { DailyChallengesCard } from '../components/DailyChallengesCard';
 import { InappRemindersBanner } from '../components/InappRemindersBanner';
@@ -159,16 +158,6 @@ export function Today() {
           <PerfectDayRing doneCount={completedCount} total={5} tier={tier} />
         </div>
       </section>
-
-      {/* 时段 hero 插画(早晨/中午/黄昏/夜晚自动切换) */}
-      <div className="mb-4 -mx-1 rounded-3xl overflow-hidden">
-        <img
-          src={asset(todayHeroAsset())}
-          alt=""
-          className="w-full h-auto block"
-          loading="lazy"
-        />
-      </div>
 
       <InappRemindersBanner />
 
