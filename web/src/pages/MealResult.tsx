@@ -213,7 +213,7 @@ export function MealResult() {
         </button>
         <button
           type="button"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/app')}
           className="flex-1 rounded-full bg-ink text-white py-3 text-sm font-medium"
         >
           回主页
