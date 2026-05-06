@@ -27,8 +27,6 @@ const TIER_TO_VARIANT: Record<Exclude<DayTier, 'none'>, OrangeVariant> = {
   nice: 'nice'
 };
 
-const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
-
 export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = new Date() }: Props) {
   const histByDate = useMemo(
     () => new Map((daysHistory ?? []).map((d) => [d.date, d.tier])),
@@ -37,7 +35,7 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
 
   const cells = useMemo(() => {
     const today = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
-    const arr: Array<{ date: string; day: number; weekday: number; isPast: boolean; isToday: boolean; tier: DayTier }> = [];
+    const arr: Array<{ date: string; day: number; isPast: boolean; isToday: boolean; tier: DayTier }> = [];
     for (let offset = -3; offset <= 3; offset++) {
       const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
       const yyyy = d.getFullYear();
@@ -47,7 +45,7 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
       const isToday = offset === 0;
       const isPast = offset < 0;
       const tier = isToday ? todayTier : histByDate.get(dateStr) ?? 'none';
-      arr.push({ date: dateStr, day: d.getDate(), weekday: d.getDay(), isPast, isToday, tier });
+      arr.push({ date: dateStr, day: d.getDate(), isPast, isToday, tier });
     }
     return arr;
   }, [histByDate, todayTier, todayDate]);
@@ -59,22 +57,24 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
           c.tier !== 'none'
             ? TIER_TO_VARIANT[c.tier as keyof typeof TIER_TO_VARIANT]
             : 'outline';
-        const opacity = c.tier === 'none' && !c.isPast && !c.isToday ? 'opacity-30' : c.tier === 'none' ? 'opacity-55' : 'opacity-100';
+        const opacity =
+          c.tier === 'none' && !c.isPast && !c.isToday
+            ? 'opacity-30'
+            : c.tier === 'none'
+            ? 'opacity-55'
+            : 'opacity-100';
         return (
-          <div key={c.date} className="flex flex-col items-center gap-1">
-            <span className="text-[10px] text-ink/40">{WEEKDAYS[c.weekday]}</span>
-            <span
-              className={`text-xs ${
-                c.isToday
-                  ? 'w-6 h-6 rounded-full bg-ink text-paper flex items-center justify-center font-medium'
-                  : 'text-ink/65'
+          <div key={c.date} className="flex flex-col items-center gap-1.5">
+            {/* 日期 — 固定 24×24 高度,所有 cell 视觉等高 */}
+            <div
+              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+                c.isToday ? 'bg-ink text-paper font-medium' : 'text-ink/65'
               }`}
             >
               {c.day}
-            </span>
-            <div className="w-7 h-7 flex items-center justify-center">
-              <OrangeIcon variant={variant} className={`w-7 h-7 ${opacity}`} />
             </div>
+            {/* 橘子徽标 */}
+            <OrangeIcon variant={variant} className={`w-7 h-7 ${opacity}`} />
           </div>
         );
       })}
