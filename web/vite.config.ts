@@ -25,12 +25,37 @@ export default defineConfig({
         ]
       },
       workbox: {
-        // 默认离线缓存策略 — 静态资源 cache-first,API 请求 network-first
+        // 排除大体积非首屏关键 chunk(matter.js)从 precache;首次进入有勋章的 Insights 页时
+        // 走网络下载,然后命中 runtime image cache。其它 lazy chunk 保留 precache 以支持离线。
+        globIgnores: ['**/AchievementJarPhysics-*.js'],
         runtimeCaching: [
           {
+            // API 请求 — network-first + 5s timeout
             urlPattern: /\/api\/v1\//,
             handler: 'NetworkFirst',
             options: { cacheName: 'yanyan-api', networkTimeoutSeconds: 5 }
+          },
+          {
+            // 图片资源(hero / mascot / badge / icon)— cache-first,30 天有效
+            // 这些 PNG/SVG/JPG 来自 dist/* 或 Supabase app-assets bucket
+            urlPattern: ({ request, url }) =>
+              request.destination === 'image' ||
+              /\.(?:png|jpg|jpeg|svg|gif|webp|avif)(?:\?|$)/i.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'yanyan-images',
+              expiration: { maxEntries: 100, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            // 矩阵物理引擎 chunk(从 precache 排除)首次走网络,后续走缓存
+            urlPattern: /\/assets\/AchievementJarPhysics-.*\.js$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'yanyan-lazy-js',
+              expiration: { maxEntries: 5, maxAgeSeconds: 30 * 24 * 60 * 60 }
+            }
           }
         ]
       }
