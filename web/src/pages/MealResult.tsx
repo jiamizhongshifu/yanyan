@@ -45,6 +45,14 @@ const LEVEL_DECOR_COLOR: Record<FireLevel, string> = {
   大火: 'text-fire-mid/15'
 };
 
+/** 水豚表情按等级配:开心 / 思考 / 关切,不引焦虑只引共情 */
+const LEVEL_MASCOT: Record<FireLevel, string> = {
+  平: 'mascot-happy.png',
+  微火: 'mascot-happy.png',
+  中火: 'mascot-thinking.png',
+  大火: 'mascot-worried.png'
+};
+
 export function MealResult() {
   const [, navigate] = useLocation();
   const result = useLastMeal((s) => s.result);
@@ -149,10 +157,11 @@ export function MealResult() {
       {/* mascot + 陪伴对话气泡 */}
       <section className="mb-5 px-1 flex items-center gap-2.5">
         <img
-          src={asset('mascot-happy.png')}
+          src={asset(LEVEL_MASCOT[result.level])}
           alt=""
           className="w-14 h-14 object-contain flex-shrink-0"
           loading="lazy"
+          data-testid="meal-mascot"
         />
         <div className="relative flex-1 rounded-2xl bg-white px-4 py-3">
           {/* 气泡尾部三角 */}
