@@ -1,0 +1,142 @@
+[
+  {
+    "name": "燕麦坚果碗",
+    "slot": "breakfast",
+    "tier": "calm",
+    "items": ["燕麦", "核桃", "蓝莓", "希腊酸奶"],
+    "citation": { "source": "paper", "reference": "Mediterranean diet & inflammation (PREDIMED 2013)" }
+  },
+  {
+    "name": "蒸蛋羹 + 红薯小米粥",
+    "slot": "breakfast",
+    "tier": "calm",
+    "items": ["蒸蛋羹", "红薯", "小米粥"],
+    "citation": { "source": "modern_nutrition", "reference": "中国居民膳食指南 2022 — 早餐组合" }
+  },
+  {
+    "name": "全麦吐司 + 牛油果煎蛋",
+    "slot": "breakfast",
+    "tier": "calm",
+    "items": ["全麦面包", "牛油果", "鸡蛋"],
+    "citation": { "source": "paper", "reference": "Avocado + egg satiety (Nutrients 2020)" }
+  },
+  {
+    "name": "南瓜燕麦粥 + 杏仁",
+    "slot": "breakfast",
+    "tier": "calm",
+    "items": ["燕麦", "南瓜", "杏仁"],
+    "citation": { "source": "modern_nutrition", "reference": "USDA — High-fiber breakfast" }
+  },
+  {
+    "name": "豆浆紫薯餐",
+    "slot": "breakfast",
+    "tier": "calm",
+    "items": ["豆浆", "紫薯", "鸡蛋"],
+    "citation": { "source": "paper", "reference": "Anthocyanin from purple sweet potato (Food Sci Nutr 2020)" }
+  },
+  {
+    "name": "希腊酸奶蓝莓杯",
+    "slot": "breakfast",
+    "tier": "calm",
+    "items": ["希腊酸奶", "蓝莓", "燕麦", "杏仁"],
+    "citation": { "source": "paper", "reference": "Probiotic dairy & gut inflammation (Nutrients 2020)" }
+  },
+  {
+    "name": "三文鱼藜麦碗",
+    "slot": "lunch",
+    "tier": "calm",
+    "items": ["三文鱼", "藜麦", "西兰花", "牛油果"],
+    "citation": { "source": "paper", "reference": "Omega-3 EPA/DHA anti-inflammation (J Clin Med 2020)" }
+  },
+  {
+    "name": "鸡胸肉糙米饭 + 时蔬",
+    "slot": "lunch",
+    "tier": "calm",
+    "items": ["鸡胸肉", "糙米", "西兰花", "胡萝卜"],
+    "citation": { "source": "modern_nutrition", "reference": "中国居民膳食指南 2022 — 蛋白配主食" }
+  },
+  {
+    "name": "鳕鱼藜麦沙拉",
+    "slot": "lunch",
+    "tier": "calm",
+    "items": ["鳕鱼", "藜麦", "羽衣甘蓝", "西红柿"],
+    "citation": { "source": "modern_nutrition", "reference": "USDA — White fish + whole grain" }
+  },
+  {
+    "name": "豆腐西兰花炒饭",
+    "slot": "lunch",
+    "tier": "calm",
+    "items": ["豆腐", "西兰花", "糙米", "胡萝卜"],
+    "citation": { "source": "modern_nutrition", "reference": "Plant-forward bowl" }
+  },
+  {
+    "name": "鹰嘴豆蔬菜碗",
+    "slot": "lunch",
+    "tier": "calm",
+    "items": ["鹰嘴豆", "羽衣甘蓝", "西红柿", "牛油果"],
+    "citation": { "source": "paper", "reference": "DASH diet & inflammation (NEJM 2001)" }
+  },
+  {
+    "name": "番茄牛肉杂粮面",
+    "slot": "lunch",
+    "tier": "mild",
+    "items": ["牛肉", "西红柿", "全麦面包", "菠菜"],
+    "citation": { "source": "modern_nutrition", "reference": "USDA — Lean beef + whole grain" }
+  },
+  {
+    "name": "蘑菇鸡肉藜麦碗",
+    "slot": "lunch",
+    "tier": "mild",
+    "items": ["鸡胸肉", "香菇", "藜麦", "芦笋"],
+    "citation": { "source": "modern_nutrition", "reference": "Mushroom β-glucans (Front Immunol 2020)" }
+  },
+  {
+    "name": "清蒸鲈鱼 + 凉拌菠菜",
+    "slot": "dinner",
+    "tier": "calm",
+    "items": ["清蒸鲈鱼", "菠菜", "白米饭"],
+    "citation": { "source": "modern_nutrition", "reference": "USDA — Steamed fish + leafy green" }
+  },
+  {
+    "name": "豆腐海带汤 + 杂粮饭",
+    "slot": "dinner",
+    "tier": "calm",
+    "items": ["豆腐", "海带", "糙米"],
+    "citation": { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 海产品组合" }
+  },
+  {
+    "name": "三文鱼时蔬轻食",
+    "slot": "dinner",
+    "tier": "calm",
+    "items": ["三文鱼", "芦笋", "藜麦", "牛油果"],
+    "citation": { "source": "paper", "reference": "Mediterranean dinner pattern (BMJ 2018)" }
+  },
+  {
+    "name": "凉拌豆腐 + 杂粮粥",
+    "slot": "dinner",
+    "tier": "calm",
+    "items": ["豆腐", "黄瓜", "燕麦", "西红柿"],
+    "citation": { "source": "modern_nutrition", "reference": "Plant-protein dinner" }
+  },
+  {
+    "name": "白菜豆腐汤 + 红薯",
+    "slot": "dinner",
+    "tier": "calm",
+    "items": ["白菜", "豆腐", "红薯"],
+    "citation": { "source": "modern_nutrition", "reference": "中国居民膳食指南 2022 — 清淡晚餐" }
+  },
+  {
+    "name": "山药排骨汤(去油版)+ 杂粮饭",
+    "slot": "dinner",
+    "tier": "mild",
+    "items": ["山药", "牛肉", "糙米", "胡萝卜"],
+    "citation": { "source": "modern_nutrition", "reference": "USDA — Lean protein soup" }
+  },
+  {
+    "name": "蘑菇蔬菜豆腐锅",
+    "slot": "dinner",
+    "tier": "mild",
+    "items": ["香菇", "金针菇", "豆腐", "白菜"],
+    "citation": { "source": "paper", "reference": "Mushroom polysaccharides (J Funct Foods 2019)" }
+  }
+]

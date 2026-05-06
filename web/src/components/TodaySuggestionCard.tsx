@@ -81,15 +81,25 @@ export function TodaySuggestionCard() {
         <ul className="space-y-2">
           {rec.meals.map((m) => {
             const cite = preferModernCitation(m.citations);
+            // 第一项是菜名(server 端 recipes/v1.json 约定),后面是主料预览
+            const [dishName, ...ingredients] = m.items;
             return (
               <li key={m.slot} className="flex items-start gap-3 text-sm text-ink">
                 <span className="shrink-0 text-ink/50 w-12">{SLOT_LABELS[m.slot]}</span>
-                <span className="flex-1">
-                  {m.items.join(' / ')}
-                  {cite && (
-                    <span className="ml-2 text-xs text-ink/40">— {cite.reference}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-ink font-medium">{dishName ?? '—'}</p>
+                  {ingredients.length > 0 && (
+                    <p className="mt-0.5 text-xs text-ink/55">
+                      {ingredients.join(' · ')}
+                    </p>
                   )}
-                </span>
+                  {cite && (
+                    <p className="mt-0.5 text-[11px] text-ink/40">
+                      <span className="text-ink/30">[现代营养] </span>
+                      {cite.reference}
+                    </p>
+                  )}
+                </div>
               </li>
             );
           })}

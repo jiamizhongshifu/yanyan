@@ -9,8 +9,15 @@
     "addedSugarG": 0,
     "carbsG": 53,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》谷部·稻", "excerpt": "粳米...其性平,益气止泻,和胃健脾。" },
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #20444" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》谷部·稻",
+        "excerpt": "粳米...其性平,益气止泻,和胃健脾。"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central #20444"
+      }
     ]
   },
   {
@@ -23,7 +30,10 @@
     "addedSugarG": 0,
     "carbsG": 47,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #20452" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central #20452"
+      }
     ]
   },
   {
@@ -36,7 +46,11 @@
     "addedSugarG": 0,
     "carbsG": 28,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》谷部·稻", "excerpt": "粳米煮粥,最养脾胃。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》谷部·稻",
+        "excerpt": "粳米煮粥,最养脾胃。"
+      }
     ]
   },
   {
@@ -49,7 +63,11 @@
     "addedSugarG": 0,
     "carbsG": 0,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》鳞部·鲈", "excerpt": "鲈鱼...味甘性平,益脾胃,补肝肾。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》鳞部·鲈",
+        "excerpt": "鲈鱼...味甘性平,益脾胃,补肝肾。"
+      }
     ]
   },
   {
@@ -62,7 +80,10 @@
     "addedSugarG": 0,
     "carbsG": 7,
     "citations": [
-      { "source": "modern_nutrition", "reference": "DII 2014 (Shivappa)" }
+      {
+        "source": "modern_nutrition",
+        "reference": "DII 2014 (Shivappa)"
+      }
     ]
   },
   {
@@ -75,7 +96,10 @@
     "addedSugarG": 0,
     "carbsG": 4,
     "citations": [
-      { "source": "modern_nutrition", "reference": "DII 2014 (Shivappa)" }
+      {
+        "source": "modern_nutrition",
+        "reference": "DII 2014 (Shivappa)"
+      }
     ]
   },
   {
@@ -88,7 +112,10 @@
     "addedSugarG": 0,
     "carbsG": 3,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #11116" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central #11116"
+      }
     ]
   },
   {
@@ -101,7 +128,10 @@
     "addedSugarG": 0,
     "carbsG": 25,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #09003 (天然糖,不计添加糖)" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central #09003 (天然糖,不计添加糖)"
+      }
     ]
   },
   {
@@ -114,33 +144,11 @@
     "addedSugarG": 0,
     "carbsG": 4,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》谷部·豆腐", "excerpt": "豆腐...性凉味甘,清热润燥,生津解毒。" }
-    ]
-  },
-  {
-    "foodCanonicalName": "豆浆",
-    "tcmLabel": "平",
-    "tcmProperty": "凉",
-    "diiScore": -0.41,
-    "agesScore": 5,
-    "gi": null,
-    "addedSugarG": 5,
-    "carbsG": 13,
-    "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #16223 (含糖豆浆;无糖版 0g)" }
-    ]
-  },
-  {
-    "foodCanonicalName": "山药",
-    "tcmLabel": "平",
-    "tcmProperty": "平",
-    "diiScore": -0.12,
-    "agesScore": 5,
-    "gi": 51,
-    "addedSugarG": 0,
-    "carbsG": 27,
-    "citations": [
-      { "source": "canon", "reference": "《本草纲目》菜部·薯蓣", "excerpt": "山药...味甘性平,健脾补肺,益肾固精。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》谷部·豆腐",
+        "excerpt": "豆腐...性凉味甘,清热润燥,生津解毒。"
+      }
     ]
   },
   {
@@ -153,20 +161,10 @@
     "addedSugarG": 0,
     "carbsG": 1,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #01123" }
-    ]
-  },
-  {
-    "foodCanonicalName": "蒸蛋羹",
-    "tcmLabel": "温和",
-    "tcmProperty": "平",
-    "diiScore": 0.13,
-    "agesScore": 22,
-    "gi": null,
-    "addedSugarG": 0,
-    "carbsG": 2,
-    "citations": [
-      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central #01123"
+      }
     ]
   },
   {
@@ -179,7 +177,10 @@
     "addedSugarG": 1,
     "carbsG": 50,
     "citations": [
-      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:炒制 ↑AGEs" }
+      {
+        "source": "modern_nutrition",
+        "reference": "AGEs 数据库 2024:炒制 ↑AGEs"
+      }
     ]
   },
   {
@@ -192,20 +193,10 @@
     "addedSugarG": 4,
     "carbsG": 36,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA + 中国食物成分表 2018(咸馅 ~4g 添加糖)" }
-    ]
-  },
-  {
-    "foodCanonicalName": "酸奶",
-    "tcmLabel": "温和",
-    "tcmProperty": "凉",
-    "diiScore": -0.08,
-    "agesScore": 12,
-    "gi": 36,
-    "addedSugarG": 12,
-    "carbsG": 17,
-    "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #01116(典型市售加糖酸奶 ~12g 添加糖)" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA + 中国食物成分表 2018(咸馅 ~4g 添加糖)"
+      }
     ]
   },
   {
@@ -218,7 +209,11 @@
     "addedSugarG": 0,
     "carbsG": 0,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》兽部·牛", "excerpt": "牛肉...味甘性温,补脾胃,益气血。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》兽部·牛",
+        "excerpt": "牛肉...味甘性温,补脾胃,益气血。"
+      }
     ]
   },
   {
@@ -231,7 +226,11 @@
     "addedSugarG": 0,
     "carbsG": 0,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》禽部·鸡", "excerpt": "鸡肉...温中益气,补虚填精。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》禽部·鸡",
+        "excerpt": "鸡肉...温中益气,补虚填精。"
+      }
     ]
   },
   {
@@ -244,7 +243,11 @@
     "addedSugarG": 0,
     "carbsG": 0,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》兽部·羊", "excerpt": "羊肉...味甘性大热,补虚劳,益气血,但多食发热动风。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》兽部·羊",
+        "excerpt": "羊肉...味甘性大热,补虚劳,益气血,但多食发热动风。"
+      }
     ]
   },
   {
@@ -257,8 +260,14 @@
     "addedSugarG": 2,
     "carbsG": 4,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》兽部·羊" },
-      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:明火烧烤 ↑↑AGEs;调料含少量糖" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》兽部·羊"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "AGEs 数据库 2024:明火烧烤 ↑↑AGEs;调料含少量糖"
+      }
     ]
   },
   {
@@ -271,7 +280,11 @@
     "addedSugarG": 0,
     "carbsG": 0,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》鳞部·虾", "excerpt": "虾...味甘性温,补肾壮阳,但发风动疾,有疮疡者忌。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》鳞部·虾",
+        "excerpt": "虾...味甘性温,补肾壮阳,但发风动疾,有疮疡者忌。"
+      }
     ]
   },
   {
@@ -284,7 +297,11 @@
     "addedSugarG": 0,
     "carbsG": 0,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》介部·蟹", "excerpt": "蟹...味咸性寒,散诸热,但发风疾,孕妇忌之。" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》介部·蟹",
+        "excerpt": "蟹...味咸性寒,散诸热,但发风疾,孕妇忌之。"
+      }
     ]
   },
   {
@@ -297,8 +314,14 @@
     "addedSugarG": 1,
     "carbsG": 17,
     "citations": [
-      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:深炸 ↑↑↑AGEs" },
-      { "source": "paper", "reference": "DII 2014 (Shivappa) — saturated fat + omega-6" }
+      {
+        "source": "modern_nutrition",
+        "reference": "AGEs 数据库 2024:深炸 ↑↑↑AGEs"
+      },
+      {
+        "source": "paper",
+        "reference": "DII 2014 (Shivappa) — saturated fat + omega-6"
+      }
     ]
   },
   {
@@ -311,7 +334,10 @@
     "addedSugarG": 0,
     "carbsG": 41,
     "citations": [
-      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:深炸 ↑↑AGEs" }
+      {
+        "source": "modern_nutrition",
+        "reference": "AGEs 数据库 2024:深炸 ↑↑AGEs"
+      }
     ]
   },
   {
@@ -324,8 +350,15 @@
     "addedSugarG": 3,
     "carbsG": 12,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》菜部·椒", "excerpt": "辣椒...大热,多食发火,壅气伤阴。" },
-      { "source": "modern_nutrition", "reference": "AGEs 数据库 2024:高油 + 高温" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》菜部·椒",
+        "excerpt": "辣椒...大热,多食发火,壅气伤阴。"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "AGEs 数据库 2024:高油 + 高温"
+      }
     ]
   },
   {
@@ -338,7 +371,10 @@
     "addedSugarG": 0,
     "carbsG": 9,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》菜部·椒" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》菜部·椒"
+      }
     ]
   },
   {
@@ -351,7 +387,10 @@
     "addedSugarG": 25,
     "carbsG": 25,
     "citations": [
-      { "source": "paper", "reference": "DII 2014 (Shivappa) — refined sugar pro-inflammatory" }
+      {
+        "source": "paper",
+        "reference": "DII 2014 (Shivappa) — refined sugar pro-inflammatory"
+      }
     ]
   },
   {
@@ -364,8 +403,14 @@
     "addedSugarG": 50,
     "carbsG": 65,
     "citations": [
-      { "source": "paper", "reference": "DII 2014:refined sugar + saturated fat" },
-      { "source": "modern_nutrition", "reference": "中国营养学会 2023:全糖大杯 ~50g 添加糖" }
+      {
+        "source": "paper",
+        "reference": "DII 2014:refined sugar + saturated fat"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "中国营养学会 2023:全糖大杯 ~50g 添加糖"
+      }
     ]
   },
   {
@@ -378,20 +423,11 @@
     "addedSugarG": 0,
     "carbsG": 18,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》果部·瓜", "excerpt": "西瓜...味甘性寒,清热解暑,但脾胃虚寒者忌多食。" }
-    ]
-  },
-  {
-    "foodCanonicalName": "燕麦",
-    "tcmLabel": "平",
-    "tcmProperty": "平",
-    "diiScore": -0.73,
-    "agesScore": 9,
-    "gi": 55,
-    "addedSugarG": 0,
-    "carbsG": 27,
-    "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central #20137" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》果部·瓜",
+        "excerpt": "西瓜...味甘性寒,清热解暑,但脾胃虚寒者忌多食。"
+      }
     ]
   },
   {
@@ -404,8 +440,14 @@
     "addedSugarG": 35,
     "carbsG": 35,
     "citations": [
-      { "source": "paper", "reference": "DII 2014:含糖饮料强促炎(SSB)" },
-      { "source": "modern_nutrition", "reference": "USDA #14400(330ml 可乐 ~35g 添加糖)" }
+      {
+        "source": "paper",
+        "reference": "DII 2014:含糖饮料强促炎(SSB)"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA #14400(330ml 可乐 ~35g 添加糖)"
+      }
     ]
   },
   {
@@ -418,7 +460,10 @@
     "addedSugarG": 12,
     "carbsG": 22,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA #19120(典型奶巧克力 25g 一块 ~12g 添加糖)" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA #19120(典型奶巧克力 25g 一块 ~12g 添加糖)"
+      }
     ]
   },
   {
@@ -431,7 +476,10 @@
     "addedSugarG": 28,
     "carbsG": 50,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA #18154 — 奶油蛋糕 100g ~28g 添加糖" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA #18154 — 奶油蛋糕 100g ~28g 添加糖"
+      }
     ]
   },
   {
@@ -444,7 +492,10 @@
     "addedSugarG": 22,
     "carbsG": 30,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA #19090 — 香草冰淇淋 ~22g 添加糖" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA #19090 — 香草冰淇淋 ~22g 添加糖"
+      }
     ]
   },
   {
@@ -457,7 +508,10 @@
     "addedSugarG": 24,
     "carbsG": 27,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国营养学会 2023:市售果汁 ~24g 添加糖/250ml" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国营养学会 2023:市售果汁 ~24g 添加糖/250ml"
+      }
     ]
   },
   {
@@ -470,62 +524,87 @@
     "addedSugarG": 0,
     "carbsG": 7,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》菜部·香蕈", "excerpt": "气味甘平无毒,益气不饥,治风破血" },
-      { "source": "paper", "reference": "Mushroom β-glucans 抗炎 (Front Immunol 2020)" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》菜部·香蕈",
+        "excerpt": "气味甘平无毒,益气不饥,治风破血"
+      },
+      {
+        "source": "paper",
+        "reference": "Mushroom β-glucans 抗炎 (Front Immunol 2020)"
+      }
     ]
   },
   {
     "foodCanonicalName": "金针菇",
     "tcmLabel": "平",
     "tcmProperty": "凉",
-    "diiScore": -0.40,
+    "diiScore": -0.4,
     "agesScore": 3,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 6,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Flammulina velutipes" },
-      { "source": "paper", "reference": "Flammulina polysaccharides immunomodulatory (J Funct Foods 2019)" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central — Flammulina velutipes"
+      },
+      {
+        "source": "paper",
+        "reference": "Flammulina polysaccharides immunomodulatory (J Funct Foods 2019)"
+      }
     ]
   },
   {
     "foodCanonicalName": "杏鲍菇",
     "tcmLabel": "平",
     "tcmProperty": "平",
-    "diiScore": -0.50,
+    "diiScore": -0.5,
     "agesScore": 3,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 5,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 杏鲍菇" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 杏鲍菇"
+      }
     ]
   },
   {
     "foodCanonicalName": "竹荪",
     "tcmLabel": "平",
     "tcmProperty": "凉",
-    "diiScore": -0.60,
+    "diiScore": -0.6,
     "agesScore": 2,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 5,
     "citations": [
-      { "source": "canon", "reference": "《中华本草》第二册" },
-      { "source": "paper", "reference": "Dictyophora polysaccharide anti-inflammation (Carbohydr Polym 2018)" }
+      {
+        "source": "canon",
+        "reference": "《中华本草》第二册"
+      },
+      {
+        "source": "paper",
+        "reference": "Dictyophora polysaccharide anti-inflammation (Carbohydr Polym 2018)"
+      }
     ]
   },
   {
     "foodCanonicalName": "虫草花",
     "tcmLabel": "平",
     "tcmProperty": "平",
-    "diiScore": -0.70,
+    "diiScore": -0.7,
     "agesScore": 2,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 6,
     "citations": [
-      { "source": "paper", "reference": "Cordyceps militaris cordycepin anti-inflammation (J Med Food 2017)" }
+      {
+        "source": "paper",
+        "reference": "Cordyceps militaris cordycepin anti-inflammation (J Med Food 2017)"
+      }
     ]
   },
   {
@@ -538,47 +617,42 @@
     "addedSugarG": 0,
     "carbsG": 6,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 平菇" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 平菇"
+      }
     ]
   },
   {
     "foodCanonicalName": "草菇",
     "tcmLabel": "平",
     "tcmProperty": "凉",
-    "diiScore": -0.50,
+    "diiScore": -0.5,
     "agesScore": 3,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 5,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 草菇" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 草菇"
+      }
     ]
   },
   {
     "foodCanonicalName": "茶树菇",
     "tcmLabel": "平",
     "tcmProperty": "平",
-    "diiScore": -0.50,
+    "diiScore": -0.5,
     "agesScore": 3,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 6,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 茶树菇" }
-    ]
-  },
-  {
-    "foodCanonicalName": "西红柿",
-    "tcmLabel": "平",
-    "tcmProperty": "凉",
-    "diiScore": -0.78,
-    "agesScore": 1,
-    "gi": 30,
-    "addedSugarG": 0,
-    "carbsG": 4,
-    "citations": [
-      { "source": "paper", "reference": "Lycopene anti-inflammation (Nutrients 2019)" },
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Tomato" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 茶树菇"
+      }
     ]
   },
   {
@@ -591,21 +665,30 @@
     "addedSugarG": 0,
     "carbsG": 4,
     "citations": [
-      { "source": "paper", "reference": "Lycopene anti-inflammation (Nutrients 2019)" },
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Tomato" }
+      {
+        "source": "paper",
+        "reference": "Lycopene anti-inflammation (Nutrients 2019)"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central — Tomato"
+      }
     ]
   },
   {
     "foodCanonicalName": "玉米",
     "tcmLabel": "平",
     "tcmProperty": "平",
-    "diiScore": -0.10,
+    "diiScore": -0.1,
     "agesScore": 6,
     "gi": 53,
     "addedSugarG": 0,
     "carbsG": 19,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Sweet corn" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central — Sweet corn"
+      }
     ]
   },
   {
@@ -618,34 +701,46 @@
     "addedSugarG": 0,
     "carbsG": 10,
     "citations": [
-      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Carrot" }
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central — Carrot"
+      }
     ]
   },
   {
     "foodCanonicalName": "豆芽",
     "tcmLabel": "平",
     "tcmProperty": "凉",
-    "diiScore": -0.30,
+    "diiScore": -0.3,
     "agesScore": 2,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 6,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 黄豆芽" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 黄豆芽"
+      }
     ]
   },
   {
     "foodCanonicalName": "竹笋",
     "tcmLabel": "平",
     "tcmProperty": "凉",
-    "diiScore": -0.40,
+    "diiScore": -0.4,
     "agesScore": 2,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 4,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》菜部·竹笋" },
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 鲜竹笋" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》菜部·竹笋"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 鲜竹笋"
+      }
     ]
   },
   {
@@ -658,7 +753,10 @@
     "addedSugarG": 0,
     "carbsG": 7,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》菜部·葱" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》菜部·葱"
+      }
     ]
   },
   {
@@ -671,33 +769,554 @@
     "addedSugarG": 0,
     "carbsG": 7,
     "citations": [
-      { "source": "canon", "reference": "《本草纲目》菜部·葱" }
+      {
+        "source": "canon",
+        "reference": "《本草纲目》菜部·葱"
+      }
     ]
   },
   {
     "foodCanonicalName": "土鸡汤底",
     "tcmLabel": "温和",
     "tcmProperty": "温",
-    "diiScore": 0.10,
+    "diiScore": 0.1,
     "agesScore": 800,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 1,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 鸡汤" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 鸡汤"
+      }
     ]
   },
   {
     "foodCanonicalName": "鸡汤",
     "tcmLabel": "温和",
     "tcmProperty": "温",
-    "diiScore": 0.10,
+    "diiScore": 0.1,
     "agesScore": 800,
     "gi": null,
     "addedSugarG": 0,
     "carbsG": 1,
     "citations": [
-      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 鸡汤" }
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 鸡汤"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "燕麦",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.65,
+    "agesScore": 6,
+    "gi": 55,
+    "addedSugarG": 0,
+    "carbsG": 27,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central — Oats"
+      },
+      {
+        "source": "paper",
+        "reference": "β-glucan & cardiometabolic health (Nutrients 2021)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "藜麦",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.55,
+    "agesScore": 5,
+    "gi": 53,
+    "addedSugarG": 0,
+    "carbsG": 21,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA FoodData Central — Quinoa"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "三文鱼",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.85,
+    "agesScore": 600,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Omega-3 EPA/DHA anti-inflammation (J Clin Med 2020)"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Atlantic salmon, raw"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "鸡胸肉",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": 0.05,
+    "agesScore": 800,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Chicken breast, skinless"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "蓝莓",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.92,
+    "agesScore": 1,
+    "gi": 53,
+    "addedSugarG": 0,
+    "carbsG": 14,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Anthocyanin anti-inflammation (Adv Nutr 2019)"
+      },
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Blueberries, raw"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "牛油果",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.7,
+    "agesScore": 2,
+    "gi": 15,
+    "addedSugarG": 0,
+    "carbsG": 9,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Avocado, raw"
+      },
+      {
+        "source": "paper",
+        "reference": "Monounsaturated fatty acids & inflammation (J Nutr Biochem 2019)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "核桃",
+    "tcmLabel": "平",
+    "tcmProperty": "温",
+    "diiScore": -0.6,
+    "agesScore": 4,
+    "gi": 15,
+    "addedSugarG": 0,
+    "carbsG": 14,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Walnut polyphenols & inflammation (J Nutr 2018)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "杏仁",
+    "tcmLabel": "平",
+    "tcmProperty": "温",
+    "diiScore": -0.5,
+    "agesScore": 4,
+    "gi": 15,
+    "addedSugarG": 0,
+    "carbsG": 22,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Almonds, raw"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "西红柿",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.78,
+    "agesScore": 1,
+    "gi": 30,
+    "addedSugarG": 0,
+    "carbsG": 4,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Lycopene anti-inflammation (Nutrients 2019)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "羽衣甘蓝",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.95,
+    "agesScore": 1,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 9,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Kale, raw"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "鹰嘴豆",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.55,
+    "agesScore": 3,
+    "gi": 28,
+    "addedSugarG": 0,
+    "carbsG": 27,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Chickpeas, cooked"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "黑豆",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.5,
+    "agesScore": 3,
+    "gi": 30,
+    "addedSugarG": 0,
+    "carbsG": 23,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Black beans, cooked"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "毛豆",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.45,
+    "agesScore": 2,
+    "gi": 25,
+    "addedSugarG": 0,
+    "carbsG": 11,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Edamame"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "红薯",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.4,
+    "agesScore": 4,
+    "gi": 63,
+    "addedSugarG": 0,
+    "carbsG": 20,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Sweet potato, baked"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "紫薯",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.5,
+    "agesScore": 4,
+    "gi": 60,
+    "addedSugarG": 0,
+    "carbsG": 22,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Anthocyanin from purple sweet potato (Food Sci Nutr 2020)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "南瓜",
+    "tcmLabel": "平",
+    "tcmProperty": "温",
+    "diiScore": -0.4,
+    "agesScore": 3,
+    "gi": 64,
+    "addedSugarG": 0,
+    "carbsG": 7,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Pumpkin, cooked"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "山药",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.3,
+    "agesScore": 3,
+    "gi": 51,
+    "addedSugarG": 0,
+    "carbsG": 28,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 山药"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "蒸蛋羹",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.05,
+    "agesScore": 1500,
+    "gi": null,
+    "addedSugarG": 1,
+    "carbsG": 4,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "中国食物成分表 2018 — 鸡蛋"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "希腊酸奶",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.3,
+    "agesScore": 5,
+    "gi": 11,
+    "addedSugarG": 5,
+    "carbsG": 9,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Probiotic dairy & gut inflammation (Nutrients 2020)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "豆浆",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.4,
+    "agesScore": 2,
+    "gi": 34,
+    "addedSugarG": 2,
+    "carbsG": 6,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Soy milk, unsweetened"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "全麦面包",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.2,
+    "agesScore": 7,
+    "gi": 71,
+    "addedSugarG": 2,
+    "carbsG": 41,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Whole wheat bread"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "芦笋",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.65,
+    "agesScore": 1,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 4,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Asparagus, cooked"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "鳕鱼",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.6,
+    "agesScore": 800,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Cod, baked"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "海带",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.45,
+    "agesScore": 1,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 9,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Kelp, raw"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "茄子",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.4,
+    "agesScore": 2,
+    "gi": 15,
+    "addedSugarG": 0,
+    "carbsG": 6,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Eggplant, cooked"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "黄瓜",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.5,
+    "agesScore": 1,
+    "gi": 15,
+    "addedSugarG": 0,
+    "carbsG": 4,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Cucumber, raw"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "胡椒粉",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": -0.2,
+    "agesScore": 1,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 64,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Piperine anti-inflammation (Phytother Res 2019)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "肉桂",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": -0.85,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 81,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Cinnamaldehyde anti-inflammation (Crit Rev Food Sci 2018)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "姜黄",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": -0.95,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 65,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "Curcumin anti-inflammation review (J Med Food 2017)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "绿茶",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.85,
+    "agesScore": 1,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 0,
+    "citations": [
+      {
+        "source": "paper",
+        "reference": "EGCG anti-inflammation (Nutrients 2018)"
+      }
+    ]
+  },
+  {
+    "foodCanonicalName": "酸奶",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.2,
+    "agesScore": 4,
+    "gi": 27,
+    "addedSugarG": 12,
+    "carbsG": 17,
+    "citations": [
+      {
+        "source": "modern_nutrition",
+        "reference": "USDA — Yogurt, plain low-fat"
+      }
     ]
   }
 ]

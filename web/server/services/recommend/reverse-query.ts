@@ -1,22 +1,21 @@
 /**
- * 反向查 food_classifications:按 tcm_label 取代表性条目
+ * 推荐源:
+ *   - pickAvoidList:从 food_classifications 取标 '发' 的食材作为"避开"清单
+ *   - pickThreeMeals:从静态菜式模板库 data/recipes/v1.json 选 3 餐
  *
- * 群体维度:不依赖具体用户已吃过什么(那需要解密 recognized_items_ciphertext),
- * 而是用人群层面的"常见发物 / 常见平和食物"作为推荐来源,符合 plan U13a
- * "所有推荐只用群体维度,不做个体化"的边界。
+ * 设计变更(v2):菜式不再随机堆砌食材,而是从 hand-curated 的 ~20 个
+ * 现代健康菜式模板里选 — 每条菜式有完整搭配 + 现代营养来源引用。
  *
- * 早 / 午 / 晚 模板按食材类型常识划分:粥/蛋类 → 早,主菜/汤 → 午晚。
- * 这是 v1 简化模板;Phase 2 可接入 LLM 生成或人工运营推荐位。
+ * 群体维度:不读用户已吃,只按 mode + slot 过滤。
  */
 
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import type { FoodClassifierStore, FoodClassification, Citation } from '../classifier';
 import type { AvoidItem, MealOption } from './types';
 
 const AVOID_LIMIT = 4;
-const MILD_POOL_LIMIT = 12;
-const CALM_POOL_LIMIT = 12;
 
-/** 取头一条引用做卡片配文(UI 单卡只展示 1 条) */
 function firstCitation(c: FoodClassification): Citation[] {
   return c.citations.length > 0 ? [c.citations[0]] : [];
 }
@@ -26,33 +25,58 @@ export async function pickAvoidList(store: FoodClassifierStore): Promise<AvoidIt
   return fa.map((f) => ({ name: f.foodCanonicalName, citations: firstCitation(f) }));
 }
 
-/**
- * 通用 3 餐模板 — 优先从"平"取主食 + 早餐,从"温和"取主菜
- */
-export async function pickThreeMeals(store: FoodClassifierStore): Promise<MealOption[]> {
-  const [calmPool, mildPool] = await Promise.all([
-    store.listByLabel('平', CALM_POOL_LIMIT),
-    store.listByLabel('温和', MILD_POOL_LIMIT)
-  ]);
+interface RecipeTemplate {
+  name: string;
+  slot: 'breakfast' | 'lunch' | 'dinner';
+  tier: 'calm' | 'mild';
+  items: string[];
+  citation: Citation;
+}
 
-  // 简化:按池子顺序轮转分配,保证每餐 3-4 项 + 至少 1 条引用
-  const calmNames = calmPool.map((c) => c.foodCanonicalName);
-  const mildNames = mildPool.map((c) => c.foodCanonicalName);
-  const calmCit = calmPool.flatMap((c) => firstCitation(c));
-  const mildCit = mildPool.flatMap((c) => firstCitation(c));
+const RECIPES_PATH = join(__dirname, '..', '..', '..', 'data', 'recipes', 'v1.json');
+let cachedRecipes: RecipeTemplate[] | null = null;
 
-  const slots: MealOption['slot'][] = ['breakfast', 'lunch', 'dinner'];
-  const meals: MealOption[] = [];
-
-  for (let i = 0; i < 3; i++) {
-    // 每餐 3-4 项:1-2 个"平"主食/底 + 1-2 个"温和"配菜
-    const calmStart = (i * 2) % Math.max(calmNames.length, 1);
-    const mildStart = (i * 2) % Math.max(mildNames.length, 1);
-    const calmPick = calmNames.slice(calmStart, calmStart + 2);
-    const mildPick = mildNames.slice(mildStart, mildStart + 2);
-    const items = [...calmPick, ...mildPick].filter((s, idx, arr) => arr.indexOf(s) === idx).slice(0, 4);
-    const citations = [calmCit[i], mildCit[i]].filter((c): c is Citation => Boolean(c)).slice(0, 1);
-    meals.push({ slot: slots[i], items, citations });
+function loadRecipes(): RecipeTemplate[] {
+  if (cachedRecipes) return cachedRecipes;
+  try {
+    cachedRecipes = JSON.parse(readFileSync(RECIPES_PATH, 'utf8')) as RecipeTemplate[];
+  } catch (err) {
+    console.error('[recommend] failed to load recipes/v1.json', err);
+    cachedRecipes = [];
   }
-  return meals;
+  return cachedRecipes;
+}
+
+/**
+ * 取每天浮动但稳定的索引(同一天同一选,跨天换)
+ * 用 UTC 日期做 hash 避免不同时区分裂
+ */
+function dailyPick<T>(pool: T[], offset = 0): T | undefined {
+  if (pool.length === 0) return undefined;
+  const now = new Date();
+  const dayKey = Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / 86400000);
+  return pool[(dayKey + offset) % pool.length];
+}
+
+/**
+ * 取 3 餐:从菜式库按 slot 各抽一道,优先 calm tier;若 calm 池空 → 退到 mild
+ */
+export async function pickThreeMeals(_store: FoodClassifierStore): Promise<MealOption[]> {
+  const recipes = loadRecipes();
+  const slots: Array<MealOption['slot']> = ['breakfast', 'lunch', 'dinner'];
+
+  return slots.map((slot, idx) => {
+    const calmPool = recipes.filter((r) => r.slot === slot && r.tier === 'calm');
+    const mildPool = recipes.filter((r) => r.slot === slot && r.tier === 'mild');
+    const pick = dailyPick(calmPool, idx) ?? dailyPick(mildPool, idx);
+    if (!pick) {
+      return { slot, items: [], citations: [] };
+    }
+    // items 第一项放菜名,之后是主料预览(前 3 项)
+    return {
+      slot,
+      items: [pick.name, ...pick.items.slice(0, 3)],
+      citations: [pick.citation]
+    };
+  });
 }
