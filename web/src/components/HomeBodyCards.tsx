@@ -8,7 +8,7 @@
 
 import { Link } from 'wouter';
 import type { YanScoreToday } from '../services/symptoms';
-import { asset } from '../services/assets';
+import { BodyPartIcon, type BodyPartVariant } from './BodyPartIcon';
 
 interface Props {
   yanScore: YanScoreToday | null;
@@ -20,14 +20,14 @@ interface PartConfig {
   emptyHint: string;
   ctaLabel: string;
   ctaHref: string;
-  icon: string;
+  variant: BodyPartVariant;
 }
 
 const PARTS: PartConfig[] = [
-  { key: 'food', title: '饮食', emptyHint: '今日还没拍餐', ctaLabel: '拍一张', ctaHref: '/camera', icon: 'body-food.png' },
-  { key: 'symptom', title: '体感', emptyHint: '今日还没打卡', ctaLabel: '去打卡', ctaHref: '/check-in/step1', icon: 'body-symptom.png' },
-  { key: 'env', title: '环境', emptyHint: '环境数据待接入', ctaLabel: '', ctaHref: '', icon: 'body-env.png' },
-  { key: 'activity', title: '活动', emptyHint: '步数 / 心率待接入', ctaLabel: '', ctaHref: '', icon: 'body-activity.png' }
+  { key: 'food', title: '饮食', emptyHint: '今日还没拍餐', ctaLabel: '拍一张', ctaHref: '/camera', variant: 'food' },
+  { key: 'symptom', title: '体感', emptyHint: '今日还没打卡', ctaLabel: '去打卡', ctaHref: '/check-in/step1', variant: 'symptom' },
+  { key: 'env', title: '环境', emptyHint: '环境数据待接入', ctaLabel: '', ctaHref: '', variant: 'env' },
+  { key: 'activity', title: '活动', emptyHint: '步数 / 心率待接入', ctaLabel: '', ctaHref: '', variant: 'activity' }
 ];
 
 function partColor(score: number | null): string {
@@ -57,11 +57,9 @@ export function HomeBodyCards({ yanScore }: Props) {
           const score = yanScore?.partScores?.[p.key] ?? null;
           return (
             <div key={p.key} className="rounded-2xl bg-white px-5 py-4 min-h-[160px] flex flex-col relative overflow-hidden">
-              <img
-                src={asset(p.icon)}
-                alt=""
-                className="absolute -right-2 -top-2 w-16 h-16 object-contain opacity-60 pointer-events-none"
-                aria-hidden="true"
+              <BodyPartIcon
+                variant={p.variant}
+                className="absolute -right-2 -top-2 w-16 h-16 opacity-80 pointer-events-none"
               />
               <p className="text-xs text-ink/50 relative z-10">{p.title}</p>
               {score !== null ? (
