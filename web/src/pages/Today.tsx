@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
-import { fetchSugarToday, SUGAR_BADGE_ICON, type SugarToday } from '../services/sugar';
+import { fetchSugarToday, type SugarToday } from '../services/sugar';
 import { fetchHealthToday, postHealthSteps, type HealthDaily } from '../services/health';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { upsertTodayChallenges, fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
@@ -23,6 +23,7 @@ import { InappRemindersBanner } from '../components/InappRemindersBanner';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
 import { TodayWeekStrip } from '../components/TodayWeekStrip';
 import { PerfectDayRing } from '../components/PerfectDayRing';
+import { SugarBadgeIcon } from '../components/SugarBadgeIcon';
 import { Icon } from '../components/Icon';
 import { track } from '../services/tracker';
 
@@ -232,12 +233,7 @@ export function Today() {
               <span className="text-xs text-ink/45">本月勋章</span>
               {sugar.monthlyBadges.map((b) => (
                 <div key={b.kind} className="flex items-center gap-1">
-                  <img
-                    src={asset(SUGAR_BADGE_ICON[b.kind])}
-                    alt={b.label}
-                    className="w-7 h-7 object-contain"
-                    loading="lazy"
-                  />
+                  <SugarBadgeIcon variant={b.kind} className="w-7 h-7" />
                   <span className="text-xs text-ink">×{b.count}</span>
                 </div>
               ))}
