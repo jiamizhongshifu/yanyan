@@ -52,11 +52,13 @@ const compressImageMock = vi.fn();
 const uploadPhotoMock = vi.fn();
 const postMealMock = vi.fn();
 const postMealFeedbackMock = vi.fn();
+const fetchMealIllustrationMock = vi.fn().mockResolvedValue(null);
 vi.mock('../services/meals', () => ({
   compressImage: (...args: unknown[]) => compressImageMock(...args),
   uploadPhoto: (...args: unknown[]) => uploadPhotoMock(...args),
   postMeal: (...args: unknown[]) => postMealMock(...args),
-  postMealFeedback: (...args: unknown[]) => postMealFeedbackMock(...args)
+  postMealFeedback: (...args: unknown[]) => postMealFeedbackMock(...args),
+  fetchMealIllustration: (...args: unknown[]) => fetchMealIllustrationMock(...args)
 }));
 
 // crypto.randomUUID 在 jsdom 老版本可能缺失
@@ -75,6 +77,8 @@ beforeEach(() => {
   postMealMock.mockReset();
   postMealFeedbackMock.mockReset();
   postMealFeedbackMock.mockResolvedValue(true);
+  fetchMealIllustrationMock.mockReset();
+  fetchMealIllustrationMock.mockResolvedValue(null);
   useLastMeal.getState().set(null);
   supabaseMockState.session = { access_token: 'fake-jwt', user: { id: 'u1' } };
 });
@@ -150,9 +154,9 @@ describe('U6 MealResult page', () => {
     });
 
     render(<MealResult />);
-    // 抗炎指数:微火 → 显示标签"轻盈" + 4 星
+    // 抗炎指数:fireScore 33.3 → antiInflam 67;级别"微火" → 显示"轻盈" + 4 星
     expect(screen.getByTestId('fire-level')).toHaveTextContent('轻盈');
-    expect(screen.getByTestId('fire-score')).toHaveTextContent('4');
+    expect(screen.getByTestId('fire-score')).toHaveTextContent('67');
     expect(screen.getAllByTestId('food-item-card')).toHaveLength(2);
     expect(screen.getByText(/某神秘食物/)).toBeInTheDocument();
   });

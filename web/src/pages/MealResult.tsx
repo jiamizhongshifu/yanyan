@@ -1,23 +1,31 @@
 /**
- * 餐食结果页 — 红/黄/绿火分 + 食物条目 + 误识别 / 反例 反馈
+ * 餐食结果页 — 抗炎指数 + AI 蜡笔插画 + 食物条目 + 反馈
  *
- * R8: 无 AI 人格化主播 — 用典籍引用 + 数据简语
- * R7: 食物条目附引用
- * R9: 用户可标记误识别(per item)
+ * Hero 区结构(从上到下):
+ *   1. AI 生成的蜡笔插画(异步加载;loading 时显示骨架屏 + mascot)
+ *   2. "这一餐"
+ *   3. 大号 抗炎指数 数字(0-100)
+ *   4. 副位:5 颗星 + 等级标签(平/轻盈/微暖/留心)
+ *   5. mascot + 陪伴语
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { FoodItemCard } from '../components/FoodItemCard';
 import { Stars } from '../components/InflammationDial';
-import { postMealFeedback, type FireLevel } from '../services/meals';
+import {
+  fetchMealIllustration,
+  postMealFeedback,
+  type FireLevel
+} from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
 import { asset } from '../services/assets';
 import {
   LEVEL_TO_ENCOURAGEMENT,
   LEVEL_TO_LABEL,
   LEVEL_TO_STARS,
-  SCORE_LABEL
+  SCORE_LABEL,
+  scoreToAntiInflam
 } from '../services/score-display';
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
@@ -30,15 +38,34 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
 export function MealResult() {
   const [, navigate] = useLocation();
   const result = useLastMeal((s) => s.result);
+  const [illustrationUrl, setIllustrationUrl] = useState<string | null>(null);
+  const [illustrationLoading, setIllustrationLoading] = useState(false);
 
   useEffect(() => {
     if (!result) {
-      // 没结果直接跳回拍照页(刷新页面 / 直链场景)
       navigate('/camera');
     }
   }, [result, navigate]);
 
+  // 进入页面就请求插画(server 端命中缓存秒返回,miss 时触发生成 ~10-30s)
+  useEffect(() => {
+    if (!result) return;
+    let cancelled = false;
+    setIllustrationLoading(true);
+    const foodNames = result.items.map((it) => it.name);
+    void fetchMealIllustration(result.mealId, foodNames).then((url) => {
+      if (cancelled) return;
+      setIllustrationUrl(url);
+      setIllustrationLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [result]);
+
   if (!result) return null;
+
+  const antiInflam = scoreToAntiInflam(result.fireScore);
 
   const handleFlag = async (itemName: string, kind: 'misrecognized' | 'no_reaction') => {
     await postMealFeedback(result.mealId, itemName, kind);
@@ -46,30 +73,51 @@ export function MealResult() {
 
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
-      {/* 餐盘分析 hero */}
-      <div className="flex justify-center mb-4">
-        <img
-          src={asset('meal-analysis.png')}
-          alt=""
-          className="w-40 h-40 object-contain"
-          loading="lazy"
-        />
+      {/* AI 蜡笔插画 hero — 加载中骨架,加载完成后渐显 */}
+      <div className="flex justify-center mb-5">
+        {illustrationUrl ? (
+          <img
+            src={illustrationUrl}
+            alt="这一餐的蜡笔插画"
+            className="w-56 h-56 object-contain rounded-3xl animate-fadein"
+            loading="eager"
+          />
+        ) : (
+          <div className="w-56 h-56 rounded-3xl bg-white/60 flex items-center justify-center relative overflow-hidden">
+            <img
+              src={asset('mascot-happy.png')}
+              alt=""
+              className="w-24 h-24 object-contain opacity-90"
+              loading="eager"
+            />
+            {illustrationLoading && (
+              <div className="absolute inset-x-0 bottom-3 text-center">
+                <p className="text-[11px] text-ink/45">水豚正在画这一餐…</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
       <header className="mb-8 text-center">
         <p className="text-sm text-ink/60">这一餐</p>
-        <div className="mt-3 flex justify-center" data-testid="fire-stars">
-          <Stars filled={LEVEL_TO_STARS[result.level]} className="text-5xl" />
-        </div>
         <p
-          className={`mt-2 text-2xl font-medium ${LEVEL_COLOR[result.level]}`}
-          data-testid="fire-level"
+          className={`mt-2 text-7xl font-light leading-none ${LEVEL_COLOR[result.level]}`}
+          data-testid="fire-score"
         >
-          {LEVEL_TO_LABEL[result.level]}
+          {antiInflam}
         </p>
-        <p className="mt-0.5 text-xs text-ink/40">
-          {SCORE_LABEL} ★<span data-testid="fire-score">{LEVEL_TO_STARS[result.level]}</span> / 5
+        <p className="mt-2 flex items-center justify-center gap-2 text-sm text-ink/55">
+          <span>{SCORE_LABEL}</span>
+          <Stars filled={LEVEL_TO_STARS[result.level]} className="text-base" testId="fire-stars" />
+          <span
+            className={`font-medium ${LEVEL_COLOR[result.level]}`}
+            data-testid="fire-level"
+          >
+            {LEVEL_TO_LABEL[result.level]}
+          </span>
         </p>
-        {/* 全部用 happy mascot — 不再用 worried 给用户造成焦虑 */}
+
         <div className="mt-5 flex items-center justify-center gap-3 px-2">
           <img
             src={asset('mascot-happy.png')}

@@ -25,6 +25,11 @@ import {
   type LlmFoodRecognizer
 } from '../../services/recognition';
 import { buildQwenVisionFromEnv } from '../../services/llm/qwen-vision';
+import {
+  generateAndCacheIllustration,
+  illustrationPublicUrl,
+  lookupCachedIllustration
+} from '../../services/llm/wanx-image';
 
 const CreateMealBody = z.object({
   storageKey: z.string().min(1),
@@ -34,6 +39,10 @@ const CreateMealBody = z.object({
 const FeedbackBody = z.object({
   itemName: z.string().min(1),
   kind: z.enum(['misrecognized', 'no_reaction'])
+});
+
+const IllustrationBody = z.object({
+  foodNames: z.array(z.string().min(1)).min(1).max(10)
 });
 
 export interface RegisterMealsOptions {
@@ -124,6 +133,58 @@ export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMe
       };
     }
     return { ok: true, ...outcome.result };
+  });
+
+  app.get<{ Params: { id: string } }>('/meals/:id/illustration', async (req, reply) => {
+    const user = requireUser(req, reply);
+    if (!user) return;
+    // 验证 meal 属于该用户
+    const owns = await withClient(async (c) => {
+      const r = await c.query<{ id: string }>(
+        'SELECT id FROM meals WHERE id = $1 AND user_id = $2 LIMIT 1',
+        [req.params.id, user.userId]
+      );
+      return r.rowCount > 0;
+    });
+    if (!owns) {
+      reply.code(404);
+      return { ok: false, error: 'not_found' };
+    }
+    const cached = await lookupCachedIllustration(req.params.id);
+    if (cached) return { ok: true, url: cached };
+    reply.code(404);
+    return { ok: false, error: 'not_generated_yet', url: null };
+  });
+
+  app.post<{ Params: { id: string } }>('/meals/:id/illustration', async (req, reply) => {
+    const user = requireUser(req, reply);
+    if (!user) return;
+    const parsed = IllustrationBody.safeParse(req.body);
+    if (!parsed.success) {
+      reply.code(400);
+      return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
+    }
+    const owns = await withClient(async (c) => {
+      const r = await c.query<{ id: string }>(
+        'SELECT id FROM meals WHERE id = $1 AND user_id = $2 LIMIT 1',
+        [req.params.id, user.userId]
+      );
+      return r.rowCount > 0;
+    });
+    if (!owns) {
+      reply.code(404);
+      return { ok: false, error: 'not_found' };
+    }
+    // 缓存命中直接返
+    const cached = await lookupCachedIllustration(req.params.id);
+    if (cached) return { ok: true, url: cached };
+    // 生成 + 上传
+    const url = await generateAndCacheIllustration(req.params.id, parsed.data.foodNames);
+    if (!url) {
+      reply.code(503);
+      return { ok: false, error: 'generation_failed' };
+    }
+    return { ok: true, url: illustrationPublicUrl(req.params.id) };
   });
 
   app.post<{ Params: { id: string } }>('/meals/:id/feedback', async (req, reply) => {

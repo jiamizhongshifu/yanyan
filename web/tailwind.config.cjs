@@ -21,6 +21,15 @@ module.exports = {
           '"Source Han Sans"',
           'sans-serif'
         ]
+      },
+      keyframes: {
+        fadein: {
+          '0%': { opacity: '0', transform: 'scale(0.96)' },
+          '100%': { opacity: '1', transform: 'scale(1)' }
+        }
+      },
+      animation: {
+        fadein: 'fadein 0.4s ease-out'
       }
     }
   },

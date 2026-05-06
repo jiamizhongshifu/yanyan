@@ -117,6 +117,36 @@ export async function postMeal(storageKey: string): Promise<
   return { kind: 'error', message: res.fallbackMessage };
 }
 
+/**
+ * 拉取或生成餐食插画
+ *   1. GET /meals/:id/illustration → 命中缓存秒返
+ *   2. miss → POST 触发生成(异步轮询 + 上传 Supabase ~15-30s)
+ *   3. 任何环节失败返回 null,UI 会兜底到 mascot
+ */
+export async function fetchMealIllustration(mealId: string, foodNames: string[]): Promise<string | null> {
+  const token = await getCurrentAccessToken();
+  if (!token) return null;
+
+  // 先 GET 看缓存
+  const getRes = await request<{ ok: true; url: string }>({
+    url: `/meals/${mealId}/illustration`,
+    method: 'GET',
+    authToken: token
+  });
+  if (getRes.ok && getRes.data?.url) return getRes.data.url;
+
+  // miss → POST 触发生成,server 会同步等到结果返回
+  const postRes = await request<{ ok: true; url: string }>({
+    url: `/meals/${mealId}/illustration`,
+    method: 'POST',
+    authToken: token,
+    data: { foodNames },
+    timeoutMs: 55_000 // 与 server 的 45s budget + 网络 buffer 对齐
+  });
+  if (postRes.ok && postRes.data?.url) return postRes.data.url;
+  return null;
+}
+
 export async function postMealFeedback(
   mealId: string,
   itemName: string,

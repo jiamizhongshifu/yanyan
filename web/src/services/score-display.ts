@@ -49,6 +49,11 @@ export function scoreToStars(fireScore: number): number {
   return Math.max(1, Math.min(5, Math.round((inv / 100) * 4 + 1)));
 }
 
+/** 0-100 fireScore(0=最好) → 0-100 抗炎指数(100=最好) */
+export function scoreToAntiInflam(fireScore: number): number {
+  return Math.max(0, Math.min(100, Math.round(100 - fireScore)));
+}
+
 interface RatedLabel {
   text: string;
   tone: 'good' | 'mild' | 'neutral';
