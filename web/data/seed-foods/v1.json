@@ -633,5 +633,71 @@
     "citations": [
       { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 黄豆芽" }
     ]
+  },
+  {
+    "foodCanonicalName": "竹笋",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.40,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 4,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》菜部·竹笋" },
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 鲜竹笋" }
+    ]
+  },
+  {
+    "foodCanonicalName": "青葱",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": -0.35,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 7,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》菜部·葱" }
+    ]
+  },
+  {
+    "foodCanonicalName": "大葱",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": -0.35,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 7,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》菜部·葱" }
+    ]
+  },
+  {
+    "foodCanonicalName": "土鸡汤底",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.10,
+    "agesScore": 800,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 1,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 鸡汤" }
+    ]
+  },
+  {
+    "foodCanonicalName": "鸡汤",
+    "tcmLabel": "温和",
+    "tcmProperty": "温",
+    "diiScore": 0.10,
+    "agesScore": 800,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 1,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 鸡汤" }
+    ]
   }
 ]

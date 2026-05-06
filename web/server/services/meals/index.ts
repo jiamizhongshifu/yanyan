@@ -16,6 +16,7 @@
  */
 
 import type { FoodClassification, FoodClassifierStore } from '../classifier';
+import type { LlmDeriver } from '../classifier';
 import { encryptField } from '../../crypto/envelope';
 import type { LlmFoodRecognizer } from '../recognition';
 import { LOW_CONFIDENCE_THRESHOLD } from '../recognition/types';
@@ -23,12 +24,20 @@ import type { MealRow, MealStore } from './store';
 import { aggregateMeal, scoreToLevel, type FireLevel, type MealAggregate } from './aggregator';
 import { summaryFromCounts, westernSummary } from './store';
 
+/** auto-derive 入库的最低 confidence 阈值;低于此只用作本次显示,不持久化 */
+const AUTO_DERIVE_PERSIST_CONFIDENCE = 0.6;
+
+/** 同一进程内 in-flight derive 去重,避免并发请求重复调 LLM */
+const inflightDerive = new Map<string, Promise<FoodClassification | null>>();
+
 export interface MealsDeps {
   mealStore: MealStore;
   classifierStore: FoodClassifierStore;
   recognizer: LlmFoodRecognizer;
   /** 未识别食物名进入回填队列 */
   onMissingFood?: (name: string) => void;
+  /** 可选:DB 未命中时调 LLM 派生分类 + 自动入库,空时退化到 onMissingFood */
+  llmDeriver?: LlmDeriver;
 }
 
 export interface CreateMealResult {
@@ -66,11 +75,77 @@ export interface CreateMealParams {
 }
 
 /**
+ * 查 DB,miss 时若有 llmDeriver 调 LLM 派生 + 高置信入库;否则返回 null
+ * 同一进程并发 dedupe + 仅传入正常长度名字(过滤典型 hallucination)
+ */
+async function findOrDerive(
+  deps: Pick<MealsDeps, 'classifierStore' | 'llmDeriver'>,
+  name: string
+): Promise<FoodClassification | null> {
+  const cls = await deps.classifierStore.findByName(name);
+  if (cls) return cls;
+  if (!deps.llmDeriver) return null;
+  // 过滤明显非食物名:< 2 字 / > 16 字 / 含大量数字
+  const t = name.trim();
+  if (t.length < 2 || t.length > 16 || /\d{2,}/.test(t)) return null;
+
+  // 进程内 dedupe(防一次请求里多个相同食材并发调)
+  if (inflightDerive.has(t)) return inflightDerive.get(t)!;
+  const p = (async () => {
+    try {
+      const d = await deps.llmDeriver!.derive(t);
+      if (!d) return null;
+      // 高置信 → 入库,后续命中走缓存;低置信只用于本次显示
+      if (d.confidence >= AUTO_DERIVE_PERSIST_CONFIDENCE) {
+        try {
+          return await deps.classifierStore.upsert({
+            foodCanonicalName: t,
+            tcmLabel: d.tcmLabel,
+            tcmProperty: d.tcmProperty,
+            diiScore: null,
+            agesScore: null,
+            gi: null,
+            addedSugarG: d.addedSugarG ?? null,
+            carbsG: d.carbsG ?? null,
+            citations: d.citations,
+            sourceVersions: { llmModel: d.modelVersion, autoDerivedAt: new Date().toISOString() }
+          });
+        } catch (err) {
+          console.error('[meals] upsert auto-derive failed', t, err);
+          return null;
+        }
+      }
+      // 低置信:做一个 in-memory FoodClassification 给本次用,但不入库
+      return {
+        id: `auto-${t}`,
+        foodCanonicalName: t,
+        tcmLabel: d.tcmLabel,
+        tcmProperty: d.tcmProperty,
+        diiScore: null,
+        agesScore: null,
+        gi: null,
+        addedSugarG: d.addedSugarG ?? null,
+        carbsG: d.carbsG ?? null,
+        citations: d.citations,
+        sourceVersions: { llmModel: d.modelVersion, autoDerivedAt: new Date().toISOString() }
+      };
+    } catch (err) {
+      console.error('[meals] llm derive failed', t, err);
+      return null;
+    } finally {
+      inflightDerive.delete(t);
+    }
+  })();
+  inflightDerive.set(t, p);
+  return p;
+}
+
+/**
  * 给定一组 RecognizedItem,跑 dish-level + ingredient-level 分类查库 + synth + aggregate
  * 复用于 createMeal 与 updateMealItems(用户编辑后的修正)
  */
 async function classifyAndAggregate(
-  deps: Pick<MealsDeps, 'classifierStore' | 'onMissingFood'>,
+  deps: Pick<MealsDeps, 'classifierStore' | 'onMissingFood' | 'llmDeriver'>,
   items: import('../recognition/types').RecognizedItem[]
 ): Promise<{
   classifications: Array<FoodClassification | null>;
@@ -81,15 +156,20 @@ async function classifyAndAggregate(
   const classifications: Array<FoodClassification | null> = [];
   const ingredientClassifications: Array<Array<{ name: string; classification: FoodClassification | null }>> = [];
   for (const item of items) {
-    let cls = await deps.classifierStore.findByName(item.name);
+    let cls = await findOrDerive(deps, item.name);
     const ingDetails: Array<{ name: string; classification: FoodClassification | null }> = [];
     if (item.ingredients && item.ingredients.length > 0) {
-      const ingClasses: FoodClassification[] = [];
-      for (const ing of item.ingredients) {
-        const ingCls = await deps.classifierStore.findByName(ing);
-        ingDetails.push({ name: ing, classification: ingCls });
-        if (ingCls) ingClasses.push(ingCls);
+      // 并行查 + 派生所有主料(每个最多 1 次 LLM 调用,~1-2s × 并行)
+      const ingResults = await Promise.all(
+        item.ingredients.map(async (ing) => {
+          const c = await findOrDerive(deps, ing);
+          return { name: ing, classification: c };
+        })
+      );
+      for (const r of ingResults) {
+        ingDetails.push(r);
       }
+      const ingClasses = ingResults.flatMap((r) => (r.classification ? [r.classification] : []));
       if (!cls && ingClasses.length > 0) {
         cls = synthesizeFromIngredients(item.name, ingClasses, item.ingredients.length);
       }

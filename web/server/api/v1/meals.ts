@@ -11,8 +11,11 @@ import { withClient } from '../../db/client';
 import { requireUser } from '../../auth';
 import {
   PgFoodClassifierStore,
-  type FoodClassifierStore
+  RealLlmDeriver,
+  type FoodClassifierStore,
+  type LlmDeriver
 } from '../../services/classifier';
+import { getTextClient } from '../../services/llm/deepseek';
 import {
   appendMealFeedback,
   createMeal,
@@ -69,6 +72,8 @@ export interface RegisterMealsOptions {
     classifierStore?: FoodClassifierStore;
     recognizer?: LlmFoodRecognizer;
     onMissingFood?: (name: string) => void;
+    /** 注入 LLM 派生器(测试用 stub);prod 走 RealLlmDeriver(DeepSeek) */
+    llmDeriver?: LlmDeriver;
     /** 测试时注入,用 userId → DEK 密文(模拟 users.dek_ciphertext_b64 取值) */
     getUserDek?: (userId: string) => Promise<string | null>;
   };
@@ -101,6 +106,9 @@ export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMe
   const recognizer =
     opts.deps?.recognizer ?? buildDefaultRecognizer();
   const onMissingFood = opts.deps?.onMissingFood;
+  // LLM 派生器:DEEPSEEK_API_KEY 配置时自动启用,DB 未命中走 LLM 推断 + 入库
+  const llmDeriver: LlmDeriver | undefined =
+    opts.deps?.llmDeriver ?? (process.env.DEEPSEEK_API_KEY ? new RealLlmDeriver(getTextClient()) : undefined);
   const getUserDek = opts.deps?.getUserDek ?? defaultGetUserDek;
 
   app.post('/meals', async (req, reply) => {
@@ -120,7 +128,7 @@ export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMe
     let outcome;
     try {
       outcome = await createMeal(
-        { mealStore, classifierStore, recognizer, onMissingFood },
+        { mealStore, classifierStore, recognizer, onMissingFood, llmDeriver },
         {
           userId: user.userId,
           userDekCiphertextB64: dekCiphertextB64,
@@ -230,7 +238,7 @@ export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMe
       return { ok: false, error: 'not_found' };
     }
     const result = await updateMealItems(
-      { mealStore, classifierStore, recognizer, onMissingFood },
+      { mealStore, classifierStore, recognizer, onMissingFood, llmDeriver },
       {
         userId: user.userId,
         userDekCiphertextB64: dekCiphertextB64,
@@ -260,7 +268,7 @@ export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMe
       return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
     }
     const entry = await appendMealFeedback(
-      { mealStore, classifierStore, recognizer, onMissingFood },
+      { mealStore, classifierStore, recognizer, onMissingFood, llmDeriver },
       {
         userId: user.userId,
         mealId: req.params.id,
