@@ -183,7 +183,8 @@ export function Insights() {
             emoji: b.emoji,
             label: b.label,
             count: b.count,
-            iconFile: SUGAR_BADGE_ICON[b.kind]
+            iconFile: SUGAR_BADGE_ICON[b.kind],
+            kind: b.kind
           }))}
         />
       )}

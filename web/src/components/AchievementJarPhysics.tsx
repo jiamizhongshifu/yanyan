@@ -11,14 +11,27 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Matter from 'matter-js';
-import { asset } from '../services/assets';
 import { orangeIconDataUrl } from './OrangeIcon';
+import { SugarBadgeIcon, sugarBadgeDataUrl, type SugarBadgeVariant } from './SugarBadgeIcon';
 
 interface SugarBadgeInput {
   emoji: string;
   label: string;
   count: number;
+  /** 老接口字段;新版用 kind 决定 SVG 变体,iconFile 仅供 fallback */
   iconFile: string;
+  kind?: SugarBadgeVariant;
+}
+
+/** 把后端返回的 iconFile / 老 kind 名映射到 SVG 变体 */
+function resolveSugarKind(b: SugarBadgeInput): SugarBadgeVariant {
+  if (b.kind) return b.kind;
+  const f = b.iconFile;
+  if (f.includes('lollipop')) return 'lollipop';
+  if (f.includes('cola')) return 'cola';
+  if (f.includes('milktea')) return 'milktea';
+  if (f.includes('chocolate')) return 'chocolate';
+  return 'lollipop';
 }
 
 interface Props {
@@ -81,8 +94,9 @@ export function AchievementJarPhysics({
     for (let i = 0; i < great; i++) list.push({ iconUrl: orangeIconDataUrl('great'), size: 32 });
     for (let i = 0; i < nice; i++) list.push({ iconUrl: orangeIconDataUrl('nice'), size: 28 });
     for (const sb of sugarBadges) {
+      const kind = resolveSugarKind(sb);
       for (let i = 0; i < sb.count; i++) {
-        list.push({ iconUrl: asset(sb.iconFile), size: 30 });
+        list.push({ iconUrl: sugarBadgeDataUrl(kind), size: 30 });
       }
     }
     return list.slice(0, 24);
@@ -254,7 +268,7 @@ export function AchievementJarPhysics({
           <div className="grid grid-cols-2 gap-3">
             {sugarBadges.map((b, i) => (
               <div key={i} className="flex items-center gap-2.5">
-                <img src={asset(b.iconFile)} alt={b.label} className="w-9 h-9 object-contain" />
+                <SugarBadgeIcon variant={resolveSugarKind(b)} className="w-9 h-9" />
                 <div className="text-sm">
                   <span className="text-ink">{b.label}</span>
                   <span className="ml-1 text-ink/45">×{b.count}</span>
