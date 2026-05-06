@@ -459,5 +459,179 @@
     "citations": [
       { "source": "modern_nutrition", "reference": "中国营养学会 2023:市售果汁 ~24g 添加糖/250ml" }
     ]
+  },
+  {
+    "foodCanonicalName": "香菇",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.55,
+    "agesScore": 4,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 7,
+    "citations": [
+      { "source": "canon", "reference": "《本草纲目》菜部·香蕈", "excerpt": "气味甘平无毒,益气不饥,治风破血" },
+      { "source": "paper", "reference": "Mushroom β-glucans 抗炎 (Front Immunol 2020)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "金针菇",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.40,
+    "agesScore": 3,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 6,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Flammulina velutipes" },
+      { "source": "paper", "reference": "Flammulina polysaccharides immunomodulatory (J Funct Foods 2019)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "杏鲍菇",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.50,
+    "agesScore": 3,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 5,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 杏鲍菇" }
+    ]
+  },
+  {
+    "foodCanonicalName": "竹荪",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.60,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 5,
+    "citations": [
+      { "source": "canon", "reference": "《中华本草》第二册" },
+      { "source": "paper", "reference": "Dictyophora polysaccharide anti-inflammation (Carbohydr Polym 2018)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "虫草花",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.70,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 6,
+    "citations": [
+      { "source": "paper", "reference": "Cordyceps militaris cordycepin anti-inflammation (J Med Food 2017)" }
+    ]
+  },
+  {
+    "foodCanonicalName": "平菇",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.45,
+    "agesScore": 3,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 6,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 平菇" }
+    ]
+  },
+  {
+    "foodCanonicalName": "草菇",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.50,
+    "agesScore": 3,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 5,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 草菇" }
+    ]
+  },
+  {
+    "foodCanonicalName": "茶树菇",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.50,
+    "agesScore": 3,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 6,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 茶树菇" }
+    ]
+  },
+  {
+    "foodCanonicalName": "西红柿",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.78,
+    "agesScore": 1,
+    "gi": 30,
+    "addedSugarG": 0,
+    "carbsG": 4,
+    "citations": [
+      { "source": "paper", "reference": "Lycopene anti-inflammation (Nutrients 2019)" },
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Tomato" }
+    ]
+  },
+  {
+    "foodCanonicalName": "番茄",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.78,
+    "agesScore": 1,
+    "gi": 30,
+    "addedSugarG": 0,
+    "carbsG": 4,
+    "citations": [
+      { "source": "paper", "reference": "Lycopene anti-inflammation (Nutrients 2019)" },
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Tomato" }
+    ]
+  },
+  {
+    "foodCanonicalName": "玉米",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.10,
+    "agesScore": 6,
+    "gi": 53,
+    "addedSugarG": 0,
+    "carbsG": 19,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Sweet corn" }
+    ]
+  },
+  {
+    "foodCanonicalName": "胡萝卜",
+    "tcmLabel": "平",
+    "tcmProperty": "平",
+    "diiScore": -0.42,
+    "agesScore": 3,
+    "gi": 39,
+    "addedSugarG": 0,
+    "carbsG": 10,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "USDA FoodData Central — Carrot" }
+    ]
+  },
+  {
+    "foodCanonicalName": "豆芽",
+    "tcmLabel": "平",
+    "tcmProperty": "凉",
+    "diiScore": -0.30,
+    "agesScore": 2,
+    "gi": null,
+    "addedSugarG": 0,
+    "carbsG": 6,
+    "citations": [
+      { "source": "modern_nutrition", "reference": "中国食物成分表 2018 — 黄豆芽" }
+    ]
   }
 ]

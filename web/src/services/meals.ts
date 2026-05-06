@@ -17,22 +17,26 @@ const FOOD_PHOTOS_BUCKET = 'food-photos';
 const MAX_DIMENSION = 768; // 跨境上传 + base64 给 LLM,小一点更稳
 const JPG_QUALITY = 0.82;
 
+export interface FoodClassificationLite {
+  foodCanonicalName: string;
+  tcmLabel: '发' | '温和' | '平';
+  tcmProperty: '寒' | '凉' | '平' | '温' | '热';
+  diiScore: number | null;
+  agesScore: number | null;
+  gi: number | null;
+  addedSugarG: number | null;
+  carbsG: number | null;
+  citations: Array<{ source: 'canon' | 'paper' | 'modern_nutrition'; reference: string; excerpt?: string }>;
+}
+
 export interface MealItem {
   name: string;
   confidence: number;
   /** LLM 返回的主料(2-6 个 canonical 食材名);用于前端渲染主料行 */
   ingredients?: string[];
-  classification: {
-    foodCanonicalName: string;
-    tcmLabel: '发' | '温和' | '平';
-    tcmProperty: '寒' | '凉' | '平' | '温' | '热';
-    diiScore: number | null;
-    agesScore: number | null;
-    gi: number | null;
-    addedSugarG: number | null;
-    carbsG: number | null;
-    citations: Array<{ source: 'canon' | 'paper' | 'modern_nutrition'; reference: string; excerpt?: string }>;
-  } | null;
+  /** 每个主料对应的 DB 分类(matched 或 null) */
+  ingredientDetails?: Array<{ name: string; classification: FoodClassificationLite | null }>;
+  classification: FoodClassificationLite | null;
 }
 
 export type FireLevel = '平' | '微火' | '中火' | '大火';

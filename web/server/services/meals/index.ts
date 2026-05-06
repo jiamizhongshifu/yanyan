@@ -42,6 +42,8 @@ export interface CreateMealResult {
     confidence: number;
     /** LLM 识别到的主料,前端渲染主料行 */
     ingredients?: string[];
+    /** 每个主料对应的 DB 分类(matched 或 null),前端做食材成分明细 */
+    ingredientDetails?: Array<{ name: string; classification: FoodClassification | null }>;
     classification: FoodClassification | null;
   }>;
   unrecognizedNames: string[];
@@ -79,20 +81,25 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
   // 查每个识别项的双层分类。
   // 复合菜(如"野生菌火锅")在 DB 里通常没有 dish 级条目 → 命中 null,
   // 此时用 LLM 返回的 ingredients 主料数组逐个查、再合成 classification。
+  // 同时收集每个 ingredient 的逐个分类(matched 或 null),给前端做明细展示。
   const classifications: Array<FoodClassification | null> = [];
+  const ingredientClassifications: Array<Array<{ name: string; classification: FoodClassification | null }>> = [];
   for (const item of recognition.items) {
     let cls = await deps.classifierStore.findByName(item.name);
-    if (!cls && item.ingredients && item.ingredients.length > 0) {
+    const ingDetails: Array<{ name: string; classification: FoodClassification | null }> = [];
+    if (item.ingredients && item.ingredients.length > 0) {
       const ingClasses: FoodClassification[] = [];
       for (const ing of item.ingredients) {
         const ingCls = await deps.classifierStore.findByName(ing);
+        ingDetails.push({ name: ing, classification: ingCls });
         if (ingCls) ingClasses.push(ingCls);
       }
-      if (ingClasses.length > 0) {
-        cls = synthesizeFromIngredients(item.name, ingClasses);
+      if (!cls && ingClasses.length > 0) {
+        cls = synthesizeFromIngredients(item.name, ingClasses, item.ingredients.length);
       }
     }
     classifications.push(cls);
+    ingredientClassifications.push(ingDetails);
     if (!cls && deps.onMissingFood) {
       try {
         deps.onMissingFood(item.name);
@@ -135,6 +142,7 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
         name: it.name,
         confidence: it.confidence,
         ingredients: it.ingredients,
+        ingredientDetails: ingredientClassifications[i],
         classification: classifications[i]
       })),
       unrecognizedNames: agg.unrecognizedNames,
@@ -175,16 +183,21 @@ export async function appendMealFeedback(deps: MealsDeps, params: AppendFeedback
  */
 export function synthesizeFromIngredients(
   dishName: string,
-  ingClasses: FoodClassification[]
+  ingClasses: FoodClassification[],
+  totalIngredientCount?: number
 ): FoodClassification {
-  // tcmLabel 投票:取出现次数最多的;并列时 平 > 温和 > 发(避免单个发物食材
-  // 把整道菜判成"留心",过激)
-  const labelCounts: Record<string, number> = {};
+  // tcmLabel 投票:已匹配食材按真实 label,未匹配食材当 温和(中性)算入投票。
+  // 这样:
+  //   - 1/5 食材标'发' 不会一票否决,但也不会假装一切都"平";
+  //   - 数据稀疏时整体偏中性(温和),fireScore 落在 40 附近(微火/微暖),用户看到的是"中等"而不是"最差/最好"。
+  const total = Math.max(totalIngredientCount ?? ingClasses.length, ingClasses.length);
+  const unmatched = Math.max(0, total - ingClasses.length);
+  const labelCounts: Record<string, number> = { 平: 0, 温和: unmatched, 发: 0 };
   for (const c of ingClasses) labelCounts[c.tcmLabel] = (labelCounts[c.tcmLabel] ?? 0) + 1;
   const labelTiePriority: Record<string, number> = { 平: 3, 温和: 2, 发: 1 };
   const tcmLabel = (Object.entries(labelCounts).sort(
     (a, b) => b[1] - a[1] || labelTiePriority[b[0]] - labelTiePriority[a[0]]
-  )[0]?.[0] ?? ingClasses[0].tcmLabel) as FoodClassification['tcmLabel'];
+  )[0]?.[0] ?? '温和') as FoodClassification['tcmLabel'];
 
   const propCounts: Record<string, number> = {};
   for (const c of ingClasses) propCounts[c.tcmProperty] = (propCounts[c.tcmProperty] ?? 0) + 1;

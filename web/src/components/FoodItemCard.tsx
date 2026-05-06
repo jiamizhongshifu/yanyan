@@ -66,19 +66,62 @@ export function FoodItemCard({ item, onFlagMisrecognized, onFlagNoReaction }: Pr
         )}
       </div>
 
-      {/* 主料行 */}
+      {/* 主料明细行:每个食材带它自己的成分(matched 显示数据,未匹配标"待补录") */}
       {showIngredients && (
-        <div className="mt-2 flex items-start gap-2 text-[11px] text-ink/55">
-          <span className="text-ink/35 flex-shrink-0">主料</span>
-          <div className="flex flex-wrap gap-1">
-            {ingredients.map((ing) => (
-              <span
-                key={ing}
-                className="px-2 py-0.5 rounded-full bg-paper text-ink/65"
-              >
-                {ing}
-              </span>
-            ))}
+        <div className="mt-3">
+          <p className="text-[11px] text-ink/45 mb-1.5">食材成分</p>
+          <div className="space-y-1">
+            {ingredients.map((ing) => {
+              const detail = item.ingredientDetails?.find((d) => d.name === ing);
+              const c = detail?.classification ?? null;
+              return (
+                <div
+                  key={ing}
+                  className="flex items-baseline justify-between gap-2 py-1 border-b border-paper last:border-0"
+                >
+                  <span className="text-xs text-ink/80 flex-shrink-0">{ing}</span>
+                  <div className="flex flex-wrap items-center justify-end gap-1 text-[10px]">
+                    {c ? (
+                      <>
+                        <span className="text-ink/45">
+                          {c.tcmLabel} · {c.tcmProperty}
+                        </span>
+                        {c.diiScore !== null && (
+                          <span
+                            className={`px-1.5 py-0.5 rounded ${
+                              c.diiScore < -0.5
+                                ? 'bg-fire-ping/12 text-fire-ping'
+                                : c.diiScore > 0.5
+                                ? 'bg-fire-mild/12 text-fire-mild'
+                                : 'bg-ink/8 text-ink/60'
+                            }`}
+                          >
+                            DII {c.diiScore.toFixed(1)}
+                          </span>
+                        )}
+                        {c.gi !== null && (
+                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/60">
+                            GI {Math.round(c.gi)}
+                          </span>
+                        )}
+                        {c.addedSugarG !== null && c.addedSugarG > 0 && (
+                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/60">
+                            糖 {c.addedSugarG}g
+                          </span>
+                        )}
+                        {c.carbsG !== null && (
+                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/60">
+                            碳水 {c.carbsG}g
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-ink/35">数据待补录</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
