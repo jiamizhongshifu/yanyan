@@ -26,6 +26,7 @@ import { track } from '../services/tracker';
 import { asset } from '../services/assets';
 import { Icon, type IconName } from '../components/Icon';
 import { LevelIcon } from '../components/LevelIcon';
+import { AchievementBadgeIcon, type AchievementVariant } from '../components/AchievementBadgeIcon';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS, scoreToStars } from '../services/score-display';
 import type { FireLevel } from '../services/symptoms';
 
@@ -335,28 +336,28 @@ export function Insights() {
         <div className="space-y-2.5">
           <AchievementCard
             unlocked={cumulativeDays >= 7}
-            icon="achievement-week-streak.png"
+            variant="week-streak"
             title="坚持一周"
             requirement="累计打卡 7 天"
             progress={cumulativeDays / 7}
           />
           <AchievementCard
             unlocked={(progress?.flags.canDrawTrend ?? false) || cumulativeDays >= 21}
-            icon="achievement-trend-unlock.png"
+            variant="trend-unlock"
             title="趋势线解锁"
             requirement={`累计打卡 ${progress?.thresholds.trendLineDays ?? 21} 天`}
             progress={cumulativeDays / (progress?.thresholds.trendLineDays ?? 21)}
           />
           <AchievementCard
             unlocked={progress?.flags.eligibleForProfilePdf ?? false}
-            icon="achievement-month-archive.png"
+            variant="month-archive"
             title="30 天体质档案"
             requirement={`累计打卡 ${progress?.thresholds.profilePdfDay ?? 30} 天`}
             progress={cumulativeDays / (progress?.thresholds.profilePdfDay ?? 30)}
           />
           <AchievementCard
             unlocked={(sugar?.monthSavedG ?? 0) >= 50}
-            icon="achievement-sugar-master.png"
+            variant="sugar-master"
             title="减糖小达人"
             requirement="本月累计减糖 50 g"
             progress={(sugar?.monthSavedG ?? 0) / 50}
@@ -398,13 +399,13 @@ function StatTile({
 
 function AchievementCard({
   unlocked,
-  icon,
+  variant,
   title,
   requirement,
   progress
 }: {
   unlocked: boolean;
-  icon: string;
+  variant: AchievementVariant;
   title: string;
   requirement: string;
   progress: number;
@@ -412,22 +413,10 @@ function AchievementCard({
   const pct = Math.max(0, Math.min(1, progress));
   return (
     <div className={`relative flex items-center gap-3 rounded-2xl px-4 py-3 overflow-hidden ${unlocked ? 'bg-fire-mild/10' : 'bg-paper'}`}>
-      {unlocked && (
-        <img
-          src={asset('achievement-unlock.png')}
-          alt=""
-          aria-hidden="true"
-          className="absolute -right-4 -top-2 w-20 h-20 object-contain opacity-50 pointer-events-none"
-        />
-      )}
       <div className="relative z-10 flex-shrink-0">
-        <img
-          src={asset(icon)}
-          alt=""
-          className={`w-12 h-12 object-contain ${unlocked ? '' : 'opacity-25 grayscale'}`}
-        />
+        <AchievementBadgeIcon variant={variant} className="w-12 h-12" locked={!unlocked} />
         {!unlocked && (
-          // 未解锁:右下角小锁角标 + 整图灰度
+          // 未解锁:右下角小锁角标
           <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-ink/85 flex items-center justify-center shadow-sm">
             <svg viewBox="0 0 24 24" className="w-3 h-3 text-paper" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="5" y="11" width="14" height="10" rx="2" />
@@ -441,10 +430,13 @@ function AchievementCard({
           {unlocked && <Icon name="check" className="w-3.5 h-3.5 text-fire-ping" />}
           {title}
         </p>
-        <p className="text-[11px] text-ink/45 mt-0.5">{requirement}</p>
+        <p className="text-[11px] text-ink/45 mt-0.5">
+          {unlocked ? '已达成 · ' : `${Math.round(pct * 100)}% · `}
+          {requirement}
+        </p>
         {!unlocked && (
           <div className="mt-1.5 h-1 rounded-full bg-ink/10 overflow-hidden">
-            <div className="h-full bg-ink/45 transition-all" style={{ width: `${pct * 100}%` }} />
+            <div className="h-full bg-fire-ping/55 transition-all" style={{ width: `${pct * 100}%` }} />
           </div>
         )}
       </div>

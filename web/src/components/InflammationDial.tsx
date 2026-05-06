@@ -87,15 +87,25 @@ export function InflammationDial({ score, level, caption = '今日抗炎指数',
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        {showLevelIcon && <LevelIcon level={level} className="w-12 h-12 mb-1" />}
-        <Stars filled={stars} className="text-3xl" testId="dial-stars" />
+        {showLevelIcon && <LevelIcon level={level} className="w-10 h-10 mb-1" />}
+        <p
+          className={`text-5xl font-light leading-none ${LABEL_TEXT_COLOR[level]}`}
+          data-testid="dial-anti-inflam"
+          style={{ color: LEVEL_COLOR[level] }}
+        >
+          {antiInflam}
+        </p>
         <p className="mt-1 text-xs text-ink/50 tracking-wide">{caption}</p>
         <p
-          className={`mt-1 text-base font-medium ${LABEL_TEXT_COLOR[level]}`}
+          className={`mt-0.5 text-sm font-medium ${LABEL_TEXT_COLOR[level]}`}
           data-testid="dial-level"
           style={{ color: LEVEL_COLOR[level] }}
         >
           {displayLabel}
+          <span className="ml-1.5 text-xs font-normal text-ink/45">
+            {/* 副位:小号星级供视觉提示 */}
+            {'★'.repeat(stars)}
+          </span>
         </p>
       </div>
     </div>
