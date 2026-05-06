@@ -11,8 +11,12 @@
 
 import type { MealStore } from '../meals';
 import type { FoodClassifierStore } from '../classifier';
+import type { LlmTextClient } from '../llm/deepseek';
+import type { UserStore } from '../users/store';
+import type { OnboardingBaseline } from '../users/types';
 import type { RecommendMode, TodayRecommendation } from './types';
 import { pickAvoidList, pickThreeMeals } from './reverse-query';
+import { generatePersonalizedRecommendation } from './personalized-generator';
 
 export const RECENT_DAYS = 3;
 
@@ -81,20 +85,21 @@ const MODE_COPY: Record<RecommendMode, { headline: string; tagline: string }> = 
 export interface BuildRecommendationDeps {
   mealStore: MealStore;
   classifierStore: FoodClassifierStore;
+  /** 可选:启用 LLM 个性化(配 userStore + llm + baseline);未配置时只跑 template */
+  userStore?: UserStore;
+  llm?: LlmTextClient;
   now?: () => Date;
 }
 
-export async function buildTodayRecommendation(
+async function buildTemplateRecommendation(
   deps: BuildRecommendationDeps,
-  userId: string
+  userId: string,
+  now: Date
 ): Promise<TodayRecommendation> {
-  const now = deps.now?.() ?? new Date();
   const agg = await aggregateRecent(deps.mealStore, userId, now);
   const mode = classify(agg);
-
   const meals = await pickThreeMeals(deps.classifierStore);
   const avoid = mode === 'fa_heavy' ? await pickAvoidList(deps.classifierStore) : [];
-
   return {
     mode,
     headline: MODE_COPY[mode].headline,
@@ -103,4 +108,59 @@ export async function buildTodayRecommendation(
     meals,
     basis: { fa: agg.fa, mild: agg.mild, calm: agg.calm, days: agg.days }
   };
+}
+
+function todayKey(now: Date): string {
+  return now.toISOString().slice(0, 10);
+}
+
+export async function buildTodayRecommendation(
+  deps: BuildRecommendationDeps,
+  userId: string
+): Promise<TodayRecommendation> {
+  const now = deps.now?.() ?? new Date();
+  const date = todayKey(now);
+
+  // 1. 命中缓存直接返回
+  if (deps.userStore) {
+    try {
+      const cached = await deps.userStore.getCachedRecommendation(userId, date);
+      if (cached && typeof cached === 'object') {
+        return cached as TodayRecommendation;
+      }
+    } catch (err) {
+      console.warn('[recommend] cache read failed', err);
+    }
+  }
+
+  // 2. 尝试 LLM 个性化
+  let result: TodayRecommendation | null = null;
+  if (deps.userStore && deps.llm) {
+    try {
+      const userRow = await deps.userStore.findById(userId);
+      const baseline = (userRow?.baselineSummary ?? null) as OnboardingBaseline | null;
+      result = await generatePersonalizedRecommendation(
+        { mealStore: deps.mealStore, llm: deps.llm, baseline, now: () => now },
+        userId
+      );
+    } catch (err) {
+      console.warn('[recommend] personalized generator threw', err);
+    }
+  }
+
+  // 3. fallback 到 template
+  if (!result) {
+    result = await buildTemplateRecommendation(deps, userId, now);
+  }
+
+  // 4. 写入缓存(失败不阻塞)
+  if (deps.userStore) {
+    try {
+      await deps.userStore.setCachedRecommendation(userId, date, result);
+    } catch (err) {
+      console.warn('[recommend] cache write failed', err);
+    }
+  }
+
+  return result;
 }

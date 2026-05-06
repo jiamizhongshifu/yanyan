@@ -27,6 +27,10 @@ export interface UserStore {
   createUserById(params: { id: string; dekCiphertextB64: string }): Promise<void>;
   /** 写入 onboarding baseline_summary */
   updateBaseline(userId: string, baseline: OnboardingBaseline): Promise<void>;
+  /** 读取已缓存的当日推荐(命中即返回) */
+  getCachedRecommendation(userId: string, date: string): Promise<unknown | null>;
+  /** 写入当日推荐缓存(覆盖) */
+  setCachedRecommendation(userId: string, date: string, payload: unknown): Promise<void>;
 }
 
 export class PgUserStore implements UserStore {
@@ -106,6 +110,27 @@ export class PgUserStore implements UserStore {
   async updateBaseline(userId: string, baseline: OnboardingBaseline): Promise<void> {
     await withClient((c) =>
       c.query(`UPDATE users SET baseline_summary = $2, updated_at = now() WHERE id = $1`, [userId, baseline])
+    );
+  }
+
+  async getCachedRecommendation(userId: string, date: string): Promise<unknown | null> {
+    return await withClient(async (client) => {
+      const r = await client.query<{ payload: unknown }>(
+        `SELECT latest_recommendation AS payload
+           FROM users
+          WHERE id = $1 AND latest_recommendation_date = $2 AND deleted_at IS NULL`,
+        [userId, date]
+      );
+      return r.rowCount === 0 ? null : r.rows[0].payload ?? null;
+    });
+  }
+
+  async setCachedRecommendation(userId: string, date: string, payload: unknown): Promise<void> {
+    await withClient((c) =>
+      c.query(
+        `UPDATE users SET latest_recommendation = $2, latest_recommendation_date = $3, updated_at = now() WHERE id = $1`,
+        [userId, payload, date]
+      )
     );
   }
 }

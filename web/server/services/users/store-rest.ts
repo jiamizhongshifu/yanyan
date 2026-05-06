@@ -95,4 +95,32 @@ export class SupabaseRestUserStore implements UserStore {
       .eq('id', userId);
     if (error) throw new Error(`SupabaseRestUserStore.updateBaseline: ${error.message}`);
   }
+
+  async getCachedRecommendation(userId: string, date: string): Promise<unknown | null> {
+    const c = getClient();
+    const { data, error } = await c
+      .from('users')
+      .select('latest_recommendation, latest_recommendation_date')
+      .eq('id', userId)
+      .is('deleted_at', null)
+      .maybeSingle();
+    if (error) throw new Error(`SupabaseRestUserStore.getCachedRecommendation: ${error.message}`);
+    if (!data) return null;
+    const row = data as { latest_recommendation: unknown; latest_recommendation_date: string | null };
+    if (row.latest_recommendation_date !== date) return null;
+    return row.latest_recommendation ?? null;
+  }
+
+  async setCachedRecommendation(userId: string, date: string, payload: unknown): Promise<void> {
+    const c = getClient();
+    const { error } = await c
+      .from('users')
+      .update({
+        latest_recommendation: payload,
+        latest_recommendation_date: date,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+    if (error) throw new Error(`SupabaseRestUserStore.setCachedRecommendation: ${error.message}`);
+  }
 }

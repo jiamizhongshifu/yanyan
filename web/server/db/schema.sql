@@ -28,6 +28,10 @@ CREATE TABLE IF NOT EXISTS users (
 );
 CREATE INDEX IF NOT EXISTS idx_users_wx_openid ON users(wx_openid) WHERE deleted_at IS NULL;
 
+-- LLM 个性化推荐缓存(每天 1 次,daily-stable)— 命中即返回,未命中走 generator
+ALTER TABLE users ADD COLUMN IF NOT EXISTS latest_recommendation jsonb;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS latest_recommendation_date date;
+
 -- ─────────────────────────────────────────────────────────────────────────
 -- food_classifications:食物分类种子库
 --   双层标签:中医(tcm_label / tcm_property + citation)+ 西方营养(dii_score / ages_score / gi)

@@ -63,6 +63,12 @@ class FakeUserStore implements UserStore {
     const row = this.byId.get(userId);
     if (row) row.baselineSummary = baseline as unknown as Record<string, unknown>;
   }
+  async getCachedRecommendation(_userId: string, _date: string): Promise<unknown | null> {
+    return null;
+  }
+  async setCachedRecommendation(_userId: string, _date: string, _payload: unknown): Promise<void> {
+    /* no-op for tests */
+  }
 }
 
 class FakeKms implements KmsClient {
