@@ -45,12 +45,12 @@ const LEVEL_DECOR_COLOR: Record<FireLevel, string> = {
   大火: 'text-fire-mid/15'
 };
 
-/** 水豚表情按等级配:开心 / 思考 / 关切,不引焦虑只引共情 */
+/** 4 档独立的水豚表情(gpt-image-2 生成):欢呼 / 满足 / 思考 / 关切 */
 const LEVEL_MASCOT: Record<FireLevel, string> = {
-  平: 'mascot-happy.png',
-  微火: 'mascot-happy.png',
-  中火: 'mascot-thinking.png',
-  大火: 'mascot-worried.png'
+  平: 'mascot-cheer.png', // ★5 双手举起欢呼,星星爱心环绕
+  微火: 'mascot-content.png', // ★4 双爪交叠,平静微笑,眼神弯月
+  中火: 'mascot-pensive.png', // ★3 托腮思考,温和提醒
+  大火: 'mascot-caring.png' // ★2 双爪贴胸,关切共情(非焦虑非难过)
 };
 
 export function MealResult() {
