@@ -19,6 +19,17 @@ interface Entry<T> {
 const cache = new Map<string, Entry<unknown>>();
 const inflight = new Map<string, Promise<unknown>>();
 
+/**
+ * 同步读缓存 — 命中且未过期时返回值,否则 undefined。
+ * 给组件 useState 初始值用,避免 mount → effect → setState 中间那一帧的"默认空状态"。
+ */
+export function peekCache<T>(key: string): T | undefined {
+  const hit = cache.get(key);
+  if (!hit) return undefined;
+  if (hit.expiresAt <= Date.now()) return undefined;
+  return hit.value as T;
+}
+
 export function cached<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T> {
   const now = Date.now();
   const hit = cache.get(key);

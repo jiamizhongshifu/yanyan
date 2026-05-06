@@ -6,7 +6,7 @@
  */
 import { request } from './api';
 import { getCurrentAccessToken } from './auth';
-import { cached, invalidate } from './cache';
+import { cached, invalidate, peekCache } from './cache';
 import type { DayTier } from './challenges';
 import type { FireLevel } from './symptoms';
 
@@ -74,5 +74,11 @@ export async function fetchMonthChallenges(year?: number, month?: number): Promi
       days: res.data.days
     };
   });
+}
+
+/** 同步读月度挑战缓存(useState 初始化用) */
+export function peekMonthChallenges(year?: number, month?: number): MonthChallenges | null {
+  const cacheKey = `challenges:month:${year ?? 'cur'}:${month ?? 'cur'}`;
+  return peekCache<MonthChallenges>(cacheKey) ?? null;
 }
 

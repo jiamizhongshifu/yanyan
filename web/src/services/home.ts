@@ -27,7 +27,7 @@ export interface UserProgress {
   flags: { canDrawTrend: boolean; eligibleForProfilePdf: boolean };
 }
 
-import { cached } from './cache';
+import { cached, peekCache } from './cache';
 
 async function authHeader() {
   const t = await getCurrentAccessToken();
@@ -56,4 +56,12 @@ export async function fetchProgress(): Promise<UserProgress | null> {
       flags: res.data.flags
     };
   });
+}
+
+/** useState 初始值用 — 同步读缓存 */
+export function peekHomeToday(): HomeToday | null {
+  return peekCache<HomeToday>('home:today') ?? null;
+}
+export function peekProgress(): UserProgress | null {
+  return peekCache<UserProgress>('progress:me') ?? null;
 }

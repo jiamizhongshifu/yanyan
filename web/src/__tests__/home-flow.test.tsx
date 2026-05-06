@@ -45,7 +45,9 @@ const fetchHomeTodayMock = vi.fn();
 const fetchProgressMock = vi.fn();
 vi.mock('../services/home', () => ({
   fetchHomeToday: () => fetchHomeTodayMock(),
-  fetchProgress: () => fetchProgressMock()
+  fetchProgress: () => fetchProgressMock(),
+  peekHomeToday: () => null,
+  peekProgress: () => null
 }));
 
 beforeEach(() => {

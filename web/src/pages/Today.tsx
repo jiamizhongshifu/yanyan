@@ -9,12 +9,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
-import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
-import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
-import { fetchSugarToday, sugarAchievementSentence, type SugarToday } from '../services/sugar';
+import { fetchHomeToday, fetchProgress, peekHomeToday, peekProgress, type TodayMealItem, type UserProgress } from '../services/home';
+import { fetchYanScoreToday, peekYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
+import { fetchSugarToday, peekSugarToday, sugarAchievementSentence, type SugarToday } from '../services/sugar';
 import { fetchHealthToday, postHealthSteps, type HealthDaily } from '../services/health';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
-import { upsertTodayChallenges, fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
+import { upsertTodayChallenges, fetchMonthChallenges, peekMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { asset } from '../services/assets';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
 import { useWellness, todayKey } from '../store/wellness';
@@ -63,12 +63,13 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
 };
 
 export function Today() {
-  const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
-  const [meals, setMeals] = useState<TodayMealItem[]>([]);
-  const [_progress, setProgress] = useState<UserProgress | null>(null);
-  const [sugar, setSugar] = useState<SugarToday | null>(null);
+  // 初始值从客户端缓存读 — 切回 tab 时第一帧就能看到上次数据,避免"空 → 数据"的闪烁
+  const [yanScore, setYanScore] = useState<YanScoreToday | null>(() => peekYanScoreToday());
+  const [meals, setMeals] = useState<TodayMealItem[]>(() => peekHomeToday()?.meals ?? []);
+  const [_progress, setProgress] = useState<UserProgress | null>(() => peekProgress());
+  const [sugar, setSugar] = useState<SugarToday | null>(() => peekSugarToday());
   const [serverHealth, setServerHealth] = useState<HealthDaily | null>(null);
-  const [monthCh, setMonthCh] = useState<MonthChallenges | null>(null);
+  const [monthCh, setMonthCh] = useState<MonthChallenges | null>(() => peekMonthChallenges());
 
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };

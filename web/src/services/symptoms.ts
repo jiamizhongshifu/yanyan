@@ -7,7 +7,7 @@
 
 import { request } from './api';
 import { getCurrentAccessToken } from './auth';
-import { cached, invalidate } from './cache';
+import { cached, invalidate, peekCache } from './cache';
 
 export const SYMPTOM_DIMENSIONS = [
   'nasal_congestion',
@@ -130,4 +130,9 @@ export async function fetchYanScoreToday(): Promise<YanScoreToday | null> {
     if (!res.ok) return null;
     return res.data;
   });
+}
+
+/** 同步读今日 yan-score 缓存(useState 初始化用) */
+export function peekYanScoreToday(): YanScoreToday | null {
+  return peekCache<YanScoreToday>('yan-score:today') ?? null;
 }

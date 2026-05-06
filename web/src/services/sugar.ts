@@ -3,7 +3,7 @@
  */
 import { request } from './api';
 import { getCurrentAccessToken } from './auth';
-import { cached } from './cache';
+import { cached, peekCache } from './cache';
 
 export interface SugarBadge {
   kind: 'lollipop' | 'chocolate' | 'cola' | 'milktea';
@@ -64,4 +64,9 @@ export async function fetchSugarToday(): Promise<SugarToday | null> {
       monthlyBadges: res.data.monthlyBadges
     };
   });
+}
+
+/** 同步读 sugar 缓存(useState 初始化用) */
+export function peekSugarToday(): SugarToday | null {
+  return peekCache<SugarToday>('sugar:today') ?? null;
 }

@@ -26,8 +26,8 @@ import { HomeBodyCards } from '../components/HomeBodyCards';
 import { MealHistoryList } from '../components/MealHistoryList';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
 import { InappRemindersBanner } from '../components/InappRemindersBanner';
-import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
-import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
+import { fetchHomeToday, fetchProgress, peekHomeToday, peekProgress, type TodayMealItem, type UserProgress } from '../services/home';
+import { fetchYanScoreToday, peekYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
 import { useQuiz } from '../store/quiz';
 import { useOnboarding } from '../store/onboarding';
 import { computeInflammationIndex } from '../services/quiz';
@@ -37,9 +37,10 @@ import { LEVEL_TO_HOME_ENCOURAGEMENT } from '../services/score-display';
 // 走 score-display 模块的 LEVEL_TO_HOME_ENCOURAGEMENT;此处仅保留 import 锚
 
 export function Home() {
-  const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
-  const [meals, setMeals] = useState<TodayMealItem[] | null>(null);
-  const [progress, setProgress] = useState<UserProgress | null>(null);
+  // 初始值从客户端缓存读 — 切回 tab 时第一帧就有数据,避免"空 → 数据"闪烁
+  const [yanScore, setYanScore] = useState<YanScoreToday | null>(() => peekYanScoreToday());
+  const [meals, setMeals] = useState<TodayMealItem[] | null>(() => peekHomeToday()?.meals ?? null);
+  const [progress, setProgress] = useState<UserProgress | null>(() => peekProgress());
 
   const quiz = useQuiz();
   const initialFireLevel = useOnboarding((s) => s.initialFireLevel);

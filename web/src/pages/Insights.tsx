@@ -11,10 +11,10 @@
 
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
-import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
-import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
-import { fetchSugarToday, type SugarToday } from '../services/sugar';
-import { fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
+import { fetchHomeToday, fetchProgress, peekHomeToday, peekProgress, type TodayMealItem, type UserProgress } from '../services/home';
+import { fetchYanScoreToday, peekYanScoreToday, type YanScoreToday } from '../services/symptoms';
+import { fetchSugarToday, peekSugarToday, type SugarToday } from '../services/sugar';
+import { fetchMonthChallenges, peekMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { fetchYanScoreHistory, type YanScoreHistory } from '../services/yanScoreHistory';
 import { fetchHomeMonth, fetchMealsByDate, type HomeMonth } from '../services/homeMonth';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
@@ -42,11 +42,12 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
 
 export function Insights() {
   const [, navigate] = useLocation();
-  const [yanScore, setYanScore] = useState<YanScoreToday | null>(null);
-  const [meals, setMeals] = useState<TodayMealItem[]>([]);
-  const [progress, setProgress] = useState<UserProgress | null>(null);
-  const [sugar, setSugar] = useState<SugarToday | null>(null);
-  const [monthCh, setMonthCh] = useState<MonthChallenges | null>(null);
+  // 初始值从客户端缓存读 — 切回 tab 时第一帧就有数据,避免"空 → 数据"闪烁
+  const [yanScore, setYanScore] = useState<YanScoreToday | null>(() => peekYanScoreToday());
+  const [meals, setMeals] = useState<TodayMealItem[]>(() => peekHomeToday()?.meals ?? []);
+  const [progress, setProgress] = useState<UserProgress | null>(() => peekProgress());
+  const [sugar, setSugar] = useState<SugarToday | null>(() => peekSugarToday());
+  const [monthCh, setMonthCh] = useState<MonthChallenges | null>(() => peekMonthChallenges());
   const [history, setHistory] = useState<YanScoreHistory | null>(null);
   const [monthAgg, setMonthAgg] = useState<HomeMonth | null>(null);
 
