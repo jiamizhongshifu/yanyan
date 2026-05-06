@@ -82,14 +82,9 @@ export function MonthCalendarGrid({
     return arr;
   }, [monthBase]);
 
-  // fallback:server 没历史时,用 cumulativeInMonth 倒推已点亮的天
-  const checkedDays = useMemo(() => {
-    const set = new Set<number>();
-    const past = cells.filter((c) => c.day !== null && c.isPast).map((c) => c.day!);
-    const tail = past.slice(-cumulativeInMonth);
-    tail.forEach((d) => set.add(d));
-    return set;
-  }, [cells, cumulativeInMonth]);
+  // 之前用 cumulativeInMonth 倒推"已点亮"是错的(累计打卡不等于每日完美一天勋章),
+  // 现在严格按 daysHistory.tier !== 'none' 判定,cumulativeInMonth 仅作为 prop 兼容,不影响视觉
+  void cumulativeInMonth;
 
   return (
     <section data-testid="month-calendar">
@@ -103,13 +98,10 @@ export function MonthCalendarGrid({
           if (c.day === null) return <div key={i} />;
           const dateStr = `${monthBase.getFullYear()}-${String(monthBase.getMonth() + 1).padStart(2, '0')}-${String(c.day).padStart(2, '0')}`;
           const hist = historyByDate.get(dateStr);
-          const hasData = !!hist && (hist.fireLevel !== null || hist.tier !== 'none');
-          // 三态判定
-          const isLit = c.isToday
-            ? hasData || todayLevel !== null
-            : c.isPast
-            ? hasData || checkedDays.has(c.day)
-            : false;
+          // 严格:只有真的拿到了每日勋章(tier !== 'none')才算"点亮"
+          // fireLevel 不为 null 只代表"做了打卡",不代表完成完美一天/美好一天/奈斯一天
+          const hasMedal = !!hist && hist.tier !== 'none';
+          const isLit = c.isToday || c.isPast ? hasMedal : false;
 
           // title 提示:已点亮显示等级 + tier 中文
           const tierLabel = hist ? TIER_LABEL[hist.tier] : '';

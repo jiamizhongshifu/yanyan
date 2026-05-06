@@ -87,16 +87,16 @@ export function AchievementJarPhysics({
   const [needsPerm, setNeedsPerm] = useState(false);
 
   // 全部要进瓶子的勋章 specs(图片 url + 大小)
-  // 橘子勋章用 SVG dataURL,糖分勋章保留 PNG 图标
+  // 都用 SVG dataURL(64×64 viewBox)。sprite scale = size / 64
   const badges = useMemo<BadgeSpec[]>(() => {
     const list: BadgeSpec[] = [];
-    for (let i = 0; i < perfect; i++) list.push({ iconUrl: orangeIconDataUrl('perfect'), size: 36 });
-    for (let i = 0; i < great; i++) list.push({ iconUrl: orangeIconDataUrl('great'), size: 32 });
-    for (let i = 0; i < nice; i++) list.push({ iconUrl: orangeIconDataUrl('nice'), size: 28 });
+    for (let i = 0; i < perfect; i++) list.push({ iconUrl: orangeIconDataUrl('perfect'), size: 64 });
+    for (let i = 0; i < great; i++) list.push({ iconUrl: orangeIconDataUrl('great'), size: 56 });
+    for (let i = 0; i < nice; i++) list.push({ iconUrl: orangeIconDataUrl('nice'), size: 50 });
     for (const sb of sugarBadges) {
       const kind = resolveSugarKind(sb);
       for (let i = 0; i < sb.count; i++) {
-        list.push({ iconUrl: sugarBadgeDataUrl(kind), size: 30 });
+        list.push({ iconUrl: sugarBadgeDataUrl(kind), size: 56 });
       }
     }
     return list.slice(0, 24);
@@ -188,8 +188,9 @@ export function AchievementJarPhysics({
           render: {
             sprite: {
               texture: b.iconUrl,
-              xScale: b.size / 256,
-              yScale: b.size / 256
+              // SVG dataURL 的 natural size 是 viewBox 的 64;sprite scale = display / natural
+              xScale: b.size / 64,
+              yScale: b.size / 64
             }
           }
         });
