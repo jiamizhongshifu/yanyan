@@ -77,37 +77,51 @@ export function giToLabel(gi: number | null): RatedLabel | null {
   return { text: 'GI 高', tone: 'mild' };
 }
 
-/** 单条食物的模板化正向评价(零 LLM 成本) */
+/**
+ * 单条食物的模板化评价(零 LLM 成本) — 多句结构,即使数据稀疏也要写出有用内容
+ *
+ * 输出 1-3 句:
+ *   - 第一句:基于 TCM 性味的总体定调(永远有,做兜底)
+ *   - 第二句:DII / GI 数据(任一非空就出)
+ *   - 第三句:发物 / 寒凉提示
+ */
 export function foodCommentary(c: NonNullable<MealItem['classification']>): string {
-  const parts: string[] = [];
+  const lines: string[] = [];
 
-  // 1. DII 优先句(如足够强)
-  if (c.diiScore !== null) {
-    if (c.diiScore < -2) parts.push('抗炎信号很强');
-    else if (c.diiScore < -0.5) parts.push('略偏抗炎');
-    else if (c.diiScore > 2) parts.push('促炎略明显,下次少一点');
-    else if (c.diiScore > 0.5) parts.push('略偏促炎,搭配点蔬菜更好');
-  }
-
-  // 2. GI 句
-  if (c.gi !== null) {
-    if (c.gi < 55) parts.push('升糖较慢');
-    else if (c.gi >= 70) parts.push('升糖偏快,可搭配蛋白质');
-  }
-
-  // 3. 性味句(凉/寒)
+  // 1. 性味总体定调(永远出一句,作为兜底)
   if (c.tcmProperty === '寒' || c.tcmProperty === '凉') {
-    parts.push('性偏凉,搭温食物更平衡');
+    lines.push('性偏凉,适合搭温热食物平衡。');
+  } else if (c.tcmProperty === '温') {
+    lines.push('性偏温,适量吃能温和身体。');
+  } else if (c.tcmProperty === '热') {
+    lines.push('性偏热,夏天或体质偏燥时少吃。');
+  } else {
+    // 平
+    lines.push('性平和,日常常见的家常食材。');
   }
 
-  // 4. 发物提示(中性正向语气)
+  // 2. DII + GI 联合句(任一非空就出)
+  const nutritionParts: string[] = [];
+  if (c.diiScore !== null) {
+    if (c.diiScore < -2) nutritionParts.push('抗炎信号很强');
+    else if (c.diiScore < -0.5) nutritionParts.push('略偏抗炎');
+    else if (c.diiScore > 2) nutritionParts.push('促炎略明显');
+    else if (c.diiScore > 0.5) nutritionParts.push('略偏促炎');
+    else nutritionParts.push('炎症倾向中性');
+  }
+  if (c.gi !== null) {
+    if (c.gi < 55) nutritionParts.push('升糖较慢');
+    else if (c.gi < 70) nutritionParts.push('升糖中等');
+    else nutritionParts.push('升糖偏快');
+  }
+  if (nutritionParts.length > 0) {
+    lines.push(nutritionParts.join('、') + '。');
+  }
+
+  // 3. 发物提示(中性陪伴语)
   if (c.tcmLabel === '发') {
-    parts.push('记下来,看次晨体感的反应');
+    lines.push('属传统发物范畴,记下来观察次晨体感反应。');
   }
 
-  if (parts.length === 0) {
-    // 全是 null + 平 + 温和 — 给一句兜底
-    return '常见食材,正常吃就好。';
-  }
-  return parts.join(',') + '。';
+  return lines.join(' ');
 }

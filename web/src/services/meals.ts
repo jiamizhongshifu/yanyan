@@ -20,6 +20,8 @@ const JPG_QUALITY = 0.82;
 export interface MealItem {
   name: string;
   confidence: number;
+  /** LLM 返回的主料(2-6 个 canonical 食材名);用于前端渲染主料行 */
+  ingredients?: string[];
   classification: {
     foodCanonicalName: string;
     tcmLabel: '发' | '温和' | '平';
@@ -27,6 +29,8 @@ export interface MealItem {
     diiScore: number | null;
     agesScore: number | null;
     gi: number | null;
+    addedSugarG: number | null;
+    carbsG: number | null;
     citations: Array<{ source: 'canon' | 'paper' | 'modern_nutrition'; reference: string; excerpt?: string }>;
   } | null;
 }

@@ -40,6 +40,8 @@ export interface CreateMealResult {
   items: Array<{
     name: string;
     confidence: number;
+    /** LLM 识别到的主料,前端渲染主料行 */
+    ingredients?: string[];
     classification: FoodClassification | null;
   }>;
   unrecognizedNames: string[];
@@ -132,6 +134,7 @@ export async function createMeal(deps: MealsDeps, params: CreateMealParams): Pro
       items: recognition.items.map((it, i) => ({
         name: it.name,
         confidence: it.confidence,
+        ingredients: it.ingredients,
         classification: classifications[i]
       })),
       unrecognizedNames: agg.unrecognizedNames,
@@ -174,12 +177,14 @@ export function synthesizeFromIngredients(
   dishName: string,
   ingClasses: FoodClassification[]
 ): FoodClassification {
-  const labelPriority: Record<string, number> = { 发: 3, 温和: 2, 平: 1 };
-  const tcmLabel =
-    ingClasses
-      .map((c) => c.tcmLabel)
-      .reduce((best, l) => (labelPriority[l] > labelPriority[best] ? l : best),
-        ingClasses[0].tcmLabel);
+  // tcmLabel 投票:取出现次数最多的;并列时 平 > 温和 > 发(避免单个发物食材
+  // 把整道菜判成"留心",过激)
+  const labelCounts: Record<string, number> = {};
+  for (const c of ingClasses) labelCounts[c.tcmLabel] = (labelCounts[c.tcmLabel] ?? 0) + 1;
+  const labelTiePriority: Record<string, number> = { 平: 3, 温和: 2, 发: 1 };
+  const tcmLabel = (Object.entries(labelCounts).sort(
+    (a, b) => b[1] - a[1] || labelTiePriority[b[0]] - labelTiePriority[a[0]]
+  )[0]?.[0] ?? ingClasses[0].tcmLabel) as FoodClassification['tcmLabel'];
 
   const propCounts: Record<string, number> = {};
   for (const c of ingClasses) propCounts[c.tcmProperty] = (propCounts[c.tcmProperty] ?? 0) + 1;

@@ -146,8 +146,8 @@ describe('U6 MealResult page', () => {
       fireScore: 33.3,
       level: '微火',
       items: [
-        { name: '清蒸鲈鱼', confidence: 0.9, classification: { foodCanonicalName: '清蒸鲈鱼', tcmLabel: '平', tcmProperty: '平', diiScore: -0.92, agesScore: 23, gi: null, citations: [{ source: 'canon', reference: '《本草纲目》' }] } },
-        { name: '羊肉', confidence: 0.85, classification: { foodCanonicalName: '羊肉', tcmLabel: '发', tcmProperty: '热', diiScore: 0.55, agesScore: 56, gi: null, citations: [{ source: 'canon', reference: '《本草纲目》兽部·羊' }] } }
+        { name: '清蒸鲈鱼', confidence: 0.9, classification: { foodCanonicalName: '清蒸鲈鱼', tcmLabel: '平', tcmProperty: '平', diiScore: -0.92, agesScore: 23, gi: null, addedSugarG: null, carbsG: null, citations: [{ source: 'canon', reference: '《本草纲目》' }] } },
+        { name: '羊肉', confidence: 0.85, classification: { foodCanonicalName: '羊肉', tcmLabel: '发', tcmProperty: '热', diiScore: 0.55, agesScore: 56, gi: null, addedSugarG: null, carbsG: null, citations: [{ source: 'canon', reference: '《本草纲目》兽部·羊' }] } }
       ],
       unrecognizedNames: ['某神秘食物'],
       modelVersion: 'test'
@@ -167,7 +167,7 @@ describe('U6 MealResult page', () => {
       fireScore: 0,
       level: '平',
       items: [
-        { name: '清蒸鲈鱼', confidence: 0.9, classification: { foodCanonicalName: '清蒸鲈鱼', tcmLabel: '平', tcmProperty: '平', diiScore: -0.92, agesScore: 23, gi: null, citations: [] } }
+        { name: '清蒸鲈鱼', confidence: 0.9, classification: { foodCanonicalName: '清蒸鲈鱼', tcmLabel: '平', tcmProperty: '平', diiScore: -0.92, agesScore: 23, gi: null, addedSugarG: null, carbsG: null, citations: [] } }
       ],
       unrecognizedNames: [],
       modelVersion: 'test'
