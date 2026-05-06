@@ -53,16 +53,13 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
   return (
     <div className="grid grid-cols-7 gap-1" data-testid="today-week-strip">
       {cells.map((c) => {
+        // tier 决定金/银/铜;无 tier 时:过去 + 今日 → gray(灰填充);未来 → outline(空心)
         const variant: OrangeVariant =
           c.tier !== 'none'
             ? TIER_TO_VARIANT[c.tier as keyof typeof TIER_TO_VARIANT]
+            : c.isPast || c.isToday
+            ? 'gray'
             : 'outline';
-        const opacity =
-          c.tier === 'none' && !c.isPast && !c.isToday
-            ? 'opacity-30'
-            : c.tier === 'none'
-            ? 'opacity-55'
-            : 'opacity-100';
         return (
           <div key={c.date} className="flex flex-col items-center gap-1.5">
             {/* 日期 — 固定 24×24 高度,所有 cell 视觉等高 */}
@@ -74,7 +71,7 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
               {c.day}
             </div>
             {/* 橘子徽标 */}
-            <OrangeIcon variant={variant} className={`w-7 h-7 ${opacity}`} />
+            <OrangeIcon variant={variant} className="w-7 h-7" />
           </div>
         );
       })}

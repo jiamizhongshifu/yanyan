@@ -1,18 +1,21 @@
 /**
  * 橘子图标 — 纯 SVG 绘制(替代以前的 PNG 插画)
  *
- * 4 个变体:
- *   - outline    线稿空心(过去未拿勋章 / 未来日)
- *   - nice       浅橘色填充     (★2 留心 / nice 等级)
- *   - great      中橘色填充     (★3-4 / great 等级)
- *   - perfect    亮橘色 + 高光 + 2 颗小星星(★5 / perfect 等级)
+ * 5 个变体:
+ *   - outline    线稿空心        (未来日)
+ *   - gray       灰色填充        (过去日 / 今日 — 但还未拿到任何勋章等级)
+ *   - nice       铜色金属橘子    (★2 留心 / nice 等级)
+ *   - great      银色金属橘子    (★3-4 / great 等级)
+ *   - perfect    金色金属 + 2 颗小星星(★5 / perfect 等级 — 完美一天)
+ *
+ * 设计语言:三档勋章用金/银/铜暗示等级层次,与现实奖牌一致。
  *
  * 使用:
  *   - JSX:`<OrangeIcon variant="perfect" className="w-7 h-7" />`
  *   - matter.js 精灵 / 任意需要 image URL 的地方:`orangeIconDataUrl('perfect')`
  */
 
-export type OrangeVariant = 'outline' | 'nice' | 'great' | 'perfect';
+export type OrangeVariant = 'outline' | 'gray' | 'nice' | 'great' | 'perfect';
 
 interface Props {
   variant: OrangeVariant;
@@ -61,7 +64,7 @@ function OrangeSvgInner({ variant }: { variant: OrangeVariant }) {
       {/* 茎 */}
       <path
         d={`M 30 14 Q 32 11 34 14 L 33 18 L 31 18 Z`}
-        fill={variant === 'outline' ? 'none' : '#7B5A2A'}
+        fill={variant === 'outline' ? 'none' : styles.stem}
         stroke={styles.stroke}
         strokeWidth="1.5"
         strokeLinejoin="round"
@@ -70,7 +73,7 @@ function OrangeSvgInner({ variant }: { variant: OrangeVariant }) {
       {/* 绿叶 */}
       <path
         d={`M 33 16 Q 44 12 48 18 Q 42 22 33 18 Z`}
-        fill={variant === 'outline' ? 'none' : '#7BA56A'}
+        fill={variant === 'outline' ? 'none' : styles.leaf}
         stroke={styles.stroke}
         strokeWidth="1.5"
         strokeLinejoin="round"
@@ -100,11 +103,19 @@ function Star({ cx, cy, size }: { cx: number; cy: number; size: number }) {
   return <path d={path} fill="#F4C242" />;
 }
 
-const STYLE: Record<OrangeVariant, { bodyHi: string; bodyLo: string; stroke: string }> = {
-  outline: { bodyHi: 'transparent', bodyLo: 'transparent', stroke: '#C7BFA8' },
-  nice: { bodyHi: '#FAD2A1', bodyLo: '#F0B679', stroke: '#B8763F' },
-  great: { bodyHi: '#F4B377', bodyLo: '#E8954E', stroke: '#A06228' },
-  perfect: { bodyHi: '#FBC079', bodyLo: '#D9762C', stroke: '#8B4D1A' }
+/**
+ * 调色:
+ *   - gray:中性灰填充,无金属感(过去 / 今日未达成)
+ *   - nice / 铜:暖咖啡橙 → 深棕铜
+ *   - great / 银:冷月白 → 中灰银
+ *   - perfect / 金:亮浅金 → 暖深金 + 星星
+ */
+const STYLE: Record<OrangeVariant, { bodyHi: string; bodyLo: string; stroke: string; stem: string; leaf: string }> = {
+  outline: { bodyHi: 'transparent', bodyLo: 'transparent', stroke: '#C7BFA8', stem: 'none', leaf: 'none' },
+  gray:    { bodyHi: '#E5E1D6', bodyLo: '#B5AE9D', stroke: '#9A927F', stem: '#7B746B', leaf: '#9DAA8B' },
+  nice:    { bodyHi: '#E8B97A', bodyLo: '#A8662C', stroke: '#7A4313', stem: '#6B3A14', leaf: '#7BA56A' },
+  great:   { bodyHi: '#F2F4F7', bodyLo: '#A8B0BC', stroke: '#6F7886', stem: '#5C6573', leaf: '#7BA56A' },
+  perfect: { bodyHi: '#FFE588', bodyLo: '#C9970A', stroke: '#8B6508', stem: '#7A5A0A', leaf: '#7BA56A' }
 };
 
 /**
@@ -139,8 +150,8 @@ export function orangeIconDataUrl(variant: OrangeVariant): string {
     ${gradDef}
     <circle cx="32" cy="36" r="22" fill="${fillBody}" stroke="${styles.stroke}" stroke-width="2"/>
     ${detail}
-    <path d="M 30 14 Q 32 11 34 14 L 33 18 L 31 18 Z" fill="${variant === 'outline' ? 'none' : '#7B5A2A'}" stroke="${styles.stroke}" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M 33 16 Q 44 12 48 18 Q 42 22 33 18 Z" fill="${variant === 'outline' ? 'none' : '#7BA56A'}" stroke="${styles.stroke}" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 30 14 Q 32 11 34 14 L 33 18 L 31 18 Z" fill="${variant === 'outline' ? 'none' : styles.stem}" stroke="${styles.stroke}" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 33 16 Q 44 12 48 18 Q 42 22 33 18 Z" fill="${variant === 'outline' ? 'none' : styles.leaf}" stroke="${styles.stroke}" stroke-width="1.5" stroke-linejoin="round"/>
     ${sparkles}
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;

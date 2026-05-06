@@ -12,7 +12,7 @@
  */
 
 import type { DayTier } from '../services/challenges';
-import { OrangeIcon } from './OrangeIcon';
+import { OrangeIcon, type OrangeVariant } from './OrangeIcon';
 
 interface Props {
   doneCount: number; // 0-5
@@ -76,9 +76,12 @@ export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
           )}
         </svg>
 
-        {/* 中心:灰橘子 + 大号百分比 + 副位标签 */}
+        {/* 中心:橘子(按今日 tier 显示金/银/铜,未达成显示灰) + 大号百分比 + 副位标签 */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <OrangeIcon variant="outline" className="w-8 h-8 text-ink/25 mb-0.5" />
+          <OrangeIcon
+            variant={(tier === 'none' ? 'gray' : tier) as OrangeVariant}
+            className="w-8 h-8 mb-0.5"
+          />
           <p
             className="text-5xl font-light leading-none"
             style={{ color: TIER_COLOR[tier] }}

@@ -139,15 +139,13 @@ export function MonthCalendarGrid({
                 title={title}
               >
                 {(() => {
-                  // 等级:已收录的 hist tier 优先,fallback 用 perfect 表示"已点亮"
-                  const variant: OrangeVariant =
-                    c.isFuture
-                      ? 'outline'
-                      : !isLit
-                      ? 'outline'
-                      : (hist && TIER_TO_VARIANT[hist.tier]) || 'great';
-                  const opacity = c.isFuture ? 'opacity-40' : c.isPast && !isLit ? 'opacity-65' : 'opacity-100';
-                  return <OrangeIcon variant={variant} className={`w-7 h-7 ${opacity}`} />;
+                  // 未来 → outline 空心;过去/今日 + 有 tier → 金/银/铜;过去/今日无 tier → gray
+                  const variant: OrangeVariant = c.isFuture
+                    ? 'outline'
+                    : isLit
+                    ? (hist && TIER_TO_VARIANT[hist.tier]) || 'great'
+                    : 'gray';
+                  return <OrangeIcon variant={variant} className="w-7 h-7" />;
                 })()}
               </div>
             </button>
