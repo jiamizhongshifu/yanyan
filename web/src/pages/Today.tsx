@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
-import { fetchSugarToday, type SugarToday } from '../services/sugar';
+import { fetchSugarToday, sugarAchievementSentence, type SugarToday } from '../services/sugar';
 import { fetchHealthToday, postHealthSteps, type HealthDaily } from '../services/health';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { upsertTodayChallenges, fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
@@ -226,14 +226,18 @@ export function Today() {
             )}
           </p>
           {sugar.monthlyBadges.length > 0 && (
-            <div className="mt-3 flex flex-wrap items-center gap-2.5 text-sm">
-              <span className="text-xs text-ink/45">本月成就</span>
-              {sugar.monthlyBadges.map((b) => (
-                <div key={b.kind} className="flex items-center gap-1">
-                  <SugarAchievementIcon variant={b.kind} className="w-7 h-7" />
-                  <span className="text-xs text-ink">×{b.count}</span>
-                </div>
-              ))}
+            <div className="mt-3" data-testid="sugar-achievements">
+              <p className="text-xs text-ink/45 mb-2">
+                本月成就 <span className="text-ink/35">· 累计少摄入 {sugar.monthSavedG} g 添加糖</span>
+              </p>
+              <ul className="space-y-1.5">
+                {sugar.monthlyBadges.map((b) => (
+                  <li key={b.kind} className="flex items-center gap-2.5">
+                    <SugarAchievementIcon variant={b.kind} className="w-7 h-7 flex-shrink-0" />
+                    <span className="text-sm text-ink">{sugarAchievementSentence(b)}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </section>

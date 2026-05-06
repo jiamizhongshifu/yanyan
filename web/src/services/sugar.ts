@@ -21,6 +21,20 @@ export const SUGAR_BADGE_ICON: Record<SugarBadge['kind'], string> = {
   chocolate: 'badge-chocolate.png'
 };
 
+/** 把"本月减糖换算"翻成口语句:"少喝 2 杯奶茶"/"少吃 3 块巧克力" */
+export function sugarAchievementSentence(badge: SugarBadge): string {
+  switch (badge.kind) {
+    case 'milktea':
+      return `少喝 ${badge.count} 杯${badge.label}`;
+    case 'cola':
+      return `少喝 ${badge.count} 罐${badge.label}`;
+    case 'chocolate':
+      return `少吃 ${badge.count} 块${badge.label}`;
+    case 'lollipop':
+      return `少吃 ${badge.count} 根${badge.label}`;
+  }
+}
+
 export interface SugarToday {
   todayGrams: number | null;
   sevenDayAvg: number | null;
