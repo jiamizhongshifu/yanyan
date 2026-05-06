@@ -12,6 +12,7 @@
 import { getSupabase } from './supabase';
 import { request } from './api';
 import { getCurrentAccessToken } from './auth';
+import { invalidate } from './cache';
 
 const FOOD_PHOTOS_BUCKET = 'food-photos';
 const MAX_DIMENSION = 768; // 跨境上传 + base64 给 LLM,小一点更稳
@@ -131,7 +132,11 @@ export async function postMeal(storageKey: string): Promise<
     data: { storageKey },
     timeoutMs: 55_000 // server-side LLM 25s+25s+overhead,client 略小于 Vercel 60s function 上限
   });
-  if (res.ok) return { kind: 'ok', data: res.data };
+  if (res.ok) {
+    // 拍餐 → home/today / sugar / yan-score / progress 都可能变化
+    invalidateOnMealMutation();
+    return { kind: 'ok', data: res.data };
+  }
   if (res.status === 422) return { kind: 'low_confidence', message: '看不太清,要不要补一张?' };
   if (res.status === 503) return { kind: 'recognition_failed', message: '识别忙,稍后再试。' };
   return { kind: 'error', message: res.fallbackMessage };
@@ -183,8 +188,19 @@ export async function updateMealItems(
     data: { items, modelVersion: 'user-edited' },
     timeoutMs: 30_000
   });
-  if (res.ok) return res.data;
+  if (res.ok) {
+    invalidateOnMealMutation();
+    return res.data;
+  }
   return null;
+}
+
+function invalidateOnMealMutation() {
+  // 拍餐 / 编辑后这些聚合 API 都会变
+  invalidate('home:today');
+  invalidate('sugar:today');
+  invalidate('yan-score:today');
+  invalidate('progress:me');
 }
 
 export type MealFeedbackKind =

@@ -6,6 +6,7 @@
  */
 import { request } from './api';
 import { getCurrentAccessToken } from './auth';
+import { cached, invalidate } from './cache';
 import type { DayTier } from './challenges';
 import type { FireLevel } from './symptoms';
 
@@ -48,25 +49,30 @@ export async function upsertTodayChallenges(payload: {
     ...auth,
     data: payload
   });
+  if (res.ok) invalidate('challenges:month');
   return res.ok;
 }
 
 export async function fetchMonthChallenges(year?: number, month?: number): Promise<MonthChallenges | null> {
-  const auth = await withAuth();
-  if (!auth) return null;
-  const qs = year && month ? `?year=${year}&month=${month}` : '';
-  const res = await request<{ ok: true } & MonthChallenges>({
-    url: `/users/me/challenges/month${qs}`,
-    ...auth
+  const cacheKey = `challenges:month:${year ?? 'cur'}:${month ?? 'cur'}`;
+  return cached(cacheKey, 60_000, async () => {
+    const auth = await withAuth();
+    if (!auth) return null;
+    const qs = year && month ? `?year=${year}&month=${month}` : '';
+    const res = await request<{ ok: true } & MonthChallenges>({
+      url: `/users/me/challenges/month${qs}`,
+      ...auth
+    });
+    if (!res.ok) return null;
+    return {
+      year: res.data.year,
+      month: res.data.month,
+      perfect: res.data.perfect,
+      great: res.data.great,
+      nice: res.data.nice,
+      none: res.data.none,
+      days: res.data.days
+    };
   });
-  if (!res.ok) return null;
-  return {
-    year: res.data.year,
-    month: res.data.month,
-    perfect: res.data.perfect,
-    great: res.data.great,
-    nice: res.data.nice,
-    none: res.data.none,
-    days: res.data.days
-  };
 }
+

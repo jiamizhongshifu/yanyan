@@ -27,27 +27,33 @@ export interface UserProgress {
   flags: { canDrawTrend: boolean; eligibleForProfilePdf: boolean };
 }
 
+import { cached } from './cache';
+
 async function authHeader() {
   const t = await getCurrentAccessToken();
   return t ? { authToken: t } : null;
 }
 
 export async function fetchHomeToday(): Promise<HomeToday | null> {
-  const auth = await authHeader();
-  if (!auth) return null;
-  const res = await request<{ ok: true } & HomeToday>({ url: '/home/today', ...auth });
-  if (!res.ok) return null;
-  return { date: res.data.date, meals: res.data.meals };
+  return cached('home:today', 30_000, async () => {
+    const auth = await authHeader();
+    if (!auth) return null;
+    const res = await request<{ ok: true } & HomeToday>({ url: '/home/today', ...auth });
+    if (!res.ok) return null;
+    return { date: res.data.date, meals: res.data.meals };
+  });
 }
 
 export async function fetchProgress(): Promise<UserProgress | null> {
-  const auth = await authHeader();
-  if (!auth) return null;
-  const res = await request<{ ok: true } & UserProgress>({ url: '/users/me/progress', ...auth });
-  if (!res.ok) return null;
-  return {
-    cumulativeCheckinDays: res.data.cumulativeCheckinDays,
-    thresholds: res.data.thresholds,
-    flags: res.data.flags
-  };
+  return cached('progress:me', 60_000, async () => {
+    const auth = await authHeader();
+    if (!auth) return null;
+    const res = await request<{ ok: true } & UserProgress>({ url: '/users/me/progress', ...auth });
+    if (!res.ok) return null;
+    return {
+      cumulativeCheckinDays: res.data.cumulativeCheckinDays,
+      thresholds: res.data.thresholds,
+      flags: res.data.flags
+    };
+  });
 }

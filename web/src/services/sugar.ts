@@ -3,6 +3,7 @@
  */
 import { request } from './api';
 import { getCurrentAccessToken } from './auth';
+import { cached } from './cache';
 
 export interface SugarBadge {
   kind: 'lollipop' | 'chocolate' | 'cola' | 'milktea';
@@ -35,16 +36,18 @@ async function authHeader() {
 }
 
 export async function fetchSugarToday(): Promise<SugarToday | null> {
-  const auth = await authHeader();
-  if (!auth) return null;
-  const res = await request<{ ok: true } & SugarToday>({ url: '/users/me/sugar/today', ...auth });
-  if (!res.ok) return null;
-  return {
-    todayGrams: res.data.todayGrams,
-    sevenDayAvg: res.data.sevenDayAvg,
-    baselineDailyG: res.data.baselineDailyG,
-    todaySavedG: res.data.todaySavedG,
-    monthSavedG: res.data.monthSavedG,
-    monthlyBadges: res.data.monthlyBadges
-  };
+  return cached('sugar:today', 30_000, async () => {
+    const auth = await authHeader();
+    if (!auth) return null;
+    const res = await request<{ ok: true } & SugarToday>({ url: '/users/me/sugar/today', ...auth });
+    if (!res.ok) return null;
+    return {
+      todayGrams: res.data.todayGrams,
+      sevenDayAvg: res.data.sevenDayAvg,
+      baselineDailyG: res.data.baselineDailyG,
+      todaySavedG: res.data.todaySavedG,
+      monthSavedG: res.data.monthSavedG,
+      monthlyBadges: res.data.monthlyBadges
+    };
+  });
 }

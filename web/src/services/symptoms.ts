@@ -7,6 +7,7 @@
 
 import { request } from './api';
 import { getCurrentAccessToken } from './auth';
+import { cached, invalidate } from './cache';
 
 export const SYMPTOM_DIMENSIONS = [
   'nasal_congestion',
@@ -74,6 +75,10 @@ export async function postCheckin(
     ...auth,
     data: { payload, ...(recordedForDate ? { recordedForDate } : {}) }
   });
+  if (res.ok) {
+    invalidate('yan-score:today');
+    invalidate('progress:me');
+  }
   return res.ok;
 }
 
@@ -115,12 +120,14 @@ export interface YanScoreToday {
 }
 
 export async function fetchYanScoreToday(): Promise<YanScoreToday | null> {
-  const auth = await authHeader();
-  if (!auth) return null;
-  const res = await request<{ ok: true } & YanScoreToday>({
-    url: '/yan-score/today',
-    ...auth
+  return cached('yan-score:today', 30_000, async () => {
+    const auth = await authHeader();
+    if (!auth) return null;
+    const res = await request<{ ok: true } & YanScoreToday>({
+      url: '/yan-score/today',
+      ...auth
+    });
+    if (!res.ok) return null;
+    return res.data;
   });
-  if (!res.ok) return null;
-  return res.data;
 }
