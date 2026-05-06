@@ -23,7 +23,7 @@ import { InappRemindersBanner } from '../components/InappRemindersBanner';
 import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
 import { TodayWeekStrip } from '../components/TodayWeekStrip';
 import { PerfectDayRing } from '../components/PerfectDayRing';
-import { SugarBadgeIcon } from '../components/SugarBadgeIcon';
+import { SugarAchievementIcon } from '../components/SugarAchievementIcon';
 import { LevelIcon } from '../components/LevelIcon';
 import { Icon } from '../components/Icon';
 import { track } from '../services/tracker';
@@ -227,10 +227,10 @@ export function Today() {
           </p>
           {sugar.monthlyBadges.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2.5 text-sm">
-              <span className="text-xs text-ink/45">本月勋章</span>
+              <span className="text-xs text-ink/45">本月成就</span>
               {sugar.monthlyBadges.map((b) => (
                 <div key={b.kind} className="flex items-center gap-1">
-                  <SugarBadgeIcon variant={b.kind} className="w-7 h-7" />
+                  <SugarAchievementIcon variant={b.kind} className="w-7 h-7" />
                   <span className="text-xs text-ink">×{b.count}</span>
                 </div>
               ))}

@@ -13,7 +13,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { fetchHomeToday, fetchProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, type YanScoreToday } from '../services/symptoms';
-import { fetchSugarToday, SUGAR_BADGE_ICON, type SugarToday } from '../services/sugar';
+import { fetchSugarToday, type SugarToday } from '../services/sugar';
 import { fetchMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { fetchYanScoreHistory, type YanScoreHistory } from '../services/yanScoreHistory';
 import { fetchHomeMonth, fetchMealsByDate, type HomeMonth } from '../services/homeMonth';
@@ -56,9 +56,18 @@ export function Insights() {
   // 趋势锁定面板:即使 < 21 天也允许点开看现有数据
   const [trendExpanded, setTrendExpanded] = useState(false);
 
+  // 月份切换器:控制橘子瓶 + 月度统计 反映哪个月。默认当月。
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // 1-12
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const isCurrentMonth = selectedYear === currentYear && selectedMonth === currentMonth;
+
   const dateKey = todayKey();
   const dayEntry = useWellness((s) => s.dailyMap[dateKey]) ?? { waterCups: 0, steps: 0 };
 
+  // 一次性拉:今日相关数据 + 趋势历史(与月份切换无关)
   useEffect(() => {
     let mounted = true;
     track('tab_insights_visit');
@@ -67,23 +76,35 @@ export function Insights() {
       fetchHomeToday(),
       fetchProgress(),
       fetchSugarToday(),
-      fetchMonthChallenges(),
-      fetchYanScoreHistory(),
-      fetchHomeMonth()
-    ]).then(([y, h, p, s, m, hist, ma]) => {
+      fetchYanScoreHistory()
+    ]).then(([y, h, p, s, hist]) => {
       if (!mounted) return;
       setYanScore(y);
       setMeals(h?.meals ?? []);
       setProgress(p);
       setSugar(s);
-      setMonthCh(m);
       setHistory(hist);
-      setMonthAgg(ma);
     });
     return () => {
       mounted = false;
     };
   }, []);
+
+  // 月份切换 → 重新拉该月的橘子瓶 + 月度统计
+  useEffect(() => {
+    let mounted = true;
+    void Promise.all([
+      fetchMonthChallenges(selectedYear, selectedMonth),
+      fetchHomeMonth(selectedYear, selectedMonth)
+    ]).then(([m, ma]) => {
+      if (!mounted) return;
+      setMonthCh(m);
+      setMonthAgg(ma);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [selectedYear, selectedMonth]);
 
   // 选中日变化 → 拉当日餐食
   useEffect(() => {
@@ -111,22 +132,40 @@ export function Insights() {
   }, [meals, yanScore, dayEntry]);
 
   const cumulativeDays = progress?.cumulativeCheckinDays ?? 0;
-  const monthLabel = useMemo(
-    () => `${new Date().getFullYear()} 年 ${new Date().getMonth() + 1} 月`,
-    []
-  );
+  const monthLabel = `${selectedYear} 年 ${selectedMonth} 月`;
 
+  // 仅当浏览当月时,把今日 tier 累加进去(server 还没收到 upsert 的乐观值)
   const todayInServer = monthCh?.days.some((d) => d.date === dateKey) ?? false;
-  const addToday = todayInServer
-    ? { perfect: 0, great: 0, nice: 0 }
-    : {
-        perfect: todayTier === 'perfect' ? 1 : 0,
-        great: todayTier === 'great' ? 1 : 0,
-        nice: todayTier === 'nice' ? 1 : 0
-      };
+  const addToday =
+    isCurrentMonth && !todayInServer
+      ? {
+          perfect: todayTier === 'perfect' ? 1 : 0,
+          great: todayTier === 'great' ? 1 : 0,
+          nice: todayTier === 'nice' ? 1 : 0
+        }
+      : { perfect: 0, great: 0, nice: 0 };
   const perfect = (monthCh?.perfect ?? 0) + addToday.perfect;
   const great = (monthCh?.great ?? 0) + addToday.great;
   const nice = (monthCh?.nice ?? 0) + addToday.nice;
+
+  function shiftMonth(delta: number) {
+    let y = selectedYear;
+    let m = selectedMonth + delta;
+    if (m < 1) {
+      m += 12;
+      y -= 1;
+    } else if (m > 12) {
+      m -= 12;
+      y += 1;
+    }
+    // 不允许跳到未来月
+    const target = y * 100 + m;
+    const cur = currentYear * 100 + currentMonth;
+    if (target > cur) return;
+    setSelectedYear(y);
+    setSelectedMonth(m);
+    setSelectedDate(null); // 切月清空选中日
+  }
 
   const selectedDay = selectedDate
     ? history?.entries.find((e) => e.date === selectedDate) ?? null
@@ -137,16 +176,34 @@ export function Insights() {
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="insights">
-      <header className="mb-5 flex items-center justify-between">
-        <div>
+      <header className="mb-5 flex items-start justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-xs text-ink/45">洞悉</p>
-          <p className="mt-0.5 text-xl font-medium text-ink">{monthLabel}</p>
+          <p className="mt-0.5 text-xl font-medium text-ink truncate">{monthLabel}</p>
+          <span className="mt-1 inline-block text-xs text-ink/45">累计 {cumulativeDays} 天</span>
         </div>
-        <div className="flex items-center gap-2">
-          {yanScore?.result?.level && (
-            <LevelIcon level={yanScore.result.level} className="w-9 h-9" />
-          )}
-          <span className="text-xs text-ink/45">累计 {cumulativeDays} 天</span>
+        {/* 月份切换器 */}
+        <div className="flex items-center gap-1 bg-white rounded-full px-1 py-1 shadow-sm" data-testid="month-switcher">
+          <button
+            type="button"
+            onClick={() => shiftMonth(-1)}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-ink/65 hover:bg-paper active:scale-95 transition"
+            aria-label="上一个月"
+          >
+            ◀
+          </button>
+          <span className="text-xs text-ink px-1.5 min-w-[3.5rem] text-center" data-testid="month-switcher-label">
+            {selectedYear}.{String(selectedMonth).padStart(2, '0')}
+          </span>
+          <button
+            type="button"
+            onClick={() => shiftMonth(1)}
+            disabled={isCurrentMonth}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-ink/65 hover:bg-paper active:scale-95 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="下一个月"
+          >
+            ▶
+          </button>
         </div>
       </header>
 
@@ -180,13 +237,6 @@ export function Insights() {
             perfect={perfect}
             great={great}
             nice={nice}
-            sugarBadges={(sugar?.monthlyBadges ?? []).map((b) => ({
-              emoji: b.emoji,
-              label: b.label,
-              count: b.count,
-              iconFile: SUGAR_BADGE_ICON[b.kind],
-              kind: b.kind
-            }))}
           />
         </Suspense>
       )}
@@ -297,6 +347,7 @@ export function Insights() {
         <MonthCalendarGrid
           cumulativeInMonth={Math.min(cumulativeDays, 31)}
           todayLevel={yanScore?.result?.level ?? null}
+          monthBase={new Date(selectedYear, selectedMonth - 1, 1)}
           daysHistory={(monthCh?.days ?? []).map((d) => ({
             date: d.date,
             tier: d.tier,

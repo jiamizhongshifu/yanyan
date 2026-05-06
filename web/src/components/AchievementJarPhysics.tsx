@@ -1,45 +1,24 @@
 /**
- * 重力勋章瓶 — matter.js 物理引擎 + DeviceOrientation
+ * 重力橘子瓶 — matter.js 物理引擎 + DeviceOrientation
  *
- * 与原 AchievementJar 接口兼容(perfect/great/nice + sugarBadges),
- * 行为差异:
- *   - 勋章不再 absolute 定位,变成 matter 动态体落进瓶子
- *   - DeviceOrientation 改 gravity.x,手机倾斜勋章会滑动
- *   - 默认无勋章时瓶子是空的(背景图自带玻璃感)
+ * 瓶子里只放每天点亮的橘子(perfect/great/nice 三档),反映指定月份的累计成就。
+ * 控糖成就不再混入瓶子(改在 Today / Insights 控糖卡里独立展示)。
+ *
+ * 行为:
+ *   - 橘子作为 matter 动态体落进瓶子
+ *   - DeviceOrientation 改 gravity.x,手机倾斜橘子会滑动
  *   - iOS 13+ 第一次进入时弹按钮请求权限
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Matter from 'matter-js';
 import { orangeIconDataUrl } from './OrangeIcon';
-import { SugarBadgeIcon, sugarBadgeDataUrl, type SugarBadgeVariant } from './SugarBadgeIcon';
-
-interface SugarBadgeInput {
-  emoji: string;
-  label: string;
-  count: number;
-  /** 老接口字段;新版用 kind 决定 SVG 变体,iconFile 仅供 fallback */
-  iconFile: string;
-  kind?: SugarBadgeVariant;
-}
-
-/** 把后端返回的 iconFile / 老 kind 名映射到 SVG 变体 */
-function resolveSugarKind(b: SugarBadgeInput): SugarBadgeVariant {
-  if (b.kind) return b.kind;
-  const f = b.iconFile;
-  if (f.includes('lollipop')) return 'lollipop';
-  if (f.includes('cola')) return 'cola';
-  if (f.includes('milktea')) return 'milktea';
-  if (f.includes('chocolate')) return 'chocolate';
-  return 'lollipop';
-}
 
 interface Props {
   monthLabel: string;
   perfect: number;
   great: number;
   nice: number;
-  sugarBadges: SugarBadgeInput[];
 }
 
 interface BadgeSpec {
@@ -76,8 +55,7 @@ export function AchievementJarPhysics({
   monthLabel,
   perfect,
   great,
-  nice,
-  sugarBadges
+  nice
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -93,14 +71,8 @@ export function AchievementJarPhysics({
     for (let i = 0; i < perfect; i++) list.push({ iconUrl: orangeIconDataUrl('perfect'), size: 64 });
     for (let i = 0; i < great; i++) list.push({ iconUrl: orangeIconDataUrl('great'), size: 56 });
     for (let i = 0; i < nice; i++) list.push({ iconUrl: orangeIconDataUrl('nice'), size: 50 });
-    for (const sb of sugarBadges) {
-      const kind = resolveSugarKind(sb);
-      for (let i = 0; i < sb.count; i++) {
-        list.push({ iconUrl: sugarBadgeDataUrl(kind), size: 56 });
-      }
-    }
     return list.slice(0, 24);
-  }, [perfect, great, nice, sugarBadges]);
+  }, [perfect, great, nice]);
 
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -258,27 +230,10 @@ export function AchievementJarPhysics({
             className="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-ink text-paper text-xs"
             data-testid="orient-perm-btn"
           >
-            轻摇手机让勋章动起来 →
+            轻摇手机让橘子动起来 →
           </button>
         )}
       </div>
-
-      {sugarBadges.length > 0 && (
-        <div className="mt-4 rounded-2xl bg-paper px-5 py-4">
-          <p className="text-xs text-ink/50 mb-2">控糖勋章</p>
-          <div className="grid grid-cols-2 gap-3">
-            {sugarBadges.map((b, i) => (
-              <div key={i} className="flex items-center gap-2.5">
-                <SugarBadgeIcon variant={resolveSugarKind(b)} className="w-9 h-9" />
-                <div className="text-sm">
-                  <span className="text-ink">{b.label}</span>
-                  <span className="ml-1 text-ink/45">×{b.count}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </section>
   );
 }
