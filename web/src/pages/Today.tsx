@@ -24,6 +24,7 @@ import { TodaySuggestionCard } from '../components/TodaySuggestionCard';
 import { TodayWeekStrip } from '../components/TodayWeekStrip';
 import { PerfectDayRing } from '../components/PerfectDayRing';
 import { SugarBadgeIcon } from '../components/SugarBadgeIcon';
+import { LevelIcon } from '../components/LevelIcon';
 import { Icon } from '../components/Icon';
 import { track } from '../services/tracker';
 
@@ -183,11 +184,7 @@ export function Today() {
       {/* 顶部抗炎指数一句话 — 加 level 插画 */}
       {yanScore?.result && (
         <section className="mb-5 rounded-2xl bg-white px-5 py-4 flex items-center gap-4" data-testid="today-fire-strip">
-          <img
-            src={asset(`level-${yanScore.result.level === '平' ? 'ping' : yanScore.result.level === '微火' ? 'weihuo' : yanScore.result.level === '中火' ? 'zhonghuo' : 'dahuo'}.png`)}
-            alt={LEVEL_TO_LABEL[yanScore.result.level]}
-            className="w-14 h-14 object-contain flex-shrink-0"
-          />
+          <LevelIcon level={yanScore.result.level} className="w-14 h-14 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-xs text-ink/50">今日抗炎指数</p>
             <p className="mt-0.5">

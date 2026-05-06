@@ -6,7 +6,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { asset } from '../services/assets';
+import { LevelIcon } from '../components/LevelIcon';
 import { getCurrentAccessToken } from '../services/auth';
 import { useEffect, useState } from 'react';
 
@@ -106,10 +106,10 @@ URL:    ${typeof window !== 'undefined' ? window.location.origin : 'https://web-
       </section>
 
       <div className="mt-8 flex items-center gap-3 opacity-50">
-        <img src={asset('level-ping.png')} alt="" className="w-12 h-12" />
-        <img src={asset('level-weihuo.png')} alt="" className="w-12 h-12" />
-        <img src={asset('level-zhonghuo.png')} alt="" className="w-12 h-12" />
-        <img src={asset('level-dahuo.png')} alt="" className="w-12 h-12" />
+        <LevelIcon level="平" className="w-12 h-12" />
+        <LevelIcon level="微火" className="w-12 h-12" />
+        <LevelIcon level="中火" className="w-12 h-12" />
+        <LevelIcon level="大火" className="w-12 h-12" />
       </div>
     </main>
   );

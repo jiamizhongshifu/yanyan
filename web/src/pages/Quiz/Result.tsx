@@ -8,8 +8,8 @@ import { useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { computeInflammationIndex, LEVEL_HINT, type InflammationIndex } from '../../services/quiz';
 import { useQuiz } from '../../store/quiz';
-import { asset } from '../../services/assets';
 import { Icon } from '../../components/Icon';
+import { LevelIcon } from '../../components/LevelIcon';
 import type { FireLevel } from '../../services/onboarding';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../../services/score-display';
 
@@ -18,14 +18,6 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
   微火: 'text-fire-ping',
   中火: 'text-fire-mild',
   大火: 'text-fire-mid'
-};
-
-/** 每档对应的独立插图(白底,可作 icon)— Supabase app-assets bucket */
-const LEVEL_ICON_FILE: Record<FireLevel, string> = {
-  平: 'level-ping.png',
-  微火: 'level-weihuo.png',
-  中火: 'level-zhonghuo.png',
-  大火: 'level-dahuo.png'
 };
 
 const UNLOCKED_FEATURES = [
@@ -78,12 +70,9 @@ export function QuizResult() {
       <header className="text-xs text-ink/40 tracking-widest">Soak · 初步评估</header>
 
       <section className="mt-6 rounded-3xl bg-white px-6 py-10 text-center">
-        <img
-          src={asset(LEVEL_ICON_FILE[index.level])}
-          alt={`等级:${LEVEL_TO_LABEL[index.level]}`}
-          className="mx-auto w-32 h-32 object-contain"
-          data-testid="level-illustration"
-        />
+        <div className="mx-auto w-32 h-32" data-testid="level-illustration">
+          <LevelIcon level={index.level} className="w-32 h-32" />
+        </div>
         <p className="mt-5 text-xs text-ink/50 tracking-wide">你当前的抗炎指数</p>
         <p className={`mt-3 text-5xl leading-none ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
           {'★'.repeat(LEVEL_TO_STARS[index.level])}
@@ -113,12 +102,15 @@ export function QuizResult() {
 
       <section className="mt-5 rounded-2xl bg-white px-4 py-4" data-testid="result-scale-img">
         <p className="text-xs text-ink/50 mb-3 px-2">抗炎指数 4 档分级参考</p>
-        <img
-          src={asset('level-scale.png')}
-          alt="平 / 轻盈 / 微暖 / 留心 4 档对照"
-          className="w-full rounded-xl"
-          loading="lazy"
-        />
+        <div className="grid grid-cols-4 gap-2">
+          {(['平', '微火', '中火', '大火'] as const).map((lvl) => (
+            <div key={lvl} className="flex flex-col items-center">
+              <LevelIcon level={lvl} className="w-12 h-12" />
+              <p className="mt-2 text-xs text-ink/65">{LEVEL_TO_LABEL[lvl]}</p>
+              <p className="text-[10px] text-ink/40">{'★'.repeat(LEVEL_TO_STARS[lvl])}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="mt-8">

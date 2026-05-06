@@ -34,13 +34,6 @@ import { computeInflammationIndex } from '../services/quiz';
 import { track } from '../services/tracker';
 import { LEVEL_TO_HOME_ENCOURAGEMENT } from '../services/score-display';
 
-const LEVEL_ICON_FILE = {
-  平: 'level-ping.png',
-  微火: 'level-weihuo.png',
-  中火: 'level-zhonghuo.png',
-  大火: 'level-dahuo.png'
-} as const;
-
 // 走 score-display 模块的 LEVEL_TO_HOME_ENCOURAGEMENT;此处仅保留 import 锚
 
 export function Home() {
@@ -130,7 +123,6 @@ export function Home() {
               score={dial.score}
               level={dial.level}
               caption={dial.caption}
-              levelIcon={LEVEL_ICON_FILE[dial.level]}
             />
             <p className="mt-2 px-2 text-sm text-ink/65 text-center leading-relaxed" data-testid="dial-encourage">
               {LEVEL_TO_HOME_ENCOURAGEMENT[dial.level]}

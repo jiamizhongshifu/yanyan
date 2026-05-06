@@ -25,15 +25,9 @@ import { AchievementJarPhysics as AchievementJar } from '../components/Achieveme
 import { track } from '../services/tracker';
 import { asset } from '../services/assets';
 import { Icon, type IconName } from '../components/Icon';
+import { LevelIcon } from '../components/LevelIcon';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS, scoreToStars } from '../services/score-display';
 import type { FireLevel } from '../services/symptoms';
-
-const LEVEL_ICON_FILE: Record<FireLevel, string> = {
-  平: 'level-ping.png',
-  微火: 'level-weihuo.png',
-  中火: 'level-zhonghuo.png',
-  大火: 'level-dahuo.png'
-};
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
   平: 'text-fire-ping',
@@ -146,11 +140,7 @@ export function Insights() {
         </div>
         <div className="flex items-center gap-2">
           {yanScore?.result?.level && (
-            <img
-              src={asset(LEVEL_ICON_FILE[yanScore.result.level])}
-              alt={yanScore.result.level}
-              className="w-9 h-9 object-contain"
-            />
+            <LevelIcon level={yanScore.result.level} className="w-9 h-9" />
           )}
           <span className="text-xs text-ink/45">累计 {cumulativeDays} 天</span>
         </div>
@@ -544,11 +534,7 @@ function DayDetailPanel({
         </p>
         {entry?.level && (
           <div className="flex items-center gap-2">
-            <img
-              src={asset(LEVEL_ICON_FILE[entry.level])}
-              alt={LEVEL_TO_LABEL[entry.level]}
-              className="w-8 h-8 object-contain"
-            />
+            <LevelIcon level={entry.level} className="w-8 h-8" />
             <span className={`text-base font-medium ${LEVEL_COLOR[entry.level]}`}>
               {LEVEL_TO_LABEL[entry.level]}
             </span>
@@ -597,13 +583,7 @@ function DayDetailPanel({
           <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-1">
             {meals.map((m) => (
               <div key={m.id} className="flex-shrink-0 w-20 rounded-xl bg-white p-2 text-center">
-                {m.level && (
-                  <img
-                    src={asset(LEVEL_ICON_FILE[m.level])}
-                    alt={m.level}
-                    className="w-10 h-10 mx-auto object-contain"
-                  />
-                )}
+                {m.level && <LevelIcon level={m.level} className="w-10 h-10 mx-auto" />}
                 <p className="mt-1 text-[10px] text-ink/55">
                   {new Date(m.ateAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
                 </p>

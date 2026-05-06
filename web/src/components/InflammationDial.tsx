@@ -7,16 +7,16 @@
  */
 
 import type { FireLevel } from '../services/symptoms';
-import { asset } from '../services/assets';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
+import { LevelIcon } from './LevelIcon';
 
 interface Props {
   /** 后端 fireScore 0-100(0=最好);组件内部翻成抗炎指数 100-fireScore */
   score: number;
   level: FireLevel;
   caption?: string;
-  /** 等级插画 — 视觉锚点保留 */
-  levelIcon?: 'level-ping.png' | 'level-weihuo.png' | 'level-zhonghuo.png' | 'level-dahuo.png';
+  /** 是否在中心显示等级 SVG 图标(默认 true) */
+  showLevelIcon?: boolean;
 }
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
@@ -33,7 +33,7 @@ const LABEL_TEXT_COLOR: Record<FireLevel, string> = {
   大火: 'text-fire-mid'
 };
 
-export function InflammationDial({ score, level, caption = '今日抗炎指数', levelIcon }: Props) {
+export function InflammationDial({ score, level, caption = '今日抗炎指数', showLevelIcon = true }: Props) {
   const fireScore = Math.max(0, Math.min(100, score));
   const antiInflam = 100 - fireScore; // 0-100,高 = 健康
   const stars = LEVEL_TO_STARS[level];
@@ -87,14 +87,7 @@ export function InflammationDial({ score, level, caption = '今日抗炎指数',
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        {levelIcon && (
-          <img
-            src={asset(levelIcon)}
-            alt={displayLabel}
-            className="w-12 h-12 object-contain mb-1"
-            loading="lazy"
-          />
-        )}
+        {showLevelIcon && <LevelIcon level={level} className="w-12 h-12 mb-1" />}
         <Stars filled={stars} className="text-3xl" testId="dial-stars" />
         <p className="mt-1 text-xs text-ink/50 tracking-wide">{caption}</p>
         <p
