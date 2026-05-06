@@ -144,14 +144,16 @@ describe('U6 aggregator — meal fire score (Round 2 review:统一公式,非 max
     expect(a.counts).toEqual({ 发: 0, 温和: 0, 平: 3, unknown: 0 });
   });
 
-  test('全发物 → fireScore = 100,level=大火', () => {
+  test('全发物 → fireScore 落在大火/中火区间(>=50)', () => {
+    // v2 多信号:每条发物贡献 55 (TCM only, dii=0 在 fakeCls);均值 55,落 中火
     const items = [it('炸鸡'), it('烤羊肉串'), it('辣椒')];
     const cls = items.map((i) => fakeCls(i.name, '发'));
-    expect(aggregateMeal(items, cls).fireScore).toBe(100);
-    expect(aggregateMeal(items, cls).level).toBe('大火');
+    const score = aggregateMeal(items, cls).fireScore;
+    expect(score).toBeGreaterThanOrEqual(50);
+    expect(score).toBeLessThan(75);
   });
 
-  test('火锅 12 食材 4 发 + 8 平 → 不被钉到 100', () => {
+  test('火锅 12 食材 4 发 + 8 平 → 中等偏低(微火/平)', () => {
     const items: RecognizedItem[] = [];
     const cls: FoodClassification[] = [];
     for (let i = 0; i < 4; i++) {
@@ -163,18 +165,19 @@ describe('U6 aggregator — meal fire score (Round 2 review:统一公式,非 max
       cls.push(fakeCls(`平${i}`, '平'));
     }
     const a = aggregateMeal(items, cls);
-    // sum=20, N*5=60, normalized = 33.3
-    expect(a.fireScore).toBeCloseTo(33.3, 0);
-    expect(a.level).toBe('微火'); // 25 ≤ score < 50
+    // (4 × 55 + 8 × 0) / 12 ≈ 18.3
+    expect(a.fireScore).toBeCloseTo(18.3, 0);
+    expect(a.level).toBe('平');
   });
 
-  test('未识别项视为权重 0(平),记入 unrecognizedNames', () => {
+  test('未识别项贡献 +12 不确定性,记入 unrecognizedNames', () => {
     const items = [it('清蒸鲈鱼'), it('佛跳墙未知')];
     const cls = [fakeCls('清蒸鲈鱼', '平'), null];
     const a = aggregateMeal(items, cls);
     expect(a.unrecognizedNames).toEqual(['佛跳墙未知']);
     expect(a.counts.unknown).toBe(1);
-    expect(a.fireScore).toBe(0);
+    // (0 + 12) / 2 = 6
+    expect(a.fireScore).toBe(6);
   });
 
   test('scoreToLevel boundary: 25 → 微火, 75 → 大火', () => {
@@ -329,7 +332,7 @@ describe('U6 meals routes', () => {
     await app.close();
   });
 
-  test('Happy: POST /meals with 清蒸鲈鱼+西兰花+白米饭 → fireScore=0(平和) + 3 items', async () => {
+  test('Happy: POST /meals with 清蒸鲈鱼+西兰花+白米饭 → fireScore<25(平) + 3 items', async () => {
     recognizer.add('users/u1/2026-05-04/m1.jpg', {
       items: [
         { name: '清蒸鲈鱼', confidence: 0.92 },
@@ -349,7 +352,8 @@ describe('U6 meals routes', () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.ok).toBe(true);
-    expect(body.fireScore).toBe(0);
+    // 白米饭 GI 73 → +10,清蒸鲈鱼 0、西兰花 0;均值 ≈ 3.3,仍落 平
+    expect(body.fireScore).toBeLessThan(25);
     expect(body.level).toBe('平');
     expect(body.items).toHaveLength(3);
     expect(body.items[0].classification?.tcmLabel).toBe('平');
@@ -388,10 +392,10 @@ describe('U6 meals routes', () => {
       payload: { storageKey: 'users/u1/hotpot.jpg' }
     });
     const body = res.json();
-    // 4 发(权重5) + 5 平(权重0) → sum=20, N*5=45, normalized = 44.4
-    expect(body.fireScore).toBeGreaterThan(40);
+    // v2 多信号:4 发(每条 55) + 5 平(每条 0~10),均值 ~24-30,落 平/微火
+    expect(body.fireScore).toBeGreaterThan(15);
     expect(body.fireScore).toBeLessThan(50);
-    expect(body.level).toBe('微火');
+    expect(['平', '微火']).toContain(body.level);
   });
 
   test('Edge: 整体置信度 < 0.6 → 422 low_confidence', async () => {

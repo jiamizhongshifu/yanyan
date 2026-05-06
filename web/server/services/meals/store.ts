@@ -19,7 +19,12 @@ export interface MealRow {
   fireScore: number | null;
   /** 餐级添加糖累计(g)。null 表示未估算(老数据);0 表示估算后无添加糖 */
   sugarGrams: number | null;
-  feedback: Array<{ itemName: string; kind: 'misrecognized' | 'no_reaction'; at: string }>;
+  feedback: Array<{
+    itemName: string;
+    kind: 'misrecognized' | 'no_reaction' | 'thumbs_up' | 'thumbs_down';
+    note?: string;
+    at: string;
+  }>;
   createdAt: Date;
 }
 

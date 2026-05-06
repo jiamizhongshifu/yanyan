@@ -39,7 +39,9 @@ const CreateMealBody = z.object({
 
 const FeedbackBody = z.object({
   itemName: z.string().min(1),
-  kind: z.enum(['misrecognized', 'no_reaction'])
+  kind: z.enum(['misrecognized', 'no_reaction', 'thumbs_up', 'thumbs_down']),
+  /** 用户对识别结果的反馈正文(可选,通常 thumbs_down 才填) */
+  note: z.string().max(500).optional()
 });
 
 const IllustrationBody = z.object({
@@ -263,7 +265,8 @@ export async function registerMealsRoutes(app: FastifyInstance, opts: RegisterMe
         userId: user.userId,
         mealId: req.params.id,
         itemName: parsed.data.itemName,
-        kind: parsed.data.kind
+        kind: parsed.data.kind,
+        note: parsed.data.note
       }
     );
     return { ok: true, entry };

@@ -161,7 +161,7 @@ describe('U6 MealResult page', () => {
     expect(screen.getByText(/某神秘食物/)).toBeInTheDocument();
   });
 
-  test('点"识别错误"按钮调 postMealFeedback', async () => {
+  test('点 👍 调 postMealFeedback(thumbs_up)', async () => {
     useLastMeal.getState().set({
       mealId: 'meal-9',
       fireScore: 0,
@@ -174,10 +174,12 @@ describe('U6 MealResult page', () => {
     });
 
     render(<MealResult />);
-    fireEvent.click(screen.getByText('识别错误'));
+    fireEvent.click(screen.getByTestId('thumbs-up'));
 
-    await waitFor(() => expect(postMealFeedbackMock).toHaveBeenCalledWith('meal-9', '清蒸鲈鱼', 'misrecognized'));
-    expect(await screen.findByRole('status')).toHaveTextContent(/已记录/);
+    await waitFor(() =>
+      expect(postMealFeedbackMock).toHaveBeenCalledWith('meal-9', '清蒸鲈鱼', 'thumbs_up', undefined)
+    );
+    expect(await screen.findByRole('status')).toHaveTextContent(/已收到/);
   });
 
   test('无 lastMeal → 自动跳 /camera', () => {

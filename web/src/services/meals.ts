@@ -175,10 +175,17 @@ export async function updateMealItems(
   return null;
 }
 
+export type MealFeedbackKind =
+  | 'misrecognized'
+  | 'no_reaction'
+  | 'thumbs_up'
+  | 'thumbs_down';
+
 export async function postMealFeedback(
   mealId: string,
   itemName: string,
-  kind: 'misrecognized' | 'no_reaction'
+  kind: MealFeedbackKind,
+  note?: string
 ): Promise<boolean> {
   const token = await getCurrentAccessToken();
   if (!token) return false;
@@ -186,7 +193,7 @@ export async function postMealFeedback(
     url: `/meals/${mealId}/feedback`,
     method: 'POST',
     authToken: token,
-    data: { itemName, kind }
+    data: { itemName, kind, ...(note ? { note } : {}) }
   });
   return res.ok;
 }

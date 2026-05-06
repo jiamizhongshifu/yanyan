@@ -104,7 +104,7 @@ async function classifyAndAggregate(
       }
     }
   }
-  const agg = aggregateMeal(items, classifications);
+  const agg = aggregateMeal(items, classifications, ingredientClassifications);
   const western = westernSummary(classifications);
   return { classifications, ingredientClassifications, agg, western };
 }
@@ -226,14 +226,17 @@ export interface AppendFeedbackParams {
   userId: string;
   mealId: string;
   itemName: string;
-  kind: 'misrecognized' | 'no_reaction';
+  kind: 'misrecognized' | 'no_reaction' | 'thumbs_up' | 'thumbs_down';
+  /** 文字反馈(thumbs_down 通常带,其它可选) */
+  note?: string;
 }
 
 export async function appendMealFeedback(deps: MealsDeps, params: AppendFeedbackParams): Promise<MealRow['feedback'][number]> {
   const entry: MealRow['feedback'][number] = {
     itemName: params.itemName,
     kind: params.kind,
-    at: new Date().toISOString()
+    at: new Date().toISOString(),
+    ...(params.note ? { note: params.note } : {})
   };
   await deps.mealStore.appendFeedback(params.mealId, params.userId, entry);
   return entry;

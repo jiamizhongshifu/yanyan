@@ -18,7 +18,8 @@ import { Stars } from '../components/InflammationDial';
 import {
   postMealFeedback,
   updateMealItems,
-  type FireLevel
+  type FireLevel,
+  type MealFeedbackKind
 } from '../services/meals';
 import { useLastMeal } from '../store/lastMeal';
 import { asset } from '../services/assets';
@@ -67,8 +68,8 @@ export function MealResult() {
       ? result.items[0].name
       : result.items.map((i) => i.name).join('、');
 
-  const handleFlag = async (itemName: string, kind: 'misrecognized' | 'no_reaction') => {
-    await postMealFeedback(result.mealId, itemName, kind);
+  const handleFlag = async (itemName: string, kind: MealFeedbackKind, note?: string) => {
+    await postMealFeedback(result.mealId, itemName, kind, note);
   };
 
   const handleEditIngredients = async (itemIdx: number, newIngredients: string[]) => {
@@ -158,9 +159,8 @@ export function MealResult() {
           <FoodItemCard
             key={`${item.name}-${idx}`}
             item={item}
-            onFlagMisrecognized={(name) => void handleFlag(name, 'misrecognized')}
-            onFlagNoReaction={(name) => void handleFlag(name, 'no_reaction')}
-            onEditIngredients={(newIngredients) => void handleEditIngredients(idx, newIngredients)}
+            onSendFeedback={(name, kind, note) => void handleFlag(name, kind, note)}
+            onSubmitIngredients={(newIngredients) => void handleEditIngredients(idx, newIngredients)}
             isSaving={savingIdx === idx}
           />
         ))}
@@ -230,32 +230,43 @@ function AlgorithmSheet({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="text-sm text-ink/70 leading-relaxed">
-          每一餐我们用<span className="font-medium text-ink">中医发物分类</span>(发 / 温和 / 平)
-          + <span className="font-medium text-ink">现代营养学 DII</span>(膳食炎症指数)
-          + GI(升糖指数)三层数据,折算出 0-100 的抗炎指数,数字越高代表越清气。
+          每一餐我们综合 <span className="font-medium text-ink">5 个信号</span> 联合打分,
+          折算出 0-100 的抗炎指数,数字越高代表这一餐对身体越清气。
         </p>
 
-        <h3 className="mt-5 text-sm font-medium text-ink">第 1 步:每条食物找分类</h3>
+        <h3 className="mt-5 text-sm font-medium text-ink">第 1 步:为每条食物找分类</h3>
         <ul className="mt-2 text-xs text-ink/65 leading-relaxed space-y-1 pl-4 list-disc">
           <li>菜名直接命中 DB(如"白米饭")→ 用该条目数据</li>
-          <li>命中失败时(如"野生菌火锅"这类复合菜)→ 用 LLM 返回的主料数组逐个查 DB,投票合成</li>
+          <li>复合菜(如"野生菌火锅")→ LLM 返回主料数组,逐个查 DB,投票合成 TCM 标签;DII / GI / 添加糖等数值取均值</li>
           <li>仍未匹配 → 标"未收录",入回填队列,后续人工补录</li>
         </ul>
 
-        <h3 className="mt-5 text-sm font-medium text-ink">第 2 步:整餐打火分</h3>
-        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
-          每条 item 按 TCM 标签计权重:
-          <span className="ml-1 px-1.5 py-0.5 rounded bg-fire-mild/15 text-fire-mild">发=5</span>
-          <span className="ml-1 px-1.5 py-0.5 rounded bg-fire-ping/15 text-fire-ping">温和=2</span>
-          <span className="ml-1 px-1.5 py-0.5 rounded bg-fire-ping/15 text-fire-ping">平=0</span>
-        </p>
-        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
-          fireScore = (Σ 权重) / (条目数 × 5) × 100,得 0-100 的"火分"。
-        </p>
+        <h3 className="mt-5 text-sm font-medium text-ink">第 2 步:每条食物的火分(0-100)</h3>
+        <p className="mt-2 text-xs text-ink/65 leading-relaxed">5 个信号叠加:</p>
+        <ul className="mt-1.5 text-[11px] text-ink/65 leading-relaxed space-y-0.5 pl-4 list-disc">
+          <li>
+            <span className="font-medium">中医标签</span>:发 +55、温和 +22、平 0
+          </li>
+          <li>
+            <span className="font-medium">DII 膳食炎症指数</span>:&gt; +0.5 才加分,最高 +25
+          </li>
+          <li>
+            <span className="font-medium">GI 升糖指数</span>:≥70 +10、≥55 +3
+          </li>
+          <li>
+            <span className="font-medium">添加糖</span>:每 1g +1.2,封顶 +30
+          </li>
+          <li>
+            <span className="font-medium">AGEs 高级糖化终产物</span>:&gt;5000 起加,封顶 +15
+          </li>
+          <li>
+            <span className="font-medium">主料未匹配率</span>:每 100% 未识别 +12(数据缺失带的小惩罚)
+          </li>
+        </ul>
 
-        <h3 className="mt-5 text-sm font-medium text-ink">第 3 步:翻成抗炎指数</h3>
+        <h3 className="mt-5 text-sm font-medium text-ink">第 3 步:整餐均值 → 抗炎指数</h3>
         <p className="mt-2 text-xs text-ink/65 leading-relaxed">
-          抗炎指数 = 100 − fireScore,数字越高越清气。
+          fireScore = 所有 item 的均值;抗炎指数 = 100 − fireScore。未识别条目计 +12。
         </p>
         <ul className="mt-2 text-[11px] text-ink/55 leading-relaxed space-y-0.5">
           <li>★★★★★ 平 — 抗炎 75-100,这一餐很清气</li>
@@ -264,22 +275,15 @@ function AlgorithmSheet({ onClose }: { onClose: () => void }) {
           <li>★★ 留心 — 抗炎 0-25,下一餐换轻盈的</li>
         </ul>
 
-        <h3 className="mt-5 text-sm font-medium text-ink">合成投票规则(复合菜)</h3>
-        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
-          复合菜的合成 TCM 标签按主料投票决定。已匹配的主料按真实标签算,
-          <span className="font-medium">未匹配主料默认按"温和"计入投票</span> ——
-          避免单个发物食材一票否决整道菜,也不假装一切都"平"。并列时偏向温和。
-        </p>
-
         <h3 className="mt-5 text-sm font-medium text-ink">数据来源</h3>
         <ul className="mt-2 text-[11px] text-ink/55 leading-relaxed space-y-0.5">
           <li>• 发物分类:《本草纲目》《中华本草》等典籍</li>
-          <li>• DII:Shivappa et al. 2014 膳食炎症指数</li>
-          <li>• GI / 营养:USDA FoodData Central + 中国食物成分表 2018</li>
+          <li>• DII:Shivappa et al. 2014 膳食炎症指数公式</li>
+          <li>• GI / AGEs / 营养:USDA FoodData Central + 中国食物成分表 2018</li>
         </ul>
 
         <p className="mt-6 text-[11px] text-ink/40 leading-relaxed">
-          本指数是生活方式参考,不构成医疗建议。
+          本指数是生活方式参考,不构成医疗建议。识别有偏差时点 👎 告诉我们。
         </p>
       </div>
     </div>

@@ -3,23 +3,21 @@
  *
  * 内容层级:
  *   - 名称 + TCM 标签徽章
- *   - 主料行(LLM 识别到的食材清单)
+ *   - 主料明细行(可加 / 可删,本地 draft → 点"重新计算"提交)
  *   - 数据胶囊行:DII / GI / AGEs / 添加糖
- *   - 模板化评价(性味 + 营养 + 发物提示,1-3 句)
- *   - 引用折叠
- *   - 反例 / 误识别按钮
+ *   - 评价 + 引用
+ *   - 反馈行:👍 / 👎(👎 弹文本框收集详细反馈)
  */
 
-import { useState } from 'react';
-import type { MealItem } from '../services/meals';
+import { useEffect, useState } from 'react';
+import type { MealItem, MealFeedbackKind } from '../services/meals';
 import { diiToLabel, foodCommentary, giToLabel } from '../services/score-display';
 
 interface Props {
   item: MealItem;
-  onFlagMisrecognized: (name: string) => void;
-  onFlagNoReaction: (name: string) => void;
-  /** 用户编辑主料(添加 / 删除)— 父组件负责 server 重算 */
-  onEditIngredients?: (newIngredients: string[]) => void;
+  onSendFeedback: (name: string, kind: MealFeedbackKind, note?: string) => void;
+  /** 用户提交编辑后的主料完整列表;父组件负责 server 重算 */
+  onSubmitIngredients?: (newIngredients: string[]) => void;
   /** 父在 server 调用进行中时锁定按钮 */
   isSaving?: boolean;
 }
@@ -36,51 +34,75 @@ const TONE_PILL: Record<'good' | 'mild' | 'neutral', string> = {
   mild: 'bg-fire-mild/12 text-fire-mild'
 };
 
-export function FoodItemCard({
-  item,
-  onFlagMisrecognized,
-  onFlagNoReaction,
-  onEditIngredients,
-  isSaving = false
-}: Props) {
-  const [flagged, setFlagged] = useState<'misrecognized' | 'no_reaction' | null>(null);
+export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSaving = false }: Props) {
+  const cls = item.classification;
+  const savedIngredients = item.ingredients ?? [];
+
+  const [draft, setDraft] = useState<string[]>(savedIngredients);
   const [showAllCitations, setShowAllCitations] = useState(false);
   const [adding, setAdding] = useState(false);
   const [newIngredient, setNewIngredient] = useState('');
-  const cls = item.classification;
-  const ingredients = item.ingredients ?? [];
 
-  const submitAdd = () => {
-    const trimmed = newIngredient.trim();
-    if (!trimmed) return;
-    if (ingredients.includes(trimmed)) {
-      setNewIngredient('');
-      setAdding(false);
-      return;
-    }
-    onEditIngredients?.([...ingredients, trimmed]);
-    setNewIngredient('');
-    setAdding(false);
-  };
+  // 反馈状态
+  const [feedbackSent, setFeedbackSent] = useState<'thumbs_up' | 'thumbs_down' | null>(null);
+  const [thumbsDownOpen, setThumbsDownOpen] = useState(false);
+  const [feedbackNote, setFeedbackNote] = useState('');
 
-  const removeIngredient = (name: string) => {
-    onEditIngredients?.(ingredients.filter((x) => x !== name));
-  };
+  // 当 server 返回新数据(savedIngredients 变了)→ 同步 draft
+  // 仅在不处于添加输入态时同步,避免覆盖用户正在输入的内容
+  const savedKey = savedIngredients.join('|');
+  useEffect(() => {
+    if (!adding) setDraft(savedIngredients);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedKey]);
 
   const dii = cls ? diiToLabel(cls.diiScore) : null;
   const gi = cls ? giToLabel(cls.gi) : null;
   const commentary = cls ? foodCommentary(cls) : null;
-
   const visibleCitations = cls
     ? showAllCitations
       ? cls.citations
       : cls.citations.slice(0, 1)
     : [];
 
-  // 主料行只在和食物名不同时显示(避免单一食材重复)
   const showIngredients =
-    ingredients.length > 0 &&
-    !(ingredients.length === 1 && ingredients[0] === item.name);
+    draft.length > 0 && !(draft.length === 1 && draft[0] === item.name);
+
+  const dirty = JSON.stringify(draft) !== JSON.stringify(savedIngredients);
+
+  const submitAdd = () => {
+    const trimmed = newIngredient.trim();
+    if (!trimmed) return;
+    if (draft.includes(trimmed)) {
+      setNewIngredient('');
+      setAdding(false);
+      return;
+    }
+    setDraft([...draft, trimmed]);
+    setNewIngredient('');
+    setAdding(false);
+  };
+
+  const removeFromDraft = (name: string) => {
+    setDraft(draft.filter((x) => x !== name));
+  };
+
+  const submitDraft = () => {
+    if (!onSubmitIngredients || !dirty) return;
+    onSubmitIngredients(draft);
+  };
+
+  const handleThumbsUp = () => {
+    if (feedbackSent) return;
+    onSendFeedback(item.name, 'thumbs_up');
+    setFeedbackSent('thumbs_up');
+  };
+
+  const submitThumbsDown = () => {
+    onSendFeedback(item.name, 'thumbs_down', feedbackNote.trim() || undefined);
+    setFeedbackSent('thumbs_down');
+    setThumbsDownOpen(false);
+  };
 
   return (
     <div className="rounded-xl bg-white px-4 py-4 mb-3" data-testid="food-item-card" data-name={item.name}>
@@ -95,12 +117,12 @@ export function FoodItemCard({
         )}
       </div>
 
-      {/* 主料明细行:每个食材带它自己的成分(matched 显示数据,未匹配标"待补录") */}
-      {(showIngredients || onEditIngredients) && (
+      {/* 主料明细 */}
+      {(showIngredients || onSubmitIngredients) && (
         <div className="mt-3">
           <p className="text-[11px] text-ink/45 mb-1.5">食材成分</p>
           <div className="space-y-1">
-            {ingredients.map((ing) => {
+            {draft.map((ing) => {
               const detail = item.ingredientDetails?.find((d) => d.name === ing);
               const c = detail?.classification ?? null;
               return (
@@ -110,10 +132,10 @@ export function FoodItemCard({
                 >
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <span className="text-xs text-ink/80">{ing}</span>
-                    {onEditIngredients && (
+                    {onSubmitIngredients && (
                       <button
                         type="button"
-                        onClick={() => removeIngredient(ing)}
+                        onClick={() => removeFromDraft(ing)}
                         disabled={isSaving}
                         className="text-ink/30 active:text-fire-mild text-xs disabled:opacity-40"
                         aria-label={`删除主料 ${ing}`}
@@ -166,11 +188,10 @@ export function FoodItemCard({
             })}
           </div>
 
-          {/* 添加食材入口 */}
-          {onEditIngredients && (
-            <div className="mt-2">
+          {onSubmitIngredients && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               {adding ? (
-                <div className="flex items-center gap-2">
+                <>
                   <input
                     type="text"
                     autoFocus
@@ -184,18 +205,18 @@ export function FoodItemCard({
                       }
                     }}
                     placeholder="食材名(如:牛肉)"
-                    className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-1.5 text-xs focus:border-ink focus:outline-none"
+                    className="flex-1 min-w-[120px] rounded-lg border border-ink/15 bg-paper px-3 py-1.5 text-xs focus:border-ink focus:outline-none"
                     maxLength={32}
                   />
                   <button
                     type="button"
                     onClick={submitAdd}
-                    disabled={isSaving || !newIngredient.trim()}
-                    className="px-3 py-1.5 rounded-lg bg-ink text-paper text-xs disabled:opacity-40"
+                    disabled={!newIngredient.trim()}
+                    className="px-3 py-1.5 rounded-lg bg-paper border border-ink/15 text-ink text-xs disabled:opacity-40"
                   >
-                    {isSaving ? '保存…' : '添加'}
+                    加入
                   </button>
-                </div>
+                </>
               ) : (
                 <button
                   type="button"
@@ -206,12 +227,22 @@ export function FoodItemCard({
                   + 添加食材
                 </button>
               )}
+              {dirty && !adding && (
+                <button
+                  type="button"
+                  onClick={submitDraft}
+                  disabled={isSaving}
+                  className="ml-auto px-3.5 py-1.5 rounded-lg bg-ink text-paper text-xs font-medium disabled:opacity-40"
+                >
+                  {isSaving ? '重新计算中…' : '重新计算'}
+                </button>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* 数据胶囊:DII / GI / AGEs / 添加糖 */}
+      {/* 数据胶囊 */}
       {cls && (
         <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
           {dii && (
@@ -245,14 +276,12 @@ export function FoodItemCard({
         </div>
       )}
 
-      {/* 评价 */}
       {commentary && (
         <p className="mt-2.5 text-xs text-ink/70 leading-relaxed" data-testid="food-commentary">
           {commentary}
         </p>
       )}
 
-      {/* 引用 */}
       {cls && cls.citations.length > 0 && (
         <div className="mt-2 text-[11px] text-ink/50 leading-relaxed">
           {visibleCitations.map((c, i) => (
@@ -275,34 +304,77 @@ export function FoodItemCard({
         </div>
       )}
 
-      {flagged ? (
-        <div className="mt-3 text-xs text-fire-ping" role="status">
-          已记录:{flagged === 'misrecognized' ? '识别错误' : '我吃了没事'}
-        </div>
-      ) : (
-        <div className="mt-3 flex gap-3 text-xs">
-          <button
-            type="button"
-            onClick={() => {
-              onFlagMisrecognized(item.name);
-              setFlagged('misrecognized');
-            }}
-            className="text-ink/55 underline"
-          >
-            识别错误
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              onFlagNoReaction(item.name);
-              setFlagged('no_reaction');
-            }}
-            className="text-ink/55 underline"
-          >
-            我吃了没事
-          </button>
-        </div>
-      )}
+      {/* 识别反馈行 */}
+      <div className="mt-3 pt-3 border-t border-paper">
+        {feedbackSent ? (
+          <p className="text-xs text-ink/55" role="status">
+            {feedbackSent === 'thumbs_up' ? '感谢反馈,已收到 👍' : '感谢反馈,已记录 👎'}
+          </p>
+        ) : thumbsDownOpen ? (
+          <div>
+            <p className="text-xs text-ink/55 mb-1.5">告诉我们哪里识别得不准:</p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                autoFocus
+                value={feedbackNote}
+                onChange={(e) => setFeedbackNote(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && feedbackNote.trim()) submitThumbsDown();
+                  else if (e.key === 'Escape') {
+                    setThumbsDownOpen(false);
+                    setFeedbackNote('');
+                  }
+                }}
+                placeholder="例如:这盘菜其实是 XX,主料应该是 YY"
+                maxLength={200}
+                className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-1.5 text-xs focus:border-ink focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={submitThumbsDown}
+                disabled={!feedbackNote.trim()}
+                className="px-3 py-1.5 rounded-lg bg-ink text-paper text-xs disabled:opacity-40"
+              >
+                提交
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setThumbsDownOpen(false);
+                  setFeedbackNote('');
+                }}
+                className="px-2 py-1.5 text-xs text-ink/55"
+              >
+                取消
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 text-xs">
+            <span className="text-ink/45">识别准确吗?</span>
+            <button
+              type="button"
+              onClick={handleThumbsUp}
+              className="px-2.5 py-1 rounded-lg bg-paper text-ink/65 active:bg-fire-ping/12 active:text-fire-ping"
+              aria-label="识别正确"
+              data-testid="thumbs-up"
+            >
+              👍
+            </button>
+            <button
+              type="button"
+              onClick={() => setThumbsDownOpen(true)}
+              className="px-2.5 py-1 rounded-lg bg-paper text-ink/65 active:bg-fire-mild/12 active:text-fire-mild"
+              aria-label="识别有误"
+              data-testid="thumbs-down"
+            >
+              👎
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
