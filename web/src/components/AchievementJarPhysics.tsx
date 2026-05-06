@@ -12,12 +12,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Matter from 'matter-js';
 import { asset } from '../services/assets';
-
-const TIER_TO_ICON: Record<'perfect' | 'great' | 'nice', string> = {
-  perfect: 'tier-perfect.png',
-  great: 'tier-great.png',
-  nice: 'tier-nice.png'
-};
+import { orangeIconDataUrl } from './OrangeIcon';
 
 interface SugarBadgeInput {
   emoji: string;
@@ -79,17 +74,17 @@ export function AchievementJarPhysics({
   const [needsPerm, setNeedsPerm] = useState(false);
 
   // 全部要进瓶子的勋章 specs(图片 url + 大小)
+  // 橘子勋章用 SVG dataURL,糖分勋章保留 PNG 图标
   const badges = useMemo<BadgeSpec[]>(() => {
     const list: BadgeSpec[] = [];
-    for (let i = 0; i < perfect; i++) list.push({ iconUrl: asset(TIER_TO_ICON.perfect), size: 36 });
-    for (let i = 0; i < great; i++) list.push({ iconUrl: asset(TIER_TO_ICON.great), size: 32 });
-    for (let i = 0; i < nice; i++) list.push({ iconUrl: asset(TIER_TO_ICON.nice), size: 28 });
+    for (let i = 0; i < perfect; i++) list.push({ iconUrl: orangeIconDataUrl('perfect'), size: 36 });
+    for (let i = 0; i < great; i++) list.push({ iconUrl: orangeIconDataUrl('great'), size: 32 });
+    for (let i = 0; i < nice; i++) list.push({ iconUrl: orangeIconDataUrl('nice'), size: 28 });
     for (const sb of sugarBadges) {
       for (let i = 0; i < sb.count; i++) {
         list.push({ iconUrl: asset(sb.iconFile), size: 30 });
       }
     }
-    // 限 24 防止 N=200 灾难
     return list.slice(0, 24);
   }, [perfect, great, nice, sugarBadges]);
 

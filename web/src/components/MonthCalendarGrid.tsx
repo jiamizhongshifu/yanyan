@@ -12,14 +12,21 @@
  */
 
 import { useMemo } from 'react';
-import { asset } from '../services/assets';
 import type { FireLevel } from '../services/symptoms';
+import { OrangeIcon, type OrangeVariant } from './OrangeIcon';
 
 interface DayInfo {
   date: string; // YYYY-MM-DD
   tier: 'perfect' | 'great' | 'nice' | 'none';
   fireLevel: FireLevel | null;
 }
+
+const TIER_TO_VARIANT: Record<DayInfo['tier'], OrangeVariant | null> = {
+  perfect: 'perfect',
+  great: 'great',
+  nice: 'nice',
+  none: null
+};
 
 interface Props {
   /** 当月内已打卡的累计天数(粗略 fallback,在 server 历史拿到前用) */
@@ -84,9 +91,6 @@ export function MonthCalendarGrid({
     return set;
   }, [cells, cumulativeInMonth]);
 
-  const filledSrc = asset('orange-filled.png');
-  const outlineSrc = asset('orange-outline.png');
-
   return (
     <section data-testid="month-calendar">
       <div className="grid grid-cols-7 gap-y-3 gap-x-1 mb-2 text-xs text-ink/45 text-center">
@@ -142,16 +146,17 @@ export function MonthCalendarGrid({
                 }`}
                 title={title}
               >
-                {c.isFuture || (!isLit && c.isPast) ? (
-                  // 过去未拿勋章 + 未来:都用空心橘子(过去更深一点,未来更淡)
-                  <img
-                    src={outlineSrc}
-                    alt={c.isFuture ? '未到来' : '未点亮'}
-                    className={`w-7 h-7 object-contain ${c.isFuture ? 'opacity-40' : 'opacity-65'}`}
-                  />
-                ) : (
-                  <img src={filledSrc} alt="已点亮" className="w-7 h-7 object-contain" />
-                )}
+                {(() => {
+                  // 等级:已收录的 hist tier 优先,fallback 用 perfect 表示"已点亮"
+                  const variant: OrangeVariant =
+                    c.isFuture
+                      ? 'outline'
+                      : !isLit
+                      ? 'outline'
+                      : (hist && TIER_TO_VARIANT[hist.tier]) || 'great';
+                  const opacity = c.isFuture ? 'opacity-40' : c.isPast && !isLit ? 'opacity-65' : 'opacity-100';
+                  return <OrangeIcon variant={variant} className={`w-7 h-7 ${opacity}`} />;
+                })()}
               </div>
             </button>
           );

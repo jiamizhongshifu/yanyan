@@ -3,14 +3,12 @@
  *
  * 显示 [today-3 ... today ... today+3] 7 个日期。每天:
  *   - 数字(今天加粗 + 圆形深色背景)
- *   - 橘子图标:已拿到勋章 → tier-* 实心橘子;过去未拿 → 空心橘子;未来 → 浅色空心橘子
- *
- * 数据源:daysHistory(同 MonthCalendarGrid)。今天若有 tier 则用今天的 tier 着色。
+ *   - 橘子图标(SVG 绘制,变体按 tier 决定):已拿到勋章 → tier 实色 / 过去未拿 → 空心 / 未来 → 浅空心
  */
 
 import { useMemo } from 'react';
 import type { DayTier } from '../services/challenges';
-import { asset } from '../services/assets';
+import { OrangeIcon, type OrangeVariant } from './OrangeIcon';
 
 interface DayInfo {
   date: string;
@@ -23,10 +21,10 @@ interface Props {
   todayDate?: Date;
 }
 
-const TIER_TO_ICON: Record<Exclude<DayTier, 'none'>, string> = {
-  perfect: 'tier-perfect.png',
-  great: 'tier-great.png',
-  nice: 'tier-nice.png'
+const TIER_TO_VARIANT: Record<Exclude<DayTier, 'none'>, OrangeVariant> = {
+  perfect: 'perfect',
+  great: 'great',
+  nice: 'nice'
 };
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
@@ -54,12 +52,14 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
     return arr;
   }, [histByDate, todayTier, todayDate]);
 
-  const outlineSrc = asset('orange-outline.png');
-
   return (
     <div className="grid grid-cols-7 gap-1" data-testid="today-week-strip">
       {cells.map((c) => {
-        const tierIcon = c.tier !== 'none' ? asset(TIER_TO_ICON[c.tier as keyof typeof TIER_TO_ICON]) : null;
+        const variant: OrangeVariant =
+          c.tier !== 'none'
+            ? TIER_TO_VARIANT[c.tier as keyof typeof TIER_TO_VARIANT]
+            : 'outline';
+        const opacity = c.tier === 'none' && !c.isPast && !c.isToday ? 'opacity-30' : c.tier === 'none' ? 'opacity-55' : 'opacity-100';
         return (
           <div key={c.date} className="flex flex-col items-center gap-1">
             <span className="text-[10px] text-ink/40">{WEEKDAYS[c.weekday]}</span>
@@ -73,15 +73,7 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
               {c.day}
             </span>
             <div className="w-7 h-7 flex items-center justify-center">
-              {tierIcon ? (
-                <img src={tierIcon} alt="" className="w-7 h-7 object-contain" />
-              ) : (
-                <img
-                  src={outlineSrc}
-                  alt=""
-                  className={`w-6 h-6 object-contain ${c.isPast ? 'opacity-55' : 'opacity-30'}`}
-                />
-              )}
+              <OrangeIcon variant={variant} className={`w-7 h-7 ${opacity}`} />
             </div>
           </div>
         );

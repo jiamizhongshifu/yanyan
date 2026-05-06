@@ -12,7 +12,7 @@
 
 import type { DayTier } from '../services/challenges';
 import { TIER_LABEL } from '../services/challenges';
-import { asset } from '../services/assets';
+import { OrangeIcon, type OrangeVariant } from './OrangeIcon';
 
 interface Props {
   doneCount: number; // 0-5
@@ -20,11 +20,11 @@ interface Props {
   tier: DayTier;
 }
 
-const TIER_TO_ICON: Record<DayTier, string> = {
-  perfect: 'tier-perfect.png',
-  great: 'tier-great.png',
-  nice: 'tier-nice.png',
-  none: 'tier-nice.png' // none 时 icon 也用 nice 但加灰度
+const TIER_TO_VARIANT: Record<DayTier, OrangeVariant> = {
+  perfect: 'perfect',
+  great: 'great',
+  nice: 'nice',
+  none: 'outline'
 };
 
 const TIER_COLOR: Record<DayTier, string> = {
@@ -59,8 +59,7 @@ export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
   const fillLargeArc = totalSweep * ratio > 180 ? 1 : 0;
   const fillArc = `M ${bgX1} ${bgY1} A ${radius} ${radius} 0 ${fillLargeArc} 1 ${fX2} ${fY2}`;
 
-  const iconFile = TIER_TO_ICON[tier];
-  const isEmpty = tier === 'none';
+  const variant = TIER_TO_VARIANT[tier];
 
   return (
     <div className="relative w-full flex flex-col items-center" data-testid="perfect-day-ring">
@@ -85,12 +84,7 @@ export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <img
-          src={asset(iconFile)}
-          alt={tier}
-          className={`w-20 h-20 object-contain ${isEmpty ? 'grayscale opacity-60' : ''}`}
-          loading="lazy"
-        />
+        <OrangeIcon variant={variant} className="w-20 h-20" />
         <p className="mt-1 text-xs text-ink/55 tracking-wide">完美一天</p>
         <p
           className="text-base font-medium leading-tight"
