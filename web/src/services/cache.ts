@@ -20,13 +20,16 @@ const cache = new Map<string, Entry<unknown>>();
 const inflight = new Map<string, Promise<unknown>>();
 
 /**
- * 同步读缓存 — 命中且未过期时返回值,否则 undefined。
- * 给组件 useState 初始值用,避免 mount → effect → setState 中间那一帧的"默认空状态"。
+ * 同步读缓存(stale-while-revalidate):
+ *   - 有缓存(无论是否过期)→ 返回值,组件用它做 useState 初始值,第一帧不闪
+ *   - 完全没缓存 → undefined
+ *
+ * 配合 cached() 异步 fetcher 一起用:peek 给即时 UI,fetcher 静默刷新。
+ * 之前严格 TTL 检查会让"刚过 30s 切回 tab"的用户看到一瞬空状态,体感像在重算。
  */
 export function peekCache<T>(key: string): T | undefined {
   const hit = cache.get(key);
   if (!hit) return undefined;
-  if (hit.expiresAt <= Date.now()) return undefined;
   return hit.value as T;
 }
 

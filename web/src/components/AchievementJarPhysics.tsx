@@ -51,6 +51,37 @@ async function requestOrientPermission(): Promise<boolean> {
   return true;
 }
 
+/**
+ * 同会话内"上次见过的瓶子状态"缓存:防止反复进出 Insights 反复看到掉落动画。
+ * 关闭浏览器 / 切账号会清(sessionStorage 语义),不污染跨用户数据。
+ */
+const JAR_SEEN_KEY = 'yanyan.jar.lastSeen';
+const JAR_SEEN_TTL_MS = 60 * 60 * 1000; // 1 小时内同样的瓶子状态视为"已见过",直接落底不动画
+
+interface JarSeenState {
+  sig: string;
+  ts: number;
+}
+function shouldSkipDropAnimation(sig: string): boolean {
+  if (typeof sessionStorage === 'undefined') return false;
+  try {
+    const raw = sessionStorage.getItem(JAR_SEEN_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw) as JarSeenState;
+    return s.sig === sig && Date.now() - s.ts < JAR_SEEN_TTL_MS;
+  } catch {
+    return false;
+  }
+}
+function markJarSeen(sig: string) {
+  if (typeof sessionStorage === 'undefined') return;
+  try {
+    sessionStorage.setItem(JAR_SEEN_KEY, JSON.stringify({ sig, ts: Date.now() }));
+  } catch {
+    // 配额满 / 隐私模式 — 不影响主流程
+  }
+}
+
 export function AchievementJarPhysics({
   monthLabel,
   perfect,
@@ -202,13 +233,21 @@ export function AchievementJarPhysics({
     // 投放范围:瓶口宽度 70-210(在 viewBox 280 中)
     const dropLeft = (W * 80) / 280;
     const dropRight = (W * 200) / 280;
-    const STAGGER_MS = 25; // 之前 90ms,体感慢;25ms 仍有错落感但 ~0.5s 就完成
+
+    // 同会话内同样的瓶子状态见过 → 跳过掉落动画,直接放到瓶底
+    // 状态变化(用户拿到新勋章 / 切月)→ 还是会播一次 cascade,celebrate 新进展
+    const sig = `${monthLabel}|${perfect}|${great}|${nice}`;
+    const skipAnim = shouldSkipDropAnimation(sig);
+    const STAGGER_MS = skipAnim ? 0 : 25;
 
     badges.forEach((b, i) => {
-      const timer = setTimeout(() => {
+      const placeBody = () => {
         if (!engineRef.current) return; // effect 已 cleanup
         const x = dropLeft + Math.random() * (dropRight - dropLeft);
-        const y = (H * 90) / 360 + Math.random() * 10;
+        // 跳过动画时,把橘子直接散放到瓶子下半段(瓶底)而不是从瓶口落
+        const y = skipAnim
+          ? (H * 250) / 360 + Math.random() * (H * 80) / 360
+          : (H * 90) / 360 + Math.random() * 10;
         const body = Matter.Bodies.circle(x, y, b.size / 2, {
           restitution: 0.4,
           friction: 0.05,
@@ -223,10 +262,18 @@ export function AchievementJarPhysics({
         });
         Matter.Composite.add(engine.world, body);
         orangeBodiesRef.current.push(body);
-      }, i * STAGGER_MS);
-      dropTimersRef.current.push(timer);
+      };
+      if (skipAnim) {
+        placeBody(); // 同步立即放置,无 setTimeout
+      } else {
+        const timer = setTimeout(placeBody, i * STAGGER_MS);
+        dropTimersRef.current.push(timer);
+      }
     });
-  }, [badges]);
+
+    // 标记本会话已见过这个状态;再进同月 + 同 tier 计数 → 跳过动画
+    markJarSeen(sig);
+  }, [badges, monthLabel, perfect, great, nice]);
 
   const askPermission = async () => {
     const ok = await requestOrientPermission();
