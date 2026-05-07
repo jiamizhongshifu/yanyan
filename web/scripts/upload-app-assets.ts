@@ -44,6 +44,10 @@ const ASSETS = [
   { local: 'quiz-lifestyle.png', remote: 'quiz-lifestyle.png', contentType: 'image/png' },
   // 第四批:mascot 表情扩展
   { local: 'mascot-happy.png', remote: 'mascot-happy.png', contentType: 'image/png' },
+  { local: 'mascot-cheer.png', remote: 'mascot-cheer.png', contentType: 'image/png' },
+  { local: 'mascot-content.png', remote: 'mascot-content.png', contentType: 'image/png' },
+  { local: 'mascot-pensive.png', remote: 'mascot-pensive.png', contentType: 'image/png' },
+  { local: 'mascot-caring.png', remote: 'mascot-caring.png', contentType: 'image/png' },
   { local: 'mascot-worried.png', remote: 'mascot-worried.png', contentType: 'image/png' },
   { local: 'mascot-thinking.png', remote: 'mascot-thinking.png', contentType: 'image/png' },
   // 第五批:糖分等价勋章 sticker(替代 emoji)
