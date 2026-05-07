@@ -11,6 +11,7 @@ import { useLocation } from 'wouter';
 import { useOnboarding } from '../../store/onboarding';
 import { asset } from '../../services/assets';
 import { LEVEL_TO_LABEL } from '../../services/score-display';
+import { Button } from '../../components/Button';
 
 export function Step4Welcome() {
   const [, navigate] = useLocation();
@@ -46,20 +47,12 @@ export function Step4Welcome() {
         </div>
       </section>
 
-      <button
-        type="button"
-        onClick={() => navigate('/camera')}
-        className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
-      >
+      <Button block onClick={() => navigate('/camera')} className="mt-6">
         现在就拍第一张 →
-      </button>
-      <button
-        type="button"
-        onClick={() => navigate('/app')}
-        className="mt-3 w-full rounded-full bg-paper text-ink/70 py-3 text-sm"
-      >
+      </Button>
+      <Button variant="secondary" size="md" block onClick={() => navigate('/app')} className="mt-3">
         稍后再拍
-      </button>
+      </Button>
 
       <p className="mt-8 text-xs text-ink/30 text-center leading-relaxed">
         步数 / 心率 接入需 iOS 快捷指令;抗炎指数当前基于饮食 + 体感打卡。

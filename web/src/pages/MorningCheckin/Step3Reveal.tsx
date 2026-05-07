@@ -10,6 +10,7 @@ import { useLocation } from 'wouter';
 import { fetchYanScoreToday, type FireLevel } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
 import { track } from '../../services/tracker';
+import { Button } from '../../components/Button';
 import { TodaySuggestionCard } from '../../components/TodaySuggestionCard';
 import { asset } from '../../services/assets';
 
@@ -56,13 +57,9 @@ export function Step3Reveal() {
     return (
       <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
         <p className="text-sm text-ink/50 leading-relaxed">没找到今早打卡记录。先去打卡吧。</p>
-        <button
-          type="button"
-          onClick={() => navigate('/check-in/step1')}
-          className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
-        >
+        <Button block onClick={() => navigate('/check-in/step1')} className="mt-6">
           打卡
-        </button>
+        </Button>
       </main>
     );
   }
@@ -91,13 +88,9 @@ export function Step3Reveal() {
             );
           })}
         </section>
-        <button
-          type="button"
-          onClick={() => navigate('/app')}
-          className="mt-10 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
-        >
+        <Button block onClick={() => navigate('/app')} className="mt-10">
           回主页
-        </button>
+        </Button>
       </main>
     );
   }
@@ -151,13 +144,9 @@ export function Step3Reveal() {
         <TodaySuggestionCard />
       </div>
 
-      <button
-        type="button"
-        onClick={() => navigate('/app')}
-        className="mt-10 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
-      >
+      <Button block onClick={() => navigate('/app')} className="mt-10">
         回主页
-      </button>
+      </Button>
     </main>
   );
 }

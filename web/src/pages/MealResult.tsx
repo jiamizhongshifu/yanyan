@@ -13,6 +13,7 @@
 
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
+import { Button } from '../components/Button';
 import { FoodItemCard } from '../components/FoodItemCard';
 import { Stars } from '../components/InflammationDial';
 import {
@@ -215,28 +216,19 @@ export function MealResult() {
       </section>
 
       <footer className="mt-6 flex gap-3">
-        <button
-          type="button"
-          onClick={() => navigate('/camera')}
-          className="flex-1 rounded-full border-2 border-ink/15 text-ink py-3 text-sm"
-        >
+        <Button variant="tertiary" size="md" block onClick={() => navigate('/camera')}>
           再拍一张
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate('/app')}
-          className="flex-1 rounded-full bg-ink text-white py-3 text-sm font-medium"
-        >
+        </Button>
+        <Button size="md" block onClick={() => navigate('/app')}>
           回主页
-        </button>
+        </Button>
       </footer>
 
-      {showAlgorithm && (
-        <AlgorithmSheet onClose={() => setShowAlgorithm(false)} />
-      )}
+      {showAlgorithm && <AlgorithmSheet onClose={() => setShowAlgorithm(false)} />}
     </main>
   );
 }
+
 
 /**
  * 抗炎指数算法说明弹层(底部 sheet 风格)
