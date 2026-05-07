@@ -115,16 +115,8 @@ export function Me() {
 
   return (
     <main className="min-h-screen bg-paper px-5 pt-12 pb-24 max-w-md mx-auto" data-testid="me">
-      <header className="mb-3 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => navigate('/app')}
-          className="text-sm text-ink/50 active:opacity-60"
-        >
-          ← 返回
-        </button>
-        <h1 className="text-base font-medium text-ink">我的</h1>
-        <div className="w-10" />
+      <header className="mb-5">
+        <h1 className="text-xl font-medium text-ink">我的</h1>
       </header>
 
       {/* 身份卡 — mascot + email */}
