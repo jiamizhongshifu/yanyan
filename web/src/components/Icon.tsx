@@ -33,7 +33,8 @@ export type IconName =
   | 'sparkle'    // 洞悉 tab / 装饰
   | 'check'      // 已完成
   | 'logout'     // 登出
-  | 'bell';      // 通知
+  | 'bell'       // 通知
+  | 'user';      // 个人中心 / 我的
 
 const PATHS: Record<IconName, JSX.Element> = {
   meal: (
@@ -151,6 +152,13 @@ const PATHS: Record<IconName, JSX.Element> = {
     <>
       <path d="M6 8 a 6 6 0 0 1 12 0 c 0 7 3 9 3 9 H 3 s 3 -2 3 -9 z" />
       <path d="M10 21 a 2 2 0 0 0 4 0" />
+    </>
+  ),
+  user: (
+    <>
+      {/* 头 + 肩膀外圈 */}
+      <circle cx="12" cy="9" r="4" />
+      <path d="M4 21 c 0 -4 4 -7 8 -7 s 8 3 8 7" />
     </>
   )
 };
