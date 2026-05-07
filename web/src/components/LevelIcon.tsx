@@ -13,6 +13,7 @@
  */
 
 import type { FireLevel } from '../services/symptoms';
+import { palette } from '../theme/palette';
 
 interface Props {
   level: FireLevel;
@@ -125,12 +126,12 @@ function FlameShape({
   return (
     <g>
       <path d={path} fill={`url(#${fillId}-fill)`} stroke={edge} strokeWidth="1.5" strokeLinejoin="round" />
-      <path d={innerPath} fill="#FFEFB0" opacity="0.85" />
+      <path d={innerPath} fill={palette.flameHighlight} opacity="0.85" />
       {config.sparks && (
         <>
-          <circle cx="14" cy="20" r="1.5" fill="#F4C242" />
-          <circle cx="50" cy="14" r="1.8" fill="#F4C242" />
-          <circle cx="48" cy="32" r="1.2" fill="#F4C242" />
+          <circle cx="14" cy="20" r="1.5" fill={palette.starGold} />
+          <circle cx="50" cy="14" r="1.8" fill={palette.starGold} />
+          <circle cx="48" cy="32" r="1.2" fill={palette.starGold} />
         </>
       )}
     </g>
@@ -154,10 +155,10 @@ export function levelIconDataUrl(level: FireLevel): string {
           const ip = `M 32 ${topY + 8} C ${32 - sx * 0.55} ${topY + 16} ${32 - sx * 0.55} 38 ${32 - sx * 0.35} 44 Q 32 50 ${32 + sx * 0.35} 44 C ${32 + sx * 0.55} 38 ${32 + sx * 0.55} ${topY + 16} 32 ${topY + 8} Z`;
           const sparks =
             level === '大火'
-              ? `<circle cx="14" cy="20" r="1.5" fill="#F4C242"/><circle cx="50" cy="14" r="1.8" fill="#F4C242"/><circle cx="48" cy="32" r="1.2" fill="#F4C242"/>`
+              ? `<circle cx="14" cy="20" r="1.5" fill="${palette.starGold}"/><circle cx="50" cy="14" r="1.8" fill="${palette.starGold}"/><circle cx="48" cy="32" r="1.2" fill="${palette.starGold}"/>`
               : '';
           return `<path d="${path}" fill="url(#g)" stroke="${p.edge}" stroke-width="1.5" stroke-linejoin="round"/>
-                  <path d="${ip}" fill="#FFEFB0" opacity="0.85"/>
+                  <path d="${ip}" fill="${palette.flameHighlight}" opacity="0.85"/>
                   ${sparks}`;
         })();
 

@@ -4,10 +4,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Yanyan 中医语言主题
+        // ⚠️ 改色时必须同步 src/theme/palette.ts(PostCSS 编译期不能 import TS 模块,
+        //    所以这里保留字面量 — palette.ts 是 SVG 组件的运行时来源)
         paper: '#F7F4EE',
         ink: '#2A2A2A',
-        // 火分 4 档配色
         'fire-ping': '#4A8B6F',
         'fire-mild': '#C9A227',
         'fire-mid':  '#D9762C',

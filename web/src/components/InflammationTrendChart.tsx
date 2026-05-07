@@ -9,6 +9,7 @@
 import { useMemo } from 'react';
 import type { YanScoreHistoryEntry } from '../services/yanScoreHistory';
 import { scoreToStars } from '../services/score-display';
+import { palette } from '../theme/palette';
 
 interface Props {
   entries: YanScoreHistoryEntry[];
@@ -55,7 +56,7 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
             y1={midY}
             x2={pad.left + drawW}
             y2={midY}
-            stroke="#0002"
+            stroke={palette.inkGrid}
             strokeWidth="2"
             strokeLinecap="round"
           />
@@ -103,10 +104,10 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
         <defs>
           {/* 0% 在 y1=100%(底),100% 在 y2=0%(顶):底=橙/红,顶=绿 */}
           <linearGradient id="trend-grad" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#D9762C" />
-            <stop offset="35%" stopColor="#C9A227" />
-            <stop offset="70%" stopColor="#7BA56A" />
-            <stop offset="100%" stopColor="#4A8B6F" />
+            <stop offset="0%" stopColor={palette.fireMid} />
+            <stop offset="35%" stopColor={palette.fireMild} />
+            <stop offset="70%" stopColor={palette.firePingLight} />
+            <stop offset="100%" stopColor={palette.firePing} />
           </linearGradient>
         </defs>
         {thresholds.map((t) => (
@@ -116,10 +117,10 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
               x2={pad.left + drawW}
               y1={yFor(t.v)}
               y2={yFor(t.v)}
-              stroke="#0001"
+              stroke={palette.inkGrid}
               strokeDasharray="3 4"
             />
-            <text x={pad.left - 4} y={yFor(t.v) + 3} fontSize="9" textAnchor="end" fill="#0006">
+            <text x={pad.left - 4} y={yFor(t.v) + 3} fontSize="9" textAnchor="end" fill={palette.inkAxis}>
               {t.label}
             </text>
           </g>
@@ -156,8 +157,8 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
                 cx={p.x}
                 cy={p.y}
                 r={r}
-                fill={isSelected ? '#222' : '#fff'}
-                stroke="#222"
+                fill={isSelected ? palette.inkSolid : '#fff'}
+                stroke={palette.inkSolid}
                 strokeWidth={isSelected ? 2 : isLast ? 1.4 : 0.6}
                 pointerEvents="none"
               />
@@ -170,7 +171,7 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
             y={lastValid.y! - 8}
             fontSize="11"
             textAnchor="middle"
-            fill="#222"
+            fill={palette.inkSolid}
             fontWeight="600"
           >
             ★{scoreToStars(lastValid.total)}
@@ -180,7 +181,7 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
           const p = points[i];
           const md = entries[i].date.slice(5);
           return (
-            <text key={i} x={p.x} y={h - 4} fontSize="9" textAnchor="middle" fill="#0007">
+            <text key={i} x={p.x} y={h - 4} fontSize="9" textAnchor="middle" fill={palette.inkTick}>
               {md}
             </text>
           );

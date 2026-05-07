@@ -8,6 +8,7 @@
 
 import type { FireLevel } from '../services/symptoms';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
+import { palette } from '../theme/palette';
 import { LevelIcon } from './LevelIcon';
 
 interface Props {
@@ -68,13 +69,13 @@ export function InflammationDial({ score, level, caption = '今日抗炎指数',
         <defs>
           {/* 沿弧扫描方向 0%→100%:红 → 黄 → 绿 */}
           <linearGradient id="dial-grad" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#D9762C" />
-            <stop offset="35%" stopColor="#C9A227" />
-            <stop offset="70%" stopColor="#7BA56A" />
-            <stop offset="100%" stopColor="#4A8B6F" />
+            <stop offset="0%" stopColor={palette.fireMid} />
+            <stop offset="35%" stopColor={palette.fireMild} />
+            <stop offset="70%" stopColor={palette.firePingLight} />
+            <stop offset="100%" stopColor={palette.firePing} />
           </linearGradient>
         </defs>
-        <path d={bgArc} fill="none" stroke="#E8E3D8" strokeWidth={stroke} strokeLinecap="round" />
+        <path d={bgArc} fill="none" stroke={palette.inkRing} strokeWidth={stroke} strokeLinecap="round" />
         {antiInflam > 0 && (
           <path
             d={fillArc}
