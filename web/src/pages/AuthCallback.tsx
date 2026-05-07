@@ -20,6 +20,7 @@ import { useQuiz } from '../store/quiz';
 import { useOnboarding } from '../store/onboarding';
 import { bootstrapFromQuiz, type BootstrapStep } from '../services/bootstrap';
 import { asset } from '../services/assets';
+import { consumeAuthRedirect } from '../components/RequireAuth';
 import { signOut } from '../services/auth';
 
 type Stage = 'waiting' | 'bootstrapping' | 'error' | 'no-session';
@@ -52,7 +53,8 @@ export function AuthCallback() {
         setInitialFireLevel(r.initialFireLevel);
         // bootstrap 成功 → 清掉 quiz prefill 缓存,避免再次登录时把陈旧答案当 baseline
         quiz.reset();
-        navigate('/app', { replace: true });
+        // 优先回跳到登录前用户原本想去的页面(deep link 不丢失)
+        navigate(consumeAuthRedirect() ?? '/app', { replace: true });
         return;
       }
       // 失败 → 留在本页,显示错误 + 重试
@@ -61,7 +63,8 @@ export function AuthCallback() {
       triggerRef.current = false;
       return;
     }
-    // 没 quiz prefill → 走标准 onboarding
+    // 没 quiz prefill → 走标准 onboarding(消费掉 redirect 但不用,onboarding 完成后自然进 /app 或 /camera)
+    consumeAuthRedirect();
     navigate('/onboarding/step1', { replace: true });
   };
 

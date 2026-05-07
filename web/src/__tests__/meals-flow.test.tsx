@@ -182,9 +182,9 @@ describe('U6 MealResult page', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(/已收到/);
   });
 
-  test('无 lastMeal → 自动跳 /camera', () => {
+  test('无 lastMeal(直链刷新)→ 跳 /app 而非 /camera 避免循环', () => {
     useLastMeal.getState().set(null);
     render(<MealResult />);
-    expect(navigateMock).toHaveBeenCalledWith('/camera');
+    expect(navigateMock).toHaveBeenCalledWith('/app', { replace: true });
   });
 });

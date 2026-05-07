@@ -10,6 +10,22 @@
 import { Link, useLocation } from 'wouter';
 import { Icon, type IconName } from './Icon';
 
+/** 记录 FAB 拍照触发时所在的 tab,MealResult / Camera 完成后回到原 tab */
+const CAMERA_FROM_KEY = 'yanyan.camera.fromTab';
+function rememberFromTab(path: string) {
+  if (typeof sessionStorage === 'undefined') return;
+  // 只记 4 个主 tab,deep link 之外的不记
+  if (['/app', '/app/body', '/app/insights', '/me'].includes(path)) {
+    sessionStorage.setItem(CAMERA_FROM_KEY, path);
+  }
+}
+export function consumeCameraFromTab(): string | null {
+  if (typeof sessionStorage === 'undefined') return null;
+  const v = sessionStorage.getItem(CAMERA_FROM_KEY);
+  if (v) sessionStorage.removeItem(CAMERA_FROM_KEY);
+  return v;
+}
+
 interface TabItem {
   key: string;
   label: string;
@@ -52,11 +68,12 @@ export function BottomTabs() {
           ))}
         </ul>
 
-        {/* 中间 FAB — 拍照按钮 */}
+        {/* 中间 FAB — 拍照按钮(点击时记录来源 tab,拍完回原 tab) */}
         <Link
           href="/camera"
           aria-label="拍餐"
           data-testid="tab-camera-fab"
+          onClick={() => rememberFromTab(location)}
           className={`absolute left-1/2 -translate-x-1/2 -top-6 w-14 h-14 rounded-full bg-ink text-paper flex items-center justify-center shadow-lg shadow-ink/20 active:scale-95 transition-transform ${
             cameraActive ? 'ring-4 ring-fire-mid/40' : ''
           }`}

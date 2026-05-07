@@ -9,10 +9,11 @@
  * 同意状态存 localStorage;登录回调后 step3 静默 postConsent + ensureUser + baseline。
  */
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { getSupabase } from '../services/supabase';
-import { useAuth } from '../services/auth';
+import { useAuth, signOut } from '../services/auth';
+import { consumeAuthRedirect } from '../components/RequireAuth';
 import { useQuiz } from '../store/quiz';
 import { useOnboarding } from '../store/onboarding';
 import { bootstrapFromQuiz } from '../services/bootstrap';
@@ -33,6 +34,16 @@ export function Login() {
   const setInitialFireLevel = useOnboarding((s) => s.setInitialFireLevel);
   const bootstrappingRef = useRef(false);
 
+  // 检查是否刚撤回同意 / 注销账号 — 显示明确状态横幅(只展示一次)
+  const [justRevoked, setJustRevoked] = useState(false);
+  useEffect(() => {
+    if (typeof sessionStorage === 'undefined') return;
+    if (sessionStorage.getItem('yanyan.account.justRevoked') === '1') {
+      sessionStorage.removeItem('yanyan.account.justRevoked');
+      setJustRevoked(true);
+    }
+  }, []);
+
   // 注意:不再自动导航。Google OAuth 的 redirectTo 会把成功登录的用户带到
   // /onboarding/step1,/login 永远不会接收登录回调。如果用户访问 /login 时
   // 已经有 session(从前次会话残留),显示「继续 →」按钮,把控制权还给用户。
@@ -41,6 +52,7 @@ export function Login() {
   const onContinue = async () => {
     if (bootstrappingRef.current) return;
     bootstrappingRef.current = true;
+    const fallbackTarget = consumeAuthRedirect() ?? '/app';
     if (quiz.completedAt && quiz.reverseFilterChoice) {
       const r = await bootstrapFromQuiz({
         reverseFilterChoice: quiz.reverseFilterChoice,
@@ -48,15 +60,15 @@ export function Login() {
       });
       if (r.ok) {
         setInitialFireLevel(r.initialFireLevel);
-        navigate('/app');
+        navigate(fallbackTarget);
         return;
       }
     }
-    navigate('/app');
+    navigate(fallbackTarget);
   };
 
   const onSignOut = async () => {
-    await getSupabase().auth.signOut();
+    await signOut();
     setStatusMessage({ kind: 'info', text: '已登出。可重新选择账号登录。' });
   };
 
@@ -116,6 +128,22 @@ export function Login() {
           />
         </div>
         <p className="mt-2 text-sm text-ink/50 text-center">控糖 × 抗炎 × 次晨体感</p>
+
+        {/* 注销提示 — 用户刚撤回同意 / 删账号时展示 */}
+        {justRevoked && (
+          <div
+            className="mt-4 rounded-2xl bg-fire-mid/10 border border-fire-mid/30 px-4 py-3 text-xs text-ink/70 leading-relaxed"
+            role="alert"
+            data-testid="account-revoked-banner"
+          >
+            <p className="font-medium text-ink">账号已标记注销</p>
+            <p className="mt-1">
+              数据将在 30 天后永久删除。期间想取消注销,联系
+              <a href="mailto:soak.support@hotmail.com" className="underline ml-0.5">客服邮箱</a>。
+              重新用同账号登录会取消删除流程。
+            </p>
+          </div>
+        )}
 
         {/* 已登录状态:不自动跳转,显式给用户两个选项 */}
         {session && (

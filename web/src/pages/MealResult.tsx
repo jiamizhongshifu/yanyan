@@ -14,6 +14,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '../components/Button';
+import { consumeCameraFromTab } from '../components/BottomTabs';
 import { FoodItemCard } from '../components/FoodItemCard';
 import { Stars } from '../components/InflammationDial';
 import {
@@ -63,8 +64,10 @@ export function MealResult() {
   const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 直链刷新到 /meals/:id 但 lastMeal 状态丢了 → 回主页(不是 /camera,
+    // 否则 /camera → 拍完跳 /meals/新 id → 仍 result=null → 又跳 /camera 死循环)
     if (!result) {
-      navigate('/camera');
+      navigate('/app', { replace: true });
     }
   }, [result, navigate]);
 
@@ -219,7 +222,15 @@ export function MealResult() {
         <Button variant="tertiary" size="md" block onClick={() => navigate('/camera')}>
           再拍一张
         </Button>
-        <Button size="md" block onClick={() => navigate('/app')}>
+        <Button
+          size="md"
+          block
+          onClick={() => {
+            // 优先回到 FAB 点击时所在的 tab(/me / /app/body / /app/insights),否则 /app
+            const fromTab = consumeCameraFromTab();
+            navigate(fromTab ?? '/app');
+          }}
+        >
           回主页
         </Button>
       </footer>

@@ -49,6 +49,10 @@ export function Me() {
     const ok = await postRevoke();
     if (ok) {
       await signOut();
+      // 标记本次登出来自"撤回同意",Login 页据此显示明确说明而不是普通登出态
+      try {
+        sessionStorage.setItem('yanyan.account.justRevoked', '1');
+      } catch {}
       navigate('/login');
     }
   };

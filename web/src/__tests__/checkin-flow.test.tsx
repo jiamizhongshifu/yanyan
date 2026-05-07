@@ -43,6 +43,8 @@ beforeEach(() => {
   postCheckinMock.mockResolvedValue(true);
   fetchYesterdayMock.mockReset();
   fetchYanScoreMock.mockReset();
+  // 默认无打卡 — Step1Blind useEffect 会调 fetchYanScoreToday 检查 hasCheckin
+  fetchYanScoreMock.mockResolvedValue(null);
   useCheckin.getState().reset();
 });
 

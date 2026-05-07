@@ -7,10 +7,10 @@
  * 提交后 → POST /symptoms/checkin → 成功跳 Step 2(那时才让 Step 2 拉昨日对照)
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { SymptomSlider } from '../../components/SymptomSlider';
-import { SYMPTOM_DIMENSIONS, postCheckin } from '../../services/symptoms';
+import { SYMPTOM_DIMENSIONS, fetchYanScoreToday, postCheckin } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
 import { track } from '../../services/tracker';
 import { asset } from '../../services/assets';
@@ -20,6 +20,20 @@ export function Step1Blind() {
   const { payload, toggle, setSeverity } = useCheckin();
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // 已打过卡(推送 deep-link / 用户重复进入)→ 跳到 reveal 页看分数,
+  // 不让用户再做一遍空表单
+  useEffect(() => {
+    let mounted = true;
+    void fetchYanScoreToday().then((s) => {
+      if (mounted && s?.hasCheckin) {
+        navigate('/check-in/reveal', { replace: true });
+      }
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
 
   // engaged=true 但 severity=null 的视为"勾了没滑" — 默认不进 severity map,但允许提交(后端 effectiveSeverityMap 过滤)
   const onSubmit = async () => {
