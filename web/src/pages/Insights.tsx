@@ -349,11 +349,21 @@ export function Insights() {
           cumulativeInMonth={Math.min(cumulativeDays, 31)}
           todayLevel={yanScore?.result?.level ?? null}
           monthBase={new Date(selectedYear, selectedMonth - 1, 1)}
-          daysHistory={(monthCh?.days ?? []).map((d) => ({
-            date: d.date,
-            tier: d.tier,
-            fireLevel: d.fireLevel
-          }))}
+          daysHistory={(() => {
+            // 乐观更新:浏览当月 + 今日有 tier + server 还没回写时,把今日 tier 注入日历
+            // 否则用户做完挑战要等 upsertTodayChallenges debounce(1.5s)+ network round-trip
+            // 才能看到当日点亮 — 体验割裂
+            const base = (monthCh?.days ?? []).map((d) => ({
+              date: d.date,
+              tier: d.tier,
+              fireLevel: d.fireLevel
+            }));
+            if (!isCurrentMonth || todayInServer || todayTier === 'none') return base;
+            return [
+              ...base,
+              { date: dateKey, tier: todayTier, fireLevel: yanScore?.result?.level ?? null }
+            ];
+          })()}
           onSelectDate={(date, intent) => {
             if (intent === 'navigate') navigate('/app');
             else setSelectedDate(date);

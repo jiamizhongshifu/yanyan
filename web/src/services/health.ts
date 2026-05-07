@@ -9,6 +9,7 @@ export interface HealthDaily {
   date: string;
   steps: number | null;
   restingHr: number | null;
+  waterCups: number | null;
   source: string | null;
   updatedAt: string | null;
 }
@@ -28,6 +29,7 @@ export async function fetchHealthToday(date?: string): Promise<HealthDaily | nul
     date: res.data.date,
     steps: res.data.steps,
     restingHr: res.data.restingHr,
+    waterCups: res.data.waterCups,
     source: res.data.source,
     updatedAt: res.data.updatedAt
   };
@@ -43,6 +45,22 @@ export async function postHealthSteps(payload: {
   if (!auth) return false;
   const res = await request<{ ok: true }>({
     url: '/users/me/health/steps',
+    method: 'POST',
+    ...auth,
+    data: payload
+  });
+  return res.ok;
+}
+
+/**
+ * 上报今日喝水杯数(整数 0-20)。每次本地 zustand 加/减都调一次,跨设备同步。
+ * 失败不打扰用户:本地 zustand 已即时更新,server 同步是最佳努力。
+ */
+export async function postHealthWater(payload: { date: string; cups: number }): Promise<boolean> {
+  const auth = await withAuth();
+  if (!auth) return false;
+  const res = await request<{ ok: true }>({
+    url: '/users/me/health/water',
     method: 'POST',
     ...auth,
     data: payload

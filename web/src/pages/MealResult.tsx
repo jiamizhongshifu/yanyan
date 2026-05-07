@@ -203,7 +203,18 @@ export function MealResult() {
         </section>
       )}
 
-      <footer className="mt-10 flex gap-3">
+      {/* 次晨打卡引导 — 让用户拍完后知道明早打卡可以建立"饮食 → 体感"对照 */}
+      <section className="mt-6 rounded-2xl bg-fire-ping/10 px-4 py-4 flex items-start gap-3" data-testid="post-meal-checkin-hint">
+        <span className="text-2xl flex-shrink-0">🌅</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-ink">明早打个卡</p>
+          <p className="mt-1 text-xs text-ink/65 leading-relaxed">
+            打卡后能对比"饮食 ↔ 次晨体感",30 天后给出个人化的发物清单。
+          </p>
+        </div>
+      </section>
+
+      <footer className="mt-6 flex gap-3">
         <button
           type="button"
           onClick={() => navigate('/camera')}

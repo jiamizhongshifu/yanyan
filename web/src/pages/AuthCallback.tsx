@@ -50,6 +50,8 @@ export function AuthCallback() {
       });
       if (r.ok) {
         setInitialFireLevel(r.initialFireLevel);
+        // bootstrap 成功 → 清掉 quiz prefill 缓存,避免再次登录时把陈旧答案当 baseline
+        quiz.reset();
         navigate('/app', { replace: true });
         return;
       }

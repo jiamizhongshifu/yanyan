@@ -48,10 +48,17 @@ export function Step4Welcome() {
 
       <button
         type="button"
-        onClick={() => navigate('/app')}
+        onClick={() => navigate('/camera')}
         className="mt-6 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
       >
-        完成,稍后我会拍第一张
+        现在就拍第一张 →
+      </button>
+      <button
+        type="button"
+        onClick={() => navigate('/app')}
+        className="mt-3 w-full rounded-full bg-paper text-ink/65 py-3 text-sm"
+      >
+        稍后再拍
       </button>
 
       <p className="mt-8 text-xs text-ink/40 text-center leading-relaxed">

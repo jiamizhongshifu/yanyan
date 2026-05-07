@@ -185,6 +185,23 @@ CREATE INDEX IF NOT EXISTS idx_inapp_reminders_user_pending
   WHERE dismissed_at IS NULL;
 
 -- ─────────────────────────────────────────────────────────────────────────
+-- user_health_daily:每日健康数据(步数 / 静息心率 / 喝水)
+--   source 区分来源:shortcut(iOS 快捷指令)/ manual(用户手动)/ import(.zip)
+--   water_cups 是用户在 Today 页点的水滴数,跨设备同步用
+-- ─────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS user_health_daily (
+  user_id     uuid NOT NULL REFERENCES users(id),
+  date        date NOT NULL,
+  steps       integer,
+  resting_hr  smallint,
+  water_cups  smallint,
+  source      varchar(16) NOT NULL DEFAULT 'manual',
+  updated_at  timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, date)
+);
+ALTER TABLE user_health_daily ADD COLUMN IF NOT EXISTS water_cups smallint;
+
+-- ─────────────────────────────────────────────────────────────────────────
 -- analytics_events:埋点事件(U12 观测仪表盘消费)
 -- ─────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS analytics_events (

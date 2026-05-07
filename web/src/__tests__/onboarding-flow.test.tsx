@@ -182,12 +182,17 @@ describe('U4 redo Step 3', () => {
 });
 
 describe('U4 redo Step 4', () => {
-  test('显示初始抗炎指数(若 store 有)+ CTA 跳主页', () => {
+  test('显示初始抗炎指数 + 主 CTA 跳 /camera,次 CTA 跳 /app', () => {
     useOnboarding.getState().setInitialFireLevel('中火');
     render(<Step4Welcome />);
     // 中火 → 显示标签"微暖"
     expect(screen.getByText(/微暖/)).toBeInTheDocument();
-    fireEvent.click(screen.getByText(/完成,稍后我会拍第一张/));
+    // 主 CTA:现在就拍 → /camera
+    fireEvent.click(screen.getByText(/现在就拍第一张/));
+    expect(navigateMock).toHaveBeenCalledWith('/camera');
+    // 次 CTA:稍后再拍 → /app
+    navigateMock.mockClear();
+    fireEvent.click(screen.getByText(/稍后再拍/));
     expect(navigateMock).toHaveBeenCalledWith('/app');
   });
 });

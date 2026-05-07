@@ -19,6 +19,11 @@ const UpsertBody = z.object({
   source: z.enum(['shortcut', 'manual', 'import']).optional()
 });
 
+const WaterBody = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  cups: z.number().int().min(0).max(20)
+});
+
 const TodayQuery = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()
 });
@@ -60,12 +65,33 @@ export async function registerHealthDailyRoutes(app: FastifyInstance, opts: Regi
     return { ok: true };
   });
 
+  app.post('/users/me/health/water', async (req, reply) => {
+    const user = requireUser(req, reply);
+    if (!user) return;
+    const parsed = WaterBody.safeParse(req.body);
+    if (!parsed.success) {
+      reply.code(400);
+      return { ok: false, error: 'invalid_body', issues: parsed.error.issues };
+    }
+    await store.upsert({
+      userId: user.userId,
+      date: parsed.data.date,
+      waterCups: parsed.data.cups,
+      source: 'manual'
+    });
+    return { ok: true };
+  });
+
   app.get('/users/me/health/today', async (req, reply) => {
     const user = requireUser(req, reply);
     if (!user) return;
     const parsed = TodayQuery.safeParse(req.query);
     const date = parsed.success && parsed.data.date ? parsed.data.date : todayDateString(now());
     const row = await store.findByDate(user.userId, date);
-    return { ok: true, date, ...(row ?? { steps: null, restingHr: null, source: null, updatedAt: null }) };
+    return {
+      ok: true,
+      date,
+      ...(row ?? { steps: null, restingHr: null, waterCups: null, source: null, updatedAt: null })
+    };
   });
 }

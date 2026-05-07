@@ -8,11 +8,11 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { fetchHomeToday, fetchProgress, peekHomeToday, peekProgress, type TodayMealItem, type UserProgress } from '../services/home';
 import { fetchYanScoreToday, peekYanScoreToday, type YanScoreToday, type FireLevel } from '../services/symptoms';
 import { fetchSugarToday, peekSugarToday, sugarAchievementSentence, type SugarToday } from '../services/sugar';
-import { fetchHealthToday, postHealthSteps, type HealthDaily } from '../services/health';
+import { fetchHealthToday, postHealthSteps, postHealthWater, type HealthDaily } from '../services/health';
 import { evaluateChallenges, tierForDay } from '../services/challenges';
 import { upsertTodayChallenges, fetchMonthChallenges, peekMonthChallenges, type MonthChallenges } from '../services/dailyChallenges';
 import { asset } from '../services/assets';
@@ -63,6 +63,7 @@ const LEVEL_COLOR: Record<FireLevel, string> = {
 };
 
 export function Today() {
+  const [, navigate] = useLocation();
   // 初始值从客户端缓存读 — 切回 tab 时第一帧就能看到上次数据,避免"空 → 数据"的闪烁
   const [yanScore, setYanScore] = useState<YanScoreToday | null>(() => peekYanScoreToday());
   const [meals, setMeals] = useState<TodayMealItem[]>(() => peekHomeToday()?.meals ?? []);
@@ -95,6 +96,12 @@ export function Today() {
       setSugar(s);
       setServerHealth(hd);
       setMonthCh(mc);
+      // 服务端 waterCups 较新 → 把本地 zustand 同步到 server 值,确保跨设备一致
+      if (hd?.waterCups != null && hd.waterCups !== dayEntry.waterCups) {
+        useWellness.setState((st) => ({
+          dailyMap: { ...st.dailyMap, [dateKey]: { ...(st.dailyMap[dateKey] ?? { waterCups: 0, steps: 0 }), waterCups: hd.waterCups! } }
+        }));
+      }
     });
     return () => {
       mounted = false;
@@ -163,6 +170,23 @@ export function Today() {
       </section>
 
       <InappRemindersBanner />
+
+      {/* 次晨打卡 CTA — 今日未打卡时顶置;新用户(0 餐 0 水)先引导拍餐,不显示此 CTA */}
+      {!yanScore?.hasCheckin && (meals.length > 0 || dayEntry.waterCups > 0) && (
+        <button
+          type="button"
+          onClick={() => navigate('/check-in/step1')}
+          className="mb-4 w-full rounded-3xl bg-ink text-paper px-5 py-4 flex items-center gap-3 active:scale-[0.99] transition"
+          data-testid="today-checkin-cta"
+        >
+          <Icon name="moon" className="w-6 h-6 flex-shrink-0" />
+          <div className="flex-1 text-left">
+            <p className="text-sm font-medium">今天还没打卡</p>
+            <p className="text-xs text-paper/70 mt-0.5">30 秒打个体感卡,挑战 +1,趋势更准</p>
+          </div>
+          <span className="text-paper/70">→</span>
+        </button>
+      )}
 
       {/* 全新用户欢迎卡 — 没拍餐 / 没打卡 / 0 杯水 → 引导拍第一餐 */}
       {meals.length === 0 && !yanScore?.hasCheckin && dayEntry.waterCups === 0 && (
@@ -260,7 +284,13 @@ export function Today() {
               <button
                 key={i}
                 type="button"
-                onClick={() => (filled ? removeWater(dateKey) : addWater(dateKey))}
+                onClick={() => {
+                  const newCups = filled ? Math.max(0, dayEntry.waterCups - 1) : Math.min(12, dayEntry.waterCups + 1);
+                  if (filled) removeWater(dateKey);
+                  else addWater(dateKey);
+                  // 同步到 server,跨设备一致(失败不打扰用户)
+                  void postHealthWater({ date: dateKey, cups: newCups });
+                }}
                 className="flex-shrink-0 active:scale-90 transition-transform"
                 aria-label={`第 ${i + 1} 杯${filled ? '(已喝,点击撤销)' : ''}`}
               >
@@ -297,7 +327,15 @@ export function Today() {
               const n = Number(e.target.value || 0);
               setSteps(dateKey, n);
               void postHealthSteps({ date: dateKey, steps: n, source: 'manual' }).then((ok) => {
-                if (ok) setServerHealth({ date: dateKey, steps: n, restingHr: null, source: 'manual', updatedAt: new Date().toISOString() });
+                if (ok)
+                  setServerHealth((prev) => ({
+                    date: dateKey,
+                    steps: n,
+                    restingHr: prev?.restingHr ?? null,
+                    waterCups: prev?.waterCups ?? null,
+                    source: 'manual',
+                    updatedAt: new Date().toISOString()
+                  }));
               });
             }}
             placeholder="录入今天的步数"
@@ -309,7 +347,14 @@ export function Today() {
               const n = effectiveSteps + 1000;
               setSteps(dateKey, n);
               void postHealthSteps({ date: dateKey, steps: n, source: 'manual' });
-              setServerHealth({ date: dateKey, steps: n, restingHr: null, source: 'manual', updatedAt: new Date().toISOString() });
+              setServerHealth((prev) => ({
+                date: dateKey,
+                steps: n,
+                restingHr: prev?.restingHr ?? null,
+                waterCups: prev?.waterCups ?? null,
+                source: 'manual',
+                updatedAt: new Date().toISOString()
+              }));
             }}
             className="px-3 py-2 rounded-xl bg-paper text-sm text-ink"
           >
