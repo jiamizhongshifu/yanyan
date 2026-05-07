@@ -108,7 +108,7 @@ export function MealResult() {
       >
         <TitleDecor className={`absolute inset-0 w-full h-full pointer-events-none ${LEVEL_DECOR_COLOR[result.level]}`} />
         <div className="relative">
-          <p className="text-[11px] text-ink/45 text-center tracking-[0.25em]">这 一 餐</p>
+          <p className="text-[11px] text-ink/50 text-center tracking-[0.25em]">这 一 餐</p>
           <h1
             className="mt-4 text-2xl font-medium text-center text-ink leading-snug px-2 break-words"
             data-testid="meal-title"
@@ -125,18 +125,18 @@ export function MealResult() {
             </span>
           </div>
           <p className="mt-3 text-center leading-none">
-            <span className="text-[11px] text-ink/45 mr-1.5">抗炎指数</span>
+            <span className="text-[11px] text-ink/50 mr-1.5">抗炎指数</span>
             <span
               className={`text-5xl font-light ${LEVEL_COLOR[result.level]}`}
               data-testid="fire-score"
             >
               {antiInflam}
             </span>
-            <span className="text-xs text-ink/40 ml-1">/ 100</span>
+            <span className="text-xs text-ink/30 ml-1">/ 100</span>
             <button
               type="button"
               onClick={() => setShowAlgorithm(true)}
-              className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-ink/8 text-ink/55 text-[11px] active:bg-ink/15 align-middle"
+              className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-ink/8 text-ink/50 text-[11px] active:bg-ink/15 align-middle"
               aria-label="查看抗炎指数算法"
               data-testid="algorithm-btn"
             >
@@ -145,7 +145,7 @@ export function MealResult() {
           </p>
           {result.breakdown && (
             <p
-              className="mt-2 text-center text-[11px] text-ink/45 leading-relaxed px-3"
+              className="mt-2 text-center text-[11px] text-ink/50 leading-relaxed px-3"
               data-testid="score-breakdown"
             >
               {formatBreakdown(result.breakdown)}
@@ -169,7 +169,7 @@ export function MealResult() {
             aria-hidden="true"
             className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rotate-45"
           />
-          <p className="relative text-sm text-ink/75 leading-relaxed">
+          <p className="relative text-sm text-ink/70 leading-relaxed">
             {LEVEL_TO_ENCOURAGEMENT[result.level]}
           </p>
         </div>
@@ -198,7 +198,7 @@ export function MealResult() {
 
       {result.unrecognizedNames.length > 0 && (
         <section className="mt-4 rounded-xl bg-ink/5 px-4 py-3">
-          <h3 className="text-xs text-ink/60 mb-1">未收录食物(已加入回填队列)</h3>
+          <h3 className="text-xs text-ink/50 mb-1">未收录食物(已加入回填队列)</h3>
           <p className="text-sm text-ink/70">{result.unrecognizedNames.join('、')}</p>
         </section>
       )}
@@ -208,7 +208,7 @@ export function MealResult() {
         <span className="text-2xl flex-shrink-0">🌅</span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-ink">明早打个卡</p>
-          <p className="mt-1 text-xs text-ink/65 leading-relaxed">
+          <p className="mt-1 text-xs text-ink/70 leading-relaxed">
             打卡后能对比"饮食 ↔ 次晨体感",30 天后给出个人化的发物清单。
           </p>
         </div>
@@ -258,7 +258,7 @@ function AlgorithmSheet({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-ink/45 active:text-ink text-sm"
+            className="text-ink/50 active:text-ink text-sm"
             aria-label="关闭"
           >
             ✕
@@ -271,15 +271,15 @@ function AlgorithmSheet({ onClose }: { onClose: () => void }) {
         </p>
 
         <h3 className="mt-5 text-sm font-medium text-ink">第 1 步:为每条食物找分类</h3>
-        <ul className="mt-2 text-xs text-ink/65 leading-relaxed space-y-1 pl-4 list-disc">
+        <ul className="mt-2 text-xs text-ink/70 leading-relaxed space-y-1 pl-4 list-disc">
           <li>菜名直接命中 DB(如"白米饭")→ 用该条目数据</li>
           <li>复合菜(如"野生菌火锅")→ LLM 返回主料数组,逐个查 DB,投票合成 TCM 标签;DII / GI / 添加糖等数值取均值</li>
           <li>仍未匹配 → 标"未收录",入回填队列,后续人工补录</li>
         </ul>
 
         <h3 className="mt-5 text-sm font-medium text-ink">第 2 步:每条食物的火分(0-100)</h3>
-        <p className="mt-2 text-xs text-ink/65 leading-relaxed">5 个信号叠加:</p>
-        <ul className="mt-1.5 text-[11px] text-ink/65 leading-relaxed space-y-0.5 pl-4 list-disc">
+        <p className="mt-2 text-xs text-ink/70 leading-relaxed">5 个信号叠加:</p>
+        <ul className="mt-1.5 text-[11px] text-ink/70 leading-relaxed space-y-0.5 pl-4 list-disc">
           <li>
             <span className="font-medium">中医标签</span>:发 +55、温和 +22、平 0
           </li>
@@ -301,10 +301,10 @@ function AlgorithmSheet({ onClose }: { onClose: () => void }) {
         </ul>
 
         <h3 className="mt-5 text-sm font-medium text-ink">第 3 步:整餐均值 → 抗炎指数</h3>
-        <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+        <p className="mt-2 text-xs text-ink/70 leading-relaxed">
           fireScore = 所有 item 的均值;抗炎指数 = 100 − fireScore。未识别条目计 +12。
         </p>
-        <ul className="mt-2 text-[11px] text-ink/55 leading-relaxed space-y-0.5">
+        <ul className="mt-2 text-[11px] text-ink/50 leading-relaxed space-y-0.5">
           <li>★★★★★ 平 — 抗炎 75-100,这一餐很清气</li>
           <li>★★★★ 轻盈 — 抗炎 50-75,整体不错</li>
           <li>★★★ 微暖 — 抗炎 25-50,稍微浓一点</li>
@@ -312,13 +312,13 @@ function AlgorithmSheet({ onClose }: { onClose: () => void }) {
         </ul>
 
         <h3 className="mt-5 text-sm font-medium text-ink">数据来源</h3>
-        <ul className="mt-2 text-[11px] text-ink/55 leading-relaxed space-y-0.5">
+        <ul className="mt-2 text-[11px] text-ink/50 leading-relaxed space-y-0.5">
           <li>• 发物分类:《本草纲目》《中华本草》等典籍</li>
           <li>• DII:Shivappa et al. 2014 膳食炎症指数公式</li>
           <li>• GI / AGEs / 营养:USDA FoodData Central + 中国食物成分表 2018</li>
         </ul>
 
-        <p className="mt-6 text-[11px] text-ink/40 leading-relaxed">
+        <p className="mt-6 text-[11px] text-ink/30 leading-relaxed">
           本指数是生活方式参考,不构成医疗建议。识别有偏差时点 👎 告诉我们。
         </p>
       </div>

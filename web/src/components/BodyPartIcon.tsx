@@ -64,7 +64,7 @@ const PATHS: Record<BodyPartVariant, JSX.Element> = {
   )
 };
 
-export function BodyPartIcon({ variant, className = 'w-10 h-10 text-ink/55' }: Props) {
+export function BodyPartIcon({ variant, className = 'w-10 h-10 text-ink/50' }: Props) {
   return (
     <svg
       viewBox="0 0 24 24"

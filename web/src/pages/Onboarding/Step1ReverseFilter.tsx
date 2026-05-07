@@ -48,7 +48,7 @@ export function Step1ReverseFilter() {
         <img src={asset('onboarding-path.png')} alt="" className="w-36 h-36 object-contain" loading="lazy" />
       </div>
       <h1 className="text-2xl font-semibold text-ink">你最希望解决什么?</h1>
-      <p className="mt-3 text-sm text-ink/60">这一步用来帮你筛对的内容,选错也没关系。</p>
+      <p className="mt-3 text-sm text-ink/50">这一步用来帮你筛对的内容,选错也没关系。</p>
 
       <div className="mt-8 space-y-3">
         {REVERSE_FILTER_CHOICES.map((key) => {

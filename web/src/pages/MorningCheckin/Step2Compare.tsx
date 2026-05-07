@@ -46,17 +46,17 @@ export function Step2Compare() {
       <h1 className="text-2xl font-semibold text-ink">对照昨天</h1>
 
       {!yesterday && (
-        <p className="mt-3 text-sm text-ink/60">加载中…</p>
+        <p className="mt-3 text-sm text-ink/50">加载中…</p>
       )}
 
       {yesterday && !yesterday.hasYesterday && (
-        <p className="mt-3 text-sm text-ink/60 leading-relaxed">
+        <p className="mt-3 text-sm text-ink/50 leading-relaxed">
           今天是第一次,无昨日对照。明天就有了。
         </p>
       )}
 
       {yesterday && yesterday.hasYesterday && yesterdayEntries.length === 0 && (
-        <p className="mt-3 text-sm text-ink/60 leading-relaxed">昨天你没勾过任何反应。</p>
+        <p className="mt-3 text-sm text-ink/50 leading-relaxed">昨天你没勾过任何反应。</p>
       )}
 
       {yesterday?.hasYesterday && yesterdayEntries.length > 0 && (

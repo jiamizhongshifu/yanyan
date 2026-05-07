@@ -59,7 +59,7 @@ export function HomeBodyCards({ yanScore }: Props) {
             <div key={p.key} className="rounded-2xl bg-white px-5 py-4 min-h-[160px] flex flex-col relative overflow-hidden">
               <BodyPartIcon
                 variant={p.variant}
-                className="absolute right-3 top-3 w-7 h-7 text-ink/35 pointer-events-none"
+                className="absolute right-3 top-3 w-7 h-7 text-ink/30 pointer-events-none"
               />
               <p className="text-xs text-ink/50 relative z-10">{p.title}</p>
               {score !== null ? (

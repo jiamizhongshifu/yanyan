@@ -34,7 +34,7 @@ export function Findings() {
     <main className="min-h-screen bg-paper px-5 pt-12 pb-24 max-w-md mx-auto" data-testid="findings">
       <header className="mb-4">
         <h1 className="text-xl font-medium text-ink">易诱炎食物</h1>
-        <p className="mt-2 text-sm text-ink/60 leading-relaxed">
+        <p className="mt-2 text-sm text-ink/50 leading-relaxed">
           {eligible
             ? '你的体质档案已可生成。'
             : '继续拍照 + 次晨打卡,你的个人易诱炎食物档案会在 Day 30 出现。'}
@@ -55,7 +55,7 @@ export function Findings() {
       <section className="rounded-2xl bg-white px-6 py-7" data-testid="progress-card">
         <div className="flex items-baseline justify-between">
           <h2 className="text-base font-medium text-ink">体质档案进度</h2>
-          <p className="text-sm text-ink/60" data-testid="day-progress">
+          <p className="text-sm text-ink/50" data-testid="day-progress">
             Day {days} / {target}
           </p>
         </div>
@@ -66,7 +66,7 @@ export function Findings() {
             data-testid="progress-bar"
           />
         </div>
-        <p className="mt-4 text-xs text-ink/40 leading-relaxed">
+        <p className="mt-4 text-xs text-ink/30 leading-relaxed">
           {eligible
             ? '体质档案 v0.5(群体先验版)已生成,Phase 2 个体 Bayesian 版会替换。'
             : days >= 14

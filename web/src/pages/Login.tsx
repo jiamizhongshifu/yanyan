@@ -115,12 +115,12 @@ export function Login() {
             loading="eager"
           />
         </div>
-        <p className="mt-2 text-sm text-ink/60 text-center">控糖 × 抗炎 × 次晨体感</p>
+        <p className="mt-2 text-sm text-ink/50 text-center">控糖 × 抗炎 × 次晨体感</p>
 
         {/* 已登录状态:不自动跳转,显式给用户两个选项 */}
         {session && (
           <div className="mt-6 rounded-2xl bg-fire-ping/10 px-4 py-4" data-testid="already-signed-in">
-            <p className="text-sm text-ink/75 leading-relaxed">
+            <p className="text-sm text-ink/70 leading-relaxed">
               你已登录(<span className="font-mono">{session.user?.email ?? session.user?.id?.slice(0, 8)}</span>)。
             </p>
             <div className="mt-3 flex gap-2">
@@ -134,7 +134,7 @@ export function Login() {
               <button
                 type="button"
                 onClick={() => void onSignOut()}
-                className="rounded-full border border-ink/15 bg-white text-ink/65 px-4 py-2.5 text-sm"
+                className="rounded-full border border-ink/15 bg-white text-ink/70 px-4 py-2.5 text-sm"
               >
                 换账号
               </button>
@@ -171,7 +171,7 @@ export function Login() {
             onChange={(e) => toggleAgreed(e.target.checked)}
             data-testid="privacy-agree-checkbox"
           />
-          <span className="text-xs text-ink/65 leading-relaxed">
+          <span className="text-xs text-ink/70 leading-relaxed">
             我已阅读并同意{' '}
             <Link href="/privacy-policy" className="text-fire-ping underline">
               《隐私政策》
@@ -192,7 +192,7 @@ export function Login() {
           </div>
         )}
 
-        <p className="mt-12 text-xs text-ink/40 text-center leading-relaxed">
+        <p className="mt-12 text-xs text-ink/30 text-center leading-relaxed">
           v1 私人 beta 仅限邀请用户。<br />
           数据存放于 Supabase 境外服务器(详见《隐私政策》)。
         </p>

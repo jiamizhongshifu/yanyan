@@ -22,7 +22,7 @@ export function DailyChallengesCard({ progresses, tier }: Props) {
     <section className="rounded-3xl bg-white px-6 pt-6 pb-5" data-testid="daily-challenges-card">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-medium text-ink">今日挑战</h2>
-        <p className="text-xs text-ink/45">
+        <p className="text-xs text-ink/50">
           {done} / 5 完成{tier !== 'none' ? ` · ${TIER_LABEL[tier]}` : ''}
         </p>
       </div>
@@ -40,15 +40,15 @@ export function DailyChallengesCard({ progresses, tier }: Props) {
       <ul className="mt-4 space-y-3">
         {progresses.map((p) => (
           <li key={p.key} className="flex items-center gap-3" data-testid={`challenge-${p.key}`}>
-            <span className={`w-6 flex justify-center ${p.done ? 'text-fire-ping' : 'text-ink/65'}`}>
+            <span className={`w-6 flex justify-center ${p.done ? 'text-fire-ping' : 'text-ink/70'}`}>
               <Icon name={p.iconName} className="w-5 h-5" />
             </span>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline justify-between gap-2">
-                <span className={`text-sm ${p.done ? 'text-ink' : 'text-ink/80'} font-medium`}>
+                <span className={`text-sm ${p.done ? 'text-ink' : 'text-ink/70'} font-medium`}>
                   {p.title}
                 </span>
-                <span className="text-xs text-ink/45">{p.status}</span>
+                <span className="text-xs text-ink/50">{p.status}</span>
               </div>
               <div className="mt-1.5 h-1.5 rounded-full bg-paper overflow-hidden">
                 <div

@@ -25,7 +25,7 @@ function ProfileBody({ data }: { data: ProfileV05Data }) {
   return (
     <article className="bg-white px-6 py-8 print:px-10 print:py-10 max-w-2xl mx-auto" data-testid="profile-body">
       <header className="mb-6">
-        <p className="text-xs text-ink/40">Soak</p>
+        <p className="text-xs text-ink/30">Soak</p>
         <h1 className="mt-1 text-2xl font-semibold text-ink">{data.title}</h1>
         <p className="mt-2 text-xs text-ink/50">
           生成于 {new Date(data.generatedAt).toLocaleDateString('zh-CN')} · 累计打卡 {data.cumulativeCheckinDays} 天
@@ -54,7 +54,7 @@ function ProfileBody({ data }: { data: ProfileV05Data }) {
             <li key={f.name}>
               <span>{f.name}</span>
               {f.citations[0] && (
-                <span className="ml-2 text-xs text-ink/40">— {f.citations[0].reference}</span>
+                <span className="ml-2 text-xs text-ink/30">— {f.citations[0].reference}</span>
               )}
             </li>
           ))}
@@ -63,14 +63,14 @@ function ProfileBody({ data }: { data: ProfileV05Data }) {
 
       <section className="mb-6" data-testid="checkup-section">
         <h2 className="text-sm font-medium text-ink mb-3">体检报告对照</h2>
-        <p className="text-xs text-ink/40">
+        <p className="text-xs text-ink/30">
           未上传体检报告。Phase 2 OCR 上线后,可在「我的 → 上传体检报告」自动比对。
         </p>
       </section>
 
       <section className="mb-2" data-testid="disclaimers-section">
         <h2 className="text-sm font-medium text-ink mb-3">免责声明</h2>
-        <ol className="space-y-1.5 text-xs text-ink/60 list-decimal pl-5">
+        <ol className="space-y-1.5 text-xs text-ink/50 list-decimal pl-5">
           {data.disclaimers.map((d) => (
             <li key={d}>{d}</li>
           ))}
@@ -118,7 +118,7 @@ export function ProfilePdf() {
   if (!state) {
     return (
       <main className="min-h-screen bg-paper px-5 pt-12" data-testid="profile-loading">
-        <p className="text-sm text-ink/40">加载中…</p>
+        <p className="text-sm text-ink/30">加载中…</p>
       </main>
     );
   }

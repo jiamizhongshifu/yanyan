@@ -144,14 +144,14 @@ export function Today() {
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="today">
       <header className="mb-3 flex items-center justify-between">
         <div>
-          <p className="text-xs text-ink/45">今天</p>
+          <p className="text-xs text-ink/50">今天</p>
           <p className="mt-0.5 text-xl font-medium text-ink">
             {new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })}
           </p>
         </div>
         <Link
           href="/me"
-          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/60 active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/50 active:scale-95 transition-transform"
           aria-label="设置"
         >
           <SettingsIcon />
@@ -199,7 +199,7 @@ export function Today() {
           />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-ink">第一次见!</p>
-            <p className="mt-1 text-xs text-ink/65 leading-relaxed">
+            <p className="mt-1 text-xs text-ink/70 leading-relaxed">
               先拍中午这一餐,5 秒识别食物 + 添加糖估算,就能看到第一份抗炎指数。
             </p>
           </div>
@@ -215,7 +215,7 @@ export function Today() {
             <p className="mt-0.5">
               <span className={`text-2xl ${LEVEL_COLOR[yanScore.result.level]}`}>
                 {'★'.repeat(LEVEL_TO_STARS[yanScore.result.level])}
-                <span className="text-ink/15">{'★'.repeat(5 - LEVEL_TO_STARS[yanScore.result.level])}</span>
+                <span className="text-ink/30">{'★'.repeat(5 - LEVEL_TO_STARS[yanScore.result.level])}</span>
               </span>
               <span className={`ml-2 text-base ${LEVEL_COLOR[yanScore.result.level]}`}>
                 {LEVEL_TO_LABEL[yanScore.result.level]}
@@ -233,16 +233,16 @@ export function Today() {
         <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="sugar-tracker">
           <div className="flex items-baseline justify-between">
             <p className="text-sm text-ink flex items-center gap-1.5">
-              <Icon name="sugar" className="w-4 h-4 text-ink/65" />
+              <Icon name="sugar" className="w-4 h-4 text-ink/70" />
               控糖
             </p>
-            <p className="text-xs text-ink/45">基线 {sugar.baselineDailyG} g / 天</p>
+            <p className="text-xs text-ink/50">基线 {sugar.baselineDailyG} g / 天</p>
           </div>
           <p className="mt-2">
             <span className="text-3xl font-light text-ink">
               {sugar.todayGrams === null ? '—' : sugar.todayGrams}
             </span>
-            <span className="ml-1 text-sm text-ink/55">g 今日添加糖</span>
+            <span className="ml-1 text-sm text-ink/50">g 今日添加糖</span>
             {sugar.todaySavedG > 0 && (
               <span className="ml-3 text-xs text-fire-ping font-medium inline-flex items-center gap-0.5">
                 <Icon name="check" className="w-3 h-3" />
@@ -252,8 +252,8 @@ export function Today() {
           </p>
           {sugar.monthlyBadges.length > 0 && (
             <div className="mt-3" data-testid="sugar-achievements">
-              <p className="text-xs text-ink/45 mb-2">
-                本月成就 <span className="text-ink/35">· 累计少摄入 {sugar.monthSavedG} g 添加糖</span>
+              <p className="text-xs text-ink/50 mb-2">
+                本月成就 <span className="text-ink/30">· 累计少摄入 {sugar.monthSavedG} g 添加糖</span>
               </p>
               <ul className="space-y-1.5">
                 {sugar.monthlyBadges.map((b) => (
@@ -272,7 +272,7 @@ export function Today() {
       <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="water-tracker">
         <div className="flex items-center justify-between">
           <p className="text-sm text-ink flex items-center gap-1.5">
-            <Icon name="drop" className="w-4 h-4 text-ink/65" />
+            <Icon name="drop" className="w-4 h-4 text-ink/70" />
             喝水
           </p>
           <p className="text-xs text-ink/50">{dayEntry.waterCups} / 8 杯</p>
@@ -305,7 +305,7 @@ export function Today() {
       <section className="mt-3 rounded-2xl bg-white px-5 py-4" data-testid="steps-tracker">
         <div className="flex items-center justify-between">
           <p className="text-sm text-ink flex items-center gap-1.5">
-            <Icon name="steps" className="w-4 h-4 text-ink/65" />
+            <Icon name="steps" className="w-4 h-4 text-ink/70" />
             步数
           </p>
           <div className="flex items-center gap-2">
@@ -365,7 +365,7 @@ export function Today() {
         {serverHealth?.source !== 'shortcut' && (
         <Link
           href="/me/health-shortcut"
-          className="mt-2 inline-block text-[11px] text-ink/45 underline"
+          className="mt-2 inline-block text-[11px] text-ink/50 underline"
           data-testid="link-health-shortcut"
         >
           配置 iOS 快捷指令自动同步 Apple Health 步数 →

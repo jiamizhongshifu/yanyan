@@ -61,7 +61,7 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
             strokeLinecap="round"
           />
         </svg>
-        <p className="mt-1 text-[10px] text-ink/40 text-center">
+        <p className="mt-1 text-[10px] text-ink/30 text-center">
           还需多打卡几天才能看到趋势
         </p>
       </div>
@@ -187,7 +187,7 @@ export function InflammationTrendChart({ entries, height = 140, onSelectDate, se
           );
         })}
       </svg>
-      <p className="mt-1 text-[10px] text-ink/40 text-right pr-2">↑ 越高越清气</p>
+      <p className="mt-1 text-[10px] text-ink/30 text-right pr-2">↑ 越高越清气</p>
     </div>
   );
 }

@@ -119,7 +119,7 @@ export function Me() {
         <button
           type="button"
           onClick={() => navigate('/app')}
-          className="text-sm text-ink/45 active:opacity-60"
+          className="text-sm text-ink/50 active:opacity-60"
         >
           ← 返回
         </button>
@@ -136,7 +136,7 @@ export function Me() {
           loading="lazy"
         />
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-ink/45">已登录</p>
+          <p className="text-xs text-ink/50">已登录</p>
           <p className="mt-0.5 text-sm text-ink truncate font-mono">{userIdentity}</p>
         </div>
       </section>
@@ -149,7 +149,7 @@ export function Me() {
           className="flex items-center justify-between px-5 py-4 text-sm text-ink"
         >
           <span className="flex items-center gap-2">
-            <Icon name="steps" className="w-4 h-4 text-ink/65" />
+            <Icon name="steps" className="w-4 h-4 text-ink/70" />
             Apple Health 步数同步
           </span>
           <span className="text-ink/30">→</span>
@@ -172,11 +172,11 @@ export function Me() {
         <button
           type="button"
           onClick={() => alert('体检报告上传:Phase 2 实施')}
-          className="w-full flex items-center justify-between px-5 py-4 text-sm text-ink/55"
+          className="w-full flex items-center justify-between px-5 py-4 text-sm text-ink/50"
           data-testid="link-checkup-upload"
         >
           <span className="flex items-center gap-2">
-            <Icon name="document" className="w-4 h-4 text-ink/45" />
+            <Icon name="document" className="w-4 h-4 text-ink/50" />
             上传体检报告
           </span>
           <span className="text-ink/30 text-xs">Phase 2</span>
@@ -189,7 +189,7 @@ export function Me() {
           data-testid="btn-export-csv"
         >
           <span className="flex items-center gap-2">
-            <Icon name="download" className="w-4 h-4 text-ink/65" />
+            <Icon name="download" className="w-4 h-4 text-ink/70" />
             导出我的数据(CSV)
           </span>
           <span className="text-ink/30 text-xs">{exporting ? '导出中…' : ''}</span>
@@ -199,7 +199,7 @@ export function Me() {
           className="flex items-center justify-between px-5 py-4 text-sm text-ink"
         >
           <span className="flex items-center gap-2">
-            <Icon name="document" className="w-4 h-4 text-ink/65" />
+            <Icon name="document" className="w-4 h-4 text-ink/70" />
             隐私政策
           </span>
           <span className="text-ink/30">→</span>
@@ -212,17 +212,17 @@ export function Me() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-ink flex items-center gap-2">
-              <Icon name="bell" className="w-4 h-4 text-ink/65" />
+              <Icon name="bell" className="w-4 h-4 text-ink/70" />
               次晨打卡推送
             </p>
-            <p className="mt-0.5 text-[11px] text-ink/45">每天早上 7:00 提醒</p>
+            <p className="mt-0.5 text-[11px] text-ink/50">每天早上 7:00 提醒</p>
           </div>
           <button
             type="button"
             onClick={onTogglePush}
             disabled={!pushSupported || pushBusy}
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium ${
-              pushOn ? 'bg-ink text-paper' : 'bg-paper text-ink/60 border border-ink/10'
+              pushOn ? 'bg-ink text-paper' : 'bg-paper text-ink/50 border border-ink/10'
             } ${!pushSupported || pushBusy ? 'opacity-50' : ''}`}
             data-testid="toggle-push"
             aria-pressed={pushOn}
@@ -231,7 +231,7 @@ export function Me() {
           </button>
         </div>
         {!pushSupported && (
-          <p className="mt-3 text-xs text-ink/40" data-testid="push-unsupported">
+          <p className="mt-3 text-xs text-ink/30" data-testid="push-unsupported">
             当前浏览器不支持 Web Push(iOS 用户请将本应用添加到主屏幕)。
           </p>
         )}
@@ -248,7 +248,7 @@ export function Me() {
         <button
           type="button"
           onClick={() => void onSignOut()}
-          className="w-full text-left px-5 py-4 text-sm text-ink/65"
+          className="w-full text-left px-5 py-4 text-sm text-ink/70"
           data-testid="btn-signout"
         >
           退出登录
@@ -263,7 +263,7 @@ export function Me() {
         </button>
       </section>
 
-      <footer className="mt-10 flex flex-col items-center gap-1.5 text-ink/35">
+      <footer className="mt-10 flex flex-col items-center gap-1.5 text-ink/30">
         <img
           src={asset('soak-wordmark.png')}
           alt="Soak"
@@ -278,6 +278,6 @@ export function Me() {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mt-5 mb-2 px-1 text-[11px] tracking-wide text-ink/45 uppercase">{children}</h2>
+    <h2 className="mt-5 mb-2 px-1 text-[11px] tracking-wide text-ink/50 uppercase">{children}</h2>
   );
 }

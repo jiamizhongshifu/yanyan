@@ -100,12 +100,12 @@ export function Home() {
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="home">
       <header className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-xs text-ink/45">{greeting}</p>
+          <p className="text-xs text-ink/50">{greeting}</p>
           <p className="mt-0.5 text-lg font-medium text-ink">Soak</p>
         </div>
         <Link
           href="/me"
-          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/60 active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-ink/50 active:scale-95 transition-transform"
           aria-label="我的"
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -125,7 +125,7 @@ export function Home() {
               level={dial.level}
               caption={dial.caption}
             />
-            <p className="mt-2 px-2 text-sm text-ink/65 text-center leading-relaxed" data-testid="dial-encourage">
+            <p className="mt-2 px-2 text-sm text-ink/70 text-center leading-relaxed" data-testid="dial-encourage">
               {LEVEL_TO_HOME_ENCOURAGEMENT[dial.level]}
             </p>
           </>
@@ -156,7 +156,7 @@ export function Home() {
       </section>
 
       {progress && !progress.flags.canDrawTrend && (
-        <p className="mt-6 text-center text-xs text-ink/40">
+        <p className="mt-6 text-center text-xs text-ink/30">
           趋势线 {progress.thresholds.trendLineDays} 天解锁(累计 {progress.cumulativeCheckinDays}/
           {progress.thresholds.trendLineDays})
         </p>

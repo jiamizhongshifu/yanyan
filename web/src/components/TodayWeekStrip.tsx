@@ -65,7 +65,7 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
             {/* 日期 — 固定 24×24 高度,所有 cell 视觉等高 */}
             <div
               className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                c.isToday ? 'bg-ink text-paper font-medium' : 'text-ink/65'
+                c.isToday ? 'bg-ink text-paper font-medium' : 'text-ink/70'
               }`}
             >
               {c.day}

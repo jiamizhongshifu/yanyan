@@ -105,7 +105,7 @@ export function Step3BaselineConsent() {
       <header className="mb-3 text-xs text-ink/50">3 / 4</header>
 
       <section className="mb-8">
-        <p className="text-sm text-ink/60">看起来你近期偏</p>
+        <p className="text-sm text-ink/50">看起来你近期偏</p>
         <div
           className={`mt-2 text-7xl font-semibold leading-none ${fireClass[localLevel]}`}
           data-testid="local-fire-level"
@@ -135,7 +135,7 @@ export function Step3BaselineConsent() {
             <h2 className="text-base font-medium text-ink">
               {stage === 'saving' ? '正在为你建立 baseline…' : '即将完成初始化'}
             </h2>
-            <p className="mt-2 text-xs text-ink/60 leading-relaxed">
+            <p className="mt-2 text-xs text-ink/50 leading-relaxed">
               {stage === 'saving'
                 ? '保存今天作为体质起点,后续每餐 / 每晨数据都以此为参照。'
                 : '马上保存今天作为体质起点,后续每餐拍照、次晨打卡都以此为参照。'}
@@ -156,13 +156,13 @@ export function Step3BaselineConsent() {
           <button
             type="button"
             onClick={() => navigate('/me')}
-            className="mt-3 w-full rounded-full border border-ink/15 bg-white text-ink/65 py-3 text-sm"
+            className="mt-3 w-full rounded-full border border-ink/15 bg-white text-ink/70 py-3 text-sm"
           >
             去「我的」重新登录
           </button>
         </>
       ) : (
-        <p className="mt-8 text-xs text-ink/40 text-center leading-relaxed">
+        <p className="mt-8 text-xs text-ink/30 text-center leading-relaxed">
           {stage === 'saving' ? '保存完成后会自动进入下一步' : '正在准备…'}
         </p>
       )}

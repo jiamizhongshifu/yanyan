@@ -179,16 +179,16 @@ export function Insights() {
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="insights">
       <header className="mb-5 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs text-ink/45">洞悉</p>
+          <p className="text-xs text-ink/50">洞悉</p>
           <p className="mt-0.5 text-xl font-medium text-ink truncate">{monthLabel}</p>
-          <span className="mt-1 inline-block text-xs text-ink/45">累计 {cumulativeDays} 天</span>
+          <span className="mt-1 inline-block text-xs text-ink/50">累计 {cumulativeDays} 天</span>
         </div>
         {/* 月份切换器 */}
         <div className="flex items-center gap-1 bg-white rounded-full px-1 py-1 shadow-sm" data-testid="month-switcher">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
-            className="w-7 h-7 rounded-full flex items-center justify-center text-ink/65 hover:bg-paper active:scale-95 transition"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-ink/70 hover:bg-paper active:scale-95 transition"
             aria-label="上一个月"
           >
             ◀
@@ -200,7 +200,7 @@ export function Insights() {
             type="button"
             onClick={() => shiftMonth(1)}
             disabled={isCurrentMonth}
-            className="w-7 h-7 rounded-full flex items-center justify-center text-ink/65 hover:bg-paper active:scale-95 transition disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-ink/70 hover:bg-paper active:scale-95 transition disabled:opacity-30 disabled:cursor-not-allowed"
             aria-label="下一个月"
           >
             ▶
@@ -219,7 +219,7 @@ export function Insights() {
           />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-ink">这里还没什么可看</p>
-            <p className="mt-1.5 text-xs text-ink/65 leading-relaxed">
+            <p className="mt-1.5 text-xs text-ink/70 leading-relaxed">
               拍第一餐 + 完成今日挑战后,玻璃瓶会开始装勋章,日历会出现小太阳。
               累计 21 天解锁抗炎趋势线。
             </p>
@@ -229,7 +229,7 @@ export function Insights() {
         <Suspense
           fallback={
             <div className="rounded-2xl bg-white px-6 py-10 flex items-center justify-center">
-              <span className="text-xs text-ink/40">勋章瓶加载中…</span>
+              <span className="text-xs text-ink/30">勋章瓶加载中…</span>
             </div>
           }
         >
@@ -243,7 +243,7 @@ export function Insights() {
       )}
 
       {sugar && (
-        <p className="mt-3 mb-4 text-[11px] text-ink/45 leading-relaxed text-center">
+        <p className="mt-3 mb-4 text-[11px] text-ink/50 leading-relaxed text-center">
           本月相比基线({sugar.baselineDailyG} g/天)累计减糖{' '}
           <span className="text-fire-ping font-medium">{sugar.monthSavedG} g</span>
           {' · '}今日{sugar.todayGrams === null ? '尚无餐照' : `已摄入 ${sugar.todayGrams} g`}
@@ -270,9 +270,9 @@ export function Insights() {
                 <div className="flex-1 min-w-0">
                   <h2 className="text-base font-medium text-ink flex items-center gap-1.5">
                     抗炎指数趋势
-                    <span className="text-xs text-ink/40">{trendExpanded ? '收起 ▴' : '展开 ▾'}</span>
+                    <span className="text-xs text-ink/30">{trendExpanded ? '收起 ▴' : '展开 ▾'}</span>
                   </h2>
-                  <p className="mt-1 text-xs text-ink/55 leading-relaxed">
+                  <p className="mt-1 text-xs text-ink/50 leading-relaxed">
                     累计 {cumulativeDays} / {TREND_THRESHOLD} 天{cumulativeDays >= TREND_THRESHOLD ? '' : ',再坚持解锁完整版'}
                   </p>
                   <div className="mt-3 h-2 rounded-full bg-paper overflow-hidden">
@@ -290,7 +290,7 @@ export function Insights() {
 
               {trendExpanded && (
                 <div className="mt-5 pt-4 border-t border-ink/5">
-                  <p className="text-xs text-ink/45 mb-2">{entries.length === 0 ? '当前没有可显示的数据点' : `${entries.length} 天数据`}</p>
+                  <p className="text-xs text-ink/50 mb-2">{entries.length === 0 ? '当前没有可显示的数据点' : `${entries.length} 天数据`}</p>
                   <InflammationTrendChart
                     entries={entries}
                     onSelectDate={setSelectedDate}
@@ -317,13 +317,13 @@ export function Insights() {
                 <button
                   type="button"
                   onClick={() => setSelectedDate(null)}
-                  className="text-[11px] text-ink/45 underline"
+                  className="text-[11px] text-ink/50 underline"
                 >
                   取消选中
                 </button>
               )}
             </div>
-            <p className="text-xs text-ink/45 mb-3">点击点查看当日详情</p>
+            <p className="text-xs text-ink/50 mb-3">点击点查看当日详情</p>
             <InflammationTrendChart
               entries={history?.entries ?? []}
               onSelectDate={setSelectedDate}
@@ -344,7 +344,7 @@ export function Insights() {
 
       <section className="mt-5 rounded-3xl bg-white px-5 py-5">
         <h2 className="mb-1 text-base font-medium text-ink">日历视图</h2>
-        <p className="text-xs text-ink/45 mb-4">每天的小太阳记录当日抗炎指数,点击趋势点回看当日</p>
+        <p className="text-xs text-ink/50 mb-4">每天的小太阳记录当日抗炎指数,点击趋势点回看当日</p>
         <MonthCalendarGrid
           cumulativeInMonth={Math.min(cumulativeDays, 31)}
           todayLevel={yanScore?.result?.level ?? null}
@@ -457,14 +457,14 @@ function StatTile({
   return (
     <div className={`rounded-2xl px-4 py-3 ${highlight ? 'bg-fire-ping/10' : 'bg-paper'}`}>
       <div className="flex items-center gap-1.5">
-        <span className={highlight ? 'text-fire-ping' : 'text-ink/65'}>
+        <span className={highlight ? 'text-fire-ping' : 'text-ink/70'}>
           <Icon name={icon} className="w-4 h-4" />
         </span>
-        <span className="text-xs text-ink/55">{label}</span>
+        <span className="text-xs text-ink/50">{label}</span>
       </div>
       <p className="mt-1.5">
         <span className={`text-2xl font-medium ${highlight ? 'text-fire-ping' : 'text-ink'}`}>{value}</span>
-        {unit && <span className="ml-1 text-xs text-ink/45">{unit}</span>}
+        {unit && <span className="ml-1 text-xs text-ink/50">{unit}</span>}
       </p>
     </div>
   );
@@ -499,11 +499,11 @@ function AchievementCard({
         )}
       </div>
       <div className="flex-1 min-w-0 relative z-10">
-        <p className={`text-sm font-medium flex items-center gap-1 ${unlocked ? 'text-ink' : 'text-ink/45'}`}>
+        <p className={`text-sm font-medium flex items-center gap-1 ${unlocked ? 'text-ink' : 'text-ink/50'}`}>
           {unlocked && <Icon name="check" className="w-3.5 h-3.5 text-fire-ping" />}
           {title}
         </p>
-        <p className="text-[11px] text-ink/45 mt-0.5">
+        <p className="text-[11px] text-ink/50 mt-0.5">
           {unlocked ? '已达成 · ' : `${Math.round(pct * 100)}% · `}
           {requirement}
         </p>
@@ -604,7 +604,7 @@ function DayDetailPanel({
       {hasScore ? (
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="rounded-xl bg-white px-3 py-2">
-            <p className="text-ink/45">抗炎指数</p>
+            <p className="text-ink/50">抗炎指数</p>
             <p className="mt-0.5 text-base font-medium text-ink">
               {entry!.level
                 ? `${'★'.repeat(LEVEL_TO_STARS[entry!.level])} / 5`
@@ -613,19 +613,19 @@ function DayDetailPanel({
           </div>
           {entry!.partScores.food !== null && (
             <div className="rounded-xl bg-white px-3 py-2">
-              <p className="text-ink/45">饮食 part</p>
+              <p className="text-ink/50">饮食 part</p>
               <p className="mt-0.5 text-base font-medium text-ink">{entry!.partScores.food}</p>
             </div>
           )}
           {entry!.partScores.symptom !== null && (
             <div className="rounded-xl bg-white px-3 py-2">
-              <p className="text-ink/45">体感 part</p>
+              <p className="text-ink/50">体感 part</p>
               <p className="mt-0.5 text-base font-medium text-ink">{entry!.partScores.symptom}</p>
             </div>
           )}
           {snapshot && (
             <div className="rounded-xl bg-white px-3 py-2">
-              <p className="text-ink/45">挑战完成</p>
+              <p className="text-ink/50">挑战完成</p>
               <p className="mt-0.5 text-base font-medium text-ink">
                 {snapshot.completedCount} / 5{snapshot.tier !== 'none' ? ` · ${snapshot.tier === 'perfect' ? '完美' : snapshot.tier === 'great' ? '美好' : '奈斯'}` : ''}
               </p>
@@ -633,17 +633,17 @@ function DayDetailPanel({
           )}
         </div>
       ) : (
-        <p className="text-xs text-ink/45 text-center py-3">这一天没有完整数据</p>
+        <p className="text-xs text-ink/50 text-center py-3">这一天没有完整数据</p>
       )}
 
       {meals && meals.length > 0 && (
         <div>
-          <p className="text-xs text-ink/45 mb-2">这一天拍了 {meals.length} 餐</p>
+          <p className="text-xs text-ink/50 mb-2">这一天拍了 {meals.length} 餐</p>
           <div className="flex gap-2 overflow-x-auto -mx-1 px-1 pb-1">
             {meals.map((m) => (
               <div key={m.id} className="flex-shrink-0 w-20 rounded-xl bg-white p-2 text-center">
                 {m.level && <LevelIcon level={m.level} className="w-10 h-10 mx-auto" />}
-                <p className="mt-1 text-[10px] text-ink/55">
+                <p className="mt-1 text-[10px] text-ink/50">
                   {new Date(m.ateAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
                 </p>
                 {m.sugarGrams !== null && (

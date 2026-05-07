@@ -48,7 +48,7 @@ function MaybeBottomTabs() {
 function RouteFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg">
-      <span className="text-xs text-ink/40">加载中…</span>
+      <span className="text-xs text-ink/30">加载中…</span>
     </div>
   );
 }

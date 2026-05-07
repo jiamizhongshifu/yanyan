@@ -49,7 +49,7 @@ export function AchievementJar({ monthLabel, perfect, great, nice, sugarBadges =
     <section data-testid="achievement-jar">
       <div className="flex items-baseline justify-between mb-3">
         <h2 className="text-base font-medium text-ink">{monthLabel} · 勋章瓶</h2>
-        <p className="text-xs text-ink/40">本月 {total} 枚</p>
+        <p className="text-xs text-ink/30">本月 {total} 枚</p>
       </div>
 
       <div className="relative mx-auto w-64 aspect-square">
@@ -74,12 +74,12 @@ export function AchievementJar({ monthLabel, perfect, great, nice, sugarBadges =
               )
             )}
             {badges.length > 24 && (
-              <span className="text-[10px] text-ink/55 self-end">+{badges.length - 24}</span>
+              <span className="text-[10px] text-ink/50 self-end">+{badges.length - 24}</span>
             )}
           </div>
         )}
         {badges.length === 0 && (
-          <p className="absolute inset-x-0 bottom-3 text-center text-[11px] text-ink/45 leading-relaxed">
+          <p className="absolute inset-x-0 bottom-3 text-center text-[11px] text-ink/50 leading-relaxed">
             完成今日挑战开始集勋章
           </p>
         )}
@@ -120,7 +120,7 @@ function TierTile({ iconFile, label, count }: { iconFile: string; label: string;
   return (
     <div className={`rounded-2xl bg-white py-3 ${count === 0 ? 'opacity-60' : ''}`}>
       <img src={asset(iconFile)} alt={label} className="w-8 h-8 mx-auto object-contain" />
-      <p className="mt-1 text-xs text-ink/60">{label}</p>
+      <p className="mt-1 text-xs text-ink/50">{label}</p>
       <p className="mt-0.5 text-sm font-medium text-ink">×{count}</p>
     </div>
   );

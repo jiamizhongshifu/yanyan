@@ -51,7 +51,7 @@ export function Step2SymptomsGrid() {
         <img src={asset('onboarding-mirror.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />
       </div>
       <h1 className="text-2xl font-semibold text-ink">过去一周,身体偶尔有过这些反应吗?</h1>
-      <p className="mt-3 text-sm text-ink/60">没有就跳过这一行,不用每行都选。</p>
+      <p className="mt-3 text-sm text-ink/50">没有就跳过这一行,不用每行都选。</p>
 
       <div className="mt-6 rounded-2xl bg-white px-3 py-2">
         <div className="flex items-center pb-2 border-b border-paper">

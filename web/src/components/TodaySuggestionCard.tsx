@@ -43,7 +43,7 @@ export function TodaySuggestionCard() {
   if (loading) {
     return (
       <section className="rounded-2xl bg-white px-5 py-4" data-testid="suggestion-loading">
-        <span className="text-xs text-ink/40">加载推荐…</span>
+        <span className="text-xs text-ink/30">加载推荐…</span>
       </section>
     );
   }
@@ -55,7 +55,7 @@ export function TodaySuggestionCard() {
         <h3 className="text-base font-medium text-ink" data-testid="suggestion-headline">
           {rec.headline}
         </h3>
-        <p className="mt-1 text-xs text-ink/60 leading-relaxed" data-testid="suggestion-tagline">
+        <p className="mt-1 text-xs text-ink/50 leading-relaxed" data-testid="suggestion-tagline">
           {rec.tagline}
         </p>
       </header>
@@ -89,12 +89,12 @@ export function TodaySuggestionCard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-ink font-medium">{dishName ?? '—'}</p>
                   {ingredients.length > 0 && (
-                    <p className="mt-0.5 text-xs text-ink/55">
+                    <p className="mt-0.5 text-xs text-ink/50">
                       {ingredients.join(' · ')}
                     </p>
                   )}
                   {cite && (
-                    <p className="mt-0.5 text-[11px] text-ink/40">
+                    <p className="mt-0.5 text-[11px] text-ink/30">
                       <span className="text-ink/30">[现代营养] </span>
                       {cite.reference}
                     </p>

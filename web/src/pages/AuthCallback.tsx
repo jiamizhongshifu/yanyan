@@ -92,7 +92,7 @@ export function AuthCallback() {
           loading="eager"
         />
         <h1 className="mt-4 text-xl font-semibold text-ink">初始化失败</h1>
-        <p className="mt-2 text-sm text-ink/60 text-center max-w-xs leading-relaxed">
+        <p className="mt-2 text-sm text-ink/50 text-center max-w-xs leading-relaxed">
           账号已登录,但
           {failedAt === 'ensure' && '账号初始化(ensureUser)'}
           {failedAt === 'consent' && '同意提交'}
@@ -112,7 +112,7 @@ export function AuthCallback() {
         <button
           type="button"
           onClick={() => void onSignOutAndBack()}
-          className="mt-3 w-full rounded-full border border-ink/15 bg-white text-ink/65 py-3 text-sm"
+          className="mt-3 w-full rounded-full border border-ink/15 bg-white text-ink/70 py-3 text-sm"
         >
           登出 / 重新登录
         </button>
@@ -129,7 +129,7 @@ export function AuthCallback() {
           className="w-32 h-32 object-contain"
         />
         <h1 className="mt-4 text-xl font-semibold text-ink">登录回调失败</h1>
-        <p className="mt-2 text-sm text-ink/60 text-center max-w-xs leading-relaxed">
+        <p className="mt-2 text-sm text-ink/50 text-center max-w-xs leading-relaxed">
           没收到有效的登录信息,可能是回调链路出问题。
         </p>
         <button
@@ -151,7 +151,7 @@ export function AuthCallback() {
         className="w-32 h-32 object-contain"
         loading="eager"
       />
-      <p className="mt-4 text-sm text-ink/60">
+      <p className="mt-4 text-sm text-ink/50">
         {stage === 'bootstrapping' ? '正在为你建立体质 baseline…' : '登录成功,正在准备主页…'}
       </p>
     </main>

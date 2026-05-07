@@ -88,7 +88,7 @@ export function MonthCalendarGrid({
 
   return (
     <section data-testid="month-calendar">
-      <div className="grid grid-cols-7 gap-y-3 gap-x-1 mb-2 text-xs text-ink/45 text-center">
+      <div className="grid grid-cols-7 gap-y-3 gap-x-1 mb-2 text-xs text-ink/50 text-center">
         {['周日', '周一', '周二', '周三', '周四', '周五', '周六'].map((d) => (
           <span key={d}>{d}</span>
         ))}
@@ -130,7 +130,7 @@ export function MonthCalendarGrid({
                 className={`text-[11px] flex items-center justify-center ${
                   c.isToday
                     ? 'w-5 h-5 rounded-full bg-ink text-paper font-medium'
-                    : 'text-ink/55'
+                    : 'text-ink/50'
                 }`}
               >
                 {c.day}

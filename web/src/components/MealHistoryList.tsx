@@ -22,7 +22,7 @@ export function MealHistoryList({ meals }: Props) {
   if (meals.length === 0) {
     return (
       <section className="rounded-2xl bg-white px-6 py-7" data-testid="meal-history">
-        <h2 className="text-sm text-ink/60">今日餐食</h2>
+        <h2 className="text-sm text-ink/50">今日餐食</h2>
         <p className="mt-3 text-sm text-ink/50 leading-relaxed">还没拍今天的第一餐。</p>
         <Link
           href="/camera"
@@ -36,7 +36,7 @@ export function MealHistoryList({ meals }: Props) {
 
   return (
     <section className="rounded-2xl bg-white px-6 py-5" data-testid="meal-history">
-      <h2 className="text-sm text-ink/60">今日餐食 · {meals.length} 餐</h2>
+      <h2 className="text-sm text-ink/50">今日餐食 · {meals.length} 餐</h2>
       <ul className="mt-3 divide-y divide-paper">
         {meals.map((m) => {
           const time = new Date(m.ateAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -44,7 +44,7 @@ export function MealHistoryList({ meals }: Props) {
             <li key={m.id} className="py-3 flex items-center justify-between" data-testid={`meal-row-${m.id}`}>
               <div>
                 <div className="text-sm text-ink">{time}</div>
-                <div className="text-xs text-ink/40 mt-0.5">
+                <div className="text-xs text-ink/30 mt-0.5">
                   发 {m.tcmLabelsSummary.发} · 温和 {m.tcmLabelsSummary.温和} · 平 {m.tcmLabelsSummary.平}
                 </div>
               </div>

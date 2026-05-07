@@ -40,7 +40,7 @@ export function Step4Welcome() {
         />
         <div className="flex-1">
           <h2 className="text-base font-medium text-ink">中午吃饭时,拍一张</h2>
-          <p className="mt-2 text-sm text-ink/65 leading-relaxed">
+          <p className="mt-2 text-sm text-ink/70 leading-relaxed">
             你拍的第一张餐照,会得到当餐抗炎指数(★1-5) + 添加糖估算,以及一句轻量陪伴语。
           </p>
         </div>
@@ -56,12 +56,12 @@ export function Step4Welcome() {
       <button
         type="button"
         onClick={() => navigate('/app')}
-        className="mt-3 w-full rounded-full bg-paper text-ink/65 py-3 text-sm"
+        className="mt-3 w-full rounded-full bg-paper text-ink/70 py-3 text-sm"
       >
         稍后再拍
       </button>
 
-      <p className="mt-8 text-xs text-ink/40 text-center leading-relaxed">
+      <p className="mt-8 text-xs text-ink/30 text-center leading-relaxed">
         步数 / 心率 接入需 iOS 快捷指令;抗炎指数当前基于饮食 + 体感打卡。
       </p>
     </main>

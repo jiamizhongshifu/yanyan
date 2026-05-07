@@ -90,12 +90,12 @@ export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
             {pct}
             <span className="text-xl font-light ml-0.5">%</span>
           </p>
-          <p className="mt-1.5 text-[11px] text-ink/55 tracking-wide">完美一天</p>
+          <p className="mt-1.5 text-[11px] text-ink/50 tracking-wide">完美一天</p>
         </div>
       </div>
 
       {/* 环外鼓励语 */}
-      <p className="mt-3 text-xs text-ink/60 leading-relaxed text-center px-4">
+      <p className="mt-3 text-xs text-ink/50 leading-relaxed text-center px-4">
         {encouragement(doneCount, total, tier)}
       </p>
     </div>

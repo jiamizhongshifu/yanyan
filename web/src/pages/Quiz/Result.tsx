@@ -67,7 +67,7 @@ export function QuizResult() {
 
   return (
     <main className="min-h-screen bg-paper px-6 pt-12 pb-20 max-w-md mx-auto" data-testid="quiz-result">
-      <header className="text-xs text-ink/40 tracking-widest">Soak · 初步评估</header>
+      <header className="text-xs text-ink/30 tracking-widest">Soak · 初步评估</header>
 
       <section className="mt-6 rounded-3xl bg-white px-6 py-10 text-center">
         <div className="mx-auto w-32 h-32" data-testid="level-illustration">
@@ -76,12 +76,12 @@ export function QuizResult() {
         <p className="mt-5 text-xs text-ink/50 tracking-wide">你当前的抗炎指数</p>
         <p className={`mt-3 text-5xl leading-none ${LEVEL_COLOR[index.level]}`} data-testid="result-score">
           {'★'.repeat(LEVEL_TO_STARS[index.level])}
-          <span className="text-ink/15">{'★'.repeat(5 - LEVEL_TO_STARS[index.level])}</span>
+          <span className="text-ink/30">{'★'.repeat(5 - LEVEL_TO_STARS[index.level])}</span>
         </p>
         <p className={`mt-3 text-2xl font-medium ${LEVEL_COLOR[index.level]}`} data-testid="result-level">
           {LEVEL_TO_LABEL[index.level]}
         </p>
-        <p className="mt-3 text-xs text-ink/40">基于 {Math.round(index.completeness * 100)}% 数据完整度</p>
+        <p className="mt-3 text-xs text-ink/30">基于 {Math.round(index.completeness * 100)}% 数据完整度</p>
       </section>
 
       <section className="mt-5 rounded-2xl bg-white px-6 py-5">
@@ -90,11 +90,11 @@ export function QuizResult() {
 
         <div className="mt-5 grid grid-cols-2 gap-3 text-xs">
           <div className="rounded-xl bg-paper px-3 py-2">
-            <p className="text-ink/40">症状部分</p>
+            <p className="text-ink/30">症状部分</p>
             <p className="mt-1 text-ink font-medium">{index.breakdown.symptomPart}</p>
           </div>
           <div className="rounded-xl bg-paper px-3 py-2">
-            <p className="text-ink/40">生活方式部分</p>
+            <p className="text-ink/30">生活方式部分</p>
             <p className="mt-1 text-ink font-medium">{index.breakdown.lifestylePart}</p>
           </div>
         </div>
@@ -106,8 +106,8 @@ export function QuizResult() {
           {(['平', '微火', '中火', '大火'] as const).map((lvl) => (
             <div key={lvl} className="flex flex-col items-center">
               <LevelIcon level={lvl} className="w-12 h-12" />
-              <p className="mt-2 text-xs text-ink/65">{LEVEL_TO_LABEL[lvl]}</p>
-              <p className="text-[10px] text-ink/40">{'★'.repeat(LEVEL_TO_STARS[lvl])}</p>
+              <p className="mt-2 text-xs text-ink/70">{LEVEL_TO_LABEL[lvl]}</p>
+              <p className="text-[10px] text-ink/30">{'★'.repeat(LEVEL_TO_STARS[lvl])}</p>
             </div>
           ))}
         </div>
@@ -122,7 +122,7 @@ export function QuizResult() {
                 <Icon name="lock" className="w-3.5 h-3.5" />
               </div>
               <h3 className="text-sm font-medium text-ink pr-8">{f.title}</h3>
-              <p className="mt-1 text-xs text-ink/60 leading-relaxed">{f.body}</p>
+              <p className="mt-1 text-xs text-ink/50 leading-relaxed">{f.body}</p>
             </div>
           ))}
         </div>
@@ -137,7 +137,7 @@ export function QuizResult() {
         >
           登录解锁完整体验 →
         </button>
-        <p className="mt-3 text-xs text-ink/40 text-center">
+        <p className="mt-3 text-xs text-ink/30 text-center">
           登录后,你刚才的回答会自动作为 baseline,无需重答。
         </p>
       </section>
@@ -146,13 +146,13 @@ export function QuizResult() {
         <button
           type="button"
           onClick={() => navigate('/quiz/step1')}
-          className="text-xs text-ink/40 underline"
+          className="text-xs text-ink/30 underline"
         >
           重新测一次
         </button>
       </section>
 
-      <p className="mt-8 text-xs text-ink/40 leading-relaxed">
+      <p className="mt-8 text-xs text-ink/30 leading-relaxed">
         本指数为生活方式参考,不构成医疗建议。若有体检异常或长期不缓解,建议同时咨询医生 / 注册营养师。
       </p>
     </main>

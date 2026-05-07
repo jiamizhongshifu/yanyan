@@ -103,7 +103,7 @@ export function InflammationDial({ score, level, caption = '今日抗炎指数',
           style={{ color: LEVEL_COLOR[level] }}
         >
           {displayLabel}
-          <span className="ml-1.5 text-xs font-normal text-ink/45">
+          <span className="ml-1.5 text-xs font-normal text-ink/50">
             {/* 副位:小号星级供视觉提示 */}
             {'★'.repeat(stars)}
           </span>
@@ -129,7 +129,7 @@ export function Stars({ filled, total = 5, className = '', testId }: StarsProps)
       {Array.from({ length: total }).map((_, i) => (
         <span
           key={i}
-          className={i < f ? 'text-fire-ping' : 'text-ink/15'}
+          className={i < f ? 'text-fire-ping' : 'text-ink/30'}
           aria-hidden="true"
         >
           ★

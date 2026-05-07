@@ -30,7 +30,7 @@ const TCM_LABEL_COLOR: Record<'发' | '温和' | '平', string> = {
 
 const TONE_PILL: Record<'good' | 'mild' | 'neutral', string> = {
   good: 'bg-fire-ping/12 text-fire-ping',
-  neutral: 'bg-ink/8 text-ink/60',
+  neutral: 'bg-ink/8 text-ink/50',
   mild: 'bg-fire-mild/12 text-fire-mild'
 };
 
@@ -113,14 +113,14 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
             {cls.tcmLabel} · {cls.tcmProperty}
           </span>
         ) : (
-          <span className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-ink/8 text-ink/55">未收录</span>
+          <span className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-ink/8 text-ink/50">未收录</span>
         )}
       </div>
 
       {/* 主料明细 */}
       {(showIngredients || onSubmitIngredients) && (
         <div className="mt-3">
-          <p className="text-[11px] text-ink/45 mb-1.5">食材成分</p>
+          <p className="text-[11px] text-ink/50 mb-1.5">食材成分</p>
           <div className="space-y-1">
             {draft.map((ing) => {
               const detail = item.ingredientDetails?.find((d) => d.name === ing);
@@ -131,7 +131,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
                   className="flex items-baseline justify-between gap-2 py-1 border-b border-paper last:border-0"
                 >
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className="text-xs text-ink/80">{ing}</span>
+                    <span className="text-xs text-ink/70">{ing}</span>
                     {onSubmitIngredients && (
                       <button
                         type="button"
@@ -147,7 +147,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
                   <div className="flex flex-wrap items-center justify-end gap-1 text-[10px]">
                     {c ? (
                       <>
-                        <span className="text-ink/45">
+                        <span className="text-ink/50">
                           {c.tcmLabel} · {c.tcmProperty}
                         </span>
                         {c.diiScore !== null && (
@@ -157,30 +157,30 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
                                 ? 'bg-fire-ping/12 text-fire-ping'
                                 : c.diiScore > 0.5
                                 ? 'bg-fire-mild/12 text-fire-mild'
-                                : 'bg-ink/8 text-ink/60'
+                                : 'bg-ink/8 text-ink/50'
                             }`}
                           >
                             DII {c.diiScore.toFixed(1)}
                           </span>
                         )}
                         {c.gi !== null && (
-                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/60">
+                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/50">
                             GI {Math.round(c.gi)}
                           </span>
                         )}
                         {c.addedSugarG !== null && c.addedSugarG > 0 && (
-                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/60">
+                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/50">
                             糖 {c.addedSugarG}g
                           </span>
                         )}
                         {c.carbsG !== null && (
-                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/60">
+                          <span className="px-1.5 py-0.5 rounded bg-ink/8 text-ink/50">
                             碳水 {c.carbsG}g
                           </span>
                         )}
                       </>
                     ) : (
-                      <span className="text-ink/35">数据待补录</span>
+                      <span className="text-ink/30">数据待补录</span>
                     )}
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
                   type="button"
                   onClick={() => setAdding(true)}
                   disabled={isSaving}
-                  className="text-xs text-ink/55 active:text-ink underline disabled:opacity-40"
+                  className="text-xs text-ink/50 active:text-ink underline disabled:opacity-40"
                 >
                   + 添加食材
                 </button>
@@ -286,7 +286,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
         <div className="mt-2 text-[11px] text-ink/50 leading-relaxed">
           {visibleCitations.map((c, i) => (
             <div key={i} className="truncate">
-              <span className="text-ink/35">
+              <span className="text-ink/30">
                 [{c.source === 'canon' ? '典籍' : c.source === 'paper' ? '论文' : '现代营养'}]
               </span>{' '}
               {c.reference}
@@ -307,12 +307,12 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
       {/* 识别反馈行 */}
       <div className="mt-3 pt-3 border-t border-paper">
         {feedbackSent ? (
-          <p className="text-xs text-ink/55" role="status">
+          <p className="text-xs text-ink/50" role="status">
             {feedbackSent === 'thumbs_up' ? '感谢反馈,已收到 👍' : '感谢反馈,已记录 👎'}
           </p>
         ) : thumbsDownOpen ? (
           <div>
-            <p className="text-xs text-ink/55 mb-1.5">告诉我们哪里识别得不准:</p>
+            <p className="text-xs text-ink/50 mb-1.5">告诉我们哪里识别得不准:</p>
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -344,7 +344,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
                   setThumbsDownOpen(false);
                   setFeedbackNote('');
                 }}
-                className="px-2 py-1.5 text-xs text-ink/55"
+                className="px-2 py-1.5 text-xs text-ink/50"
               >
                 取消
               </button>
@@ -352,11 +352,11 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
           </div>
         ) : (
           <div className="flex items-center gap-3 text-xs">
-            <span className="text-ink/45">识别准确吗?</span>
+            <span className="text-ink/50">识别准确吗?</span>
             <button
               type="button"
               onClick={handleThumbsUp}
-              className="px-2.5 py-1 rounded-lg bg-paper text-ink/65 active:bg-fire-ping/12 active:text-fire-ping"
+              className="px-2.5 py-1 rounded-lg bg-paper text-ink/70 active:bg-fire-ping/12 active:text-fire-ping"
               aria-label="识别正确"
               data-testid="thumbs-up"
             >
@@ -365,7 +365,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
             <button
               type="button"
               onClick={() => setThumbsDownOpen(true)}
-              className="px-2.5 py-1 rounded-lg bg-paper text-ink/65 active:bg-fire-mild/12 active:text-fire-mild"
+              className="px-2.5 py-1 rounded-lg bg-paper text-ink/70 active:bg-fire-mild/12 active:text-fire-mild"
               aria-label="识别有误"
               data-testid="thumbs-down"
             >

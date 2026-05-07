@@ -51,7 +51,7 @@ export function Landing() {
         >
           30 秒测一下你当前的抗炎指数 →
         </Link>
-        <p className="mt-3 text-xs text-ink/40 text-center">
+        <p className="mt-3 text-xs text-ink/30 text-center">
           不需要注册。完成后给你一份初步评估。
         </p>
       </section>
@@ -72,7 +72,7 @@ export function Landing() {
             <img src={asset('landing-step-photo.png')} alt="" className="w-20 h-20 object-contain flex-shrink-0" loading="lazy" />
             <div>
               <p className="text-sm font-medium text-ink">① 每餐拍一张照</p>
-              <p className="mt-1.5 text-xs text-ink/60 leading-relaxed">
+              <p className="mt-1.5 text-xs text-ink/50 leading-relaxed">
                 AI 识别食物,估算这一餐的添加糖与碳水,给当餐抗炎指数(★1-5)。
               </p>
             </div>
@@ -81,7 +81,7 @@ export function Landing() {
             <img src={asset('landing-step-checkin.png')} alt="" className="w-20 h-20 object-contain flex-shrink-0" loading="lazy" />
             <div>
               <p className="text-sm font-medium text-ink">② 次日早晨 30 秒打卡</p>
-              <p className="mt-1.5 text-xs text-ink/60 leading-relaxed">
+              <p className="mt-1.5 text-xs text-ink/50 leading-relaxed">
                 7 维度:鼻塞 / 起痘 / 口干 / 大便 / 精神 / 浮肿 / 喉咙痒。
               </p>
             </div>
@@ -90,7 +90,7 @@ export function Landing() {
             <img src={asset('landing-step-archive.png')} alt="" className="w-20 h-20 object-contain flex-shrink-0" loading="lazy" />
             <div>
               <p className="text-sm font-medium text-ink">③ 14-30 天累积</p>
-              <p className="mt-1.5 text-xs text-ink/60 leading-relaxed">
+              <p className="mt-1.5 text-xs text-ink/50 leading-relaxed">
                 系统统计你的减糖累计,回归出哪几样食物对你这个体质最容易引发反应。
               </p>
             </div>
@@ -99,7 +99,7 @@ export function Landing() {
       </section>
 
       <section className="px-6 py-10 pb-20 max-w-2xl mx-auto border-t border-ink/5">
-        <p className="text-xs text-ink/40 leading-relaxed">
+        <p className="text-xs text-ink/30 leading-relaxed">
           本工具仅作生活方式参考,不构成医疗建议、不替代诊疗、不涉及任何疾病诊断或治疗承诺。
           若有任何不适,请就医并咨询执业医师 / 注册营养师。
           <Link href="/privacy-policy" className="ml-2 underline">

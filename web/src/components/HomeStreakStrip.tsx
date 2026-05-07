@@ -53,7 +53,7 @@ export function HomeStreakStrip({ cumulativeDays, todayLevel }: Props) {
           <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
             <span
               className={`text-[10px] tracking-wide ${
-                d.isToday ? 'text-ink font-medium' : 'text-ink/35'
+                d.isToday ? 'text-ink font-medium' : 'text-ink/30'
               }`}
             >
               {dayNum}

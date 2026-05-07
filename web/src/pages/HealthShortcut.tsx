@@ -40,14 +40,14 @@ URL:    ${typeof window !== 'undefined' ? window.location.origin : 'https://web-
       <button
         type="button"
         onClick={() => navigate('/app')}
-        className="text-sm text-ink/45 mb-4"
+        className="text-sm text-ink/50 mb-4"
       >
         ← 返回今天
       </button>
 
       <header className="mb-6">
         <h1 className="text-2xl font-semibold text-ink">Apple Health 自动同步</h1>
-        <p className="mt-2 text-sm text-ink/60 leading-relaxed">
+        <p className="mt-2 text-sm text-ink/50 leading-relaxed">
           用一条 iOS 快捷指令,每天早上自动从「健康」app 读取昨日 / 当日步数,推送到 Soak。
           省去手动录入。
         </p>
@@ -55,14 +55,14 @@ URL:    ${typeof window !== 'undefined' ? window.location.origin : 'https://web-
 
       <section className="rounded-3xl bg-white px-6 py-6 mb-5">
         <h2 className="text-base font-medium text-ink mb-3">三步配置</h2>
-        <ol className="space-y-4 text-sm text-ink/75 leading-relaxed">
+        <ol className="space-y-4 text-sm text-ink/70 leading-relaxed">
           <li>
             <span className="font-medium text-ink">① 打开 iOS「快捷指令」app</span>,
             点右上 + 新建一条快捷指令
           </li>
           <li>
             <span className="font-medium text-ink">② 添加两个动作:</span>
-            <div className="mt-2 rounded-xl bg-paper px-3 py-3 text-xs whitespace-pre-wrap font-mono text-ink/80">
+            <div className="mt-2 rounded-xl bg-paper px-3 py-3 text-xs whitespace-pre-wrap font-mono text-ink/70">
               {cfgSnippet}
             </div>
           </li>
@@ -75,7 +75,7 @@ URL:    ${typeof window !== 'undefined' ? window.location.origin : 'https://web-
 
       <section className="rounded-3xl bg-white px-6 py-6 mb-5">
         <h2 className="text-base font-medium text-ink mb-3">你的同步 token(Bearer)</h2>
-        <p className="text-xs text-ink/55 mb-3 leading-relaxed">
+        <p className="text-xs text-ink/50 mb-3 leading-relaxed">
           把下面这段粘到快捷指令的 Authorization 头里。token 当前会话有效;
           快捷指令推送失败时回到这页重新拷贝即可。
         </p>
@@ -86,14 +86,14 @@ URL:    ${typeof window !== 'undefined' ? window.location.origin : 'https://web-
           className="w-full text-[10px] font-mono p-3 rounded-xl border border-ink/15 bg-paper resize-none"
           onFocus={(e) => e.currentTarget.select()}
         />
-        <p className="mt-2 text-[11px] text-ink/40">
+        <p className="mt-2 text-[11px] text-ink/30">
           安全提示:不要把 token 转发给他人。只贴到自己的快捷指令里。
         </p>
       </section>
 
       <section className="rounded-3xl bg-white px-6 py-6">
         <h2 className="text-base font-medium text-ink mb-3">手动录入也能用</h2>
-        <p className="text-sm text-ink/65 leading-relaxed">
+        <p className="text-sm text-ink/70 leading-relaxed">
           没装快捷指令也没关系 — 在「今天」页步数输入框直接填数字也会同步到 server,
           换设备也能看到。Apple Health / 微信运动 / Garmin 等更深度集成在 Phase 3 计划。
         </p>

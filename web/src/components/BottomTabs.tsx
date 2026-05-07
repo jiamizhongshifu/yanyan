@@ -28,7 +28,7 @@ export function BottomTabs() {
               <Link
                 href={t.href}
                 className={`flex flex-col items-center py-2.5 text-xs ${
-                  active ? 'text-ink' : 'text-ink/40'
+                  active ? 'text-ink' : 'text-ink/30'
                 }`}
                 aria-current={active ? 'page' : undefined}
                 data-testid={`tab-${t.key}`}

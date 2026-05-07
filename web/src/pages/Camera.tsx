@@ -98,7 +98,7 @@ export function Camera() {
       <h1 className="text-2xl font-semibold text-ink text-center">
         {errorMessage ? '出了点小问题' : busy ? STAGE_HINT[stage as keyof typeof STAGE_HINT] : '拍下这一餐'}
       </h1>
-      <p className="mt-3 text-sm text-ink/60 leading-relaxed text-center">
+      <p className="mt-3 text-sm text-ink/50 leading-relaxed text-center">
         {errorMessage
           ? errorMessage
           : busy
@@ -132,7 +132,7 @@ export function Camera() {
         </div>
       )}
 
-      <p className="mt-12 text-xs text-ink/40 leading-relaxed text-center">
+      <p className="mt-12 text-xs text-ink/30 leading-relaxed text-center">
         v1 阶段 LLM 识别走境内多模态服务;<br />
         识别结果不出境,照片仅在你的账号下保留。
       </p>

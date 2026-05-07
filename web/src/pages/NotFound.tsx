@@ -29,14 +29,14 @@ export function NotFound({
         loading="lazy"
       />
       <h1 className="text-2xl font-semibold text-ink">{title}</h1>
-      <p className="mt-3 text-sm text-ink/60 leading-relaxed max-w-xs">{description}</p>
+      <p className="mt-3 text-sm text-ink/50 leading-relaxed max-w-xs">{description}</p>
       <Link
         href={ctaHref}
         className="mt-10 inline-block rounded-full bg-ink text-white px-8 py-3 text-base font-medium"
       >
         {ctaLabel}
       </Link>
-      <Link href="/" className="mt-4 text-xs text-ink/45 underline">
+      <Link href="/" className="mt-4 text-xs text-ink/50 underline">
         回到落地页
       </Link>
     </main>

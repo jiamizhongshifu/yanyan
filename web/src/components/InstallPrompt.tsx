@@ -100,7 +100,7 @@ export function InstallPrompt() {
       />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-ink">添加到主屏</p>
-        <p className="mt-0.5 text-[11px] text-ink/55 leading-snug">
+        <p className="mt-0.5 text-[11px] text-ink/50 leading-snug">
           {event ? '一键安装,以后从桌面图标直接打开' : '点击底部分享 → 添加到主屏幕'}
         </p>
       </div>
@@ -116,7 +116,7 @@ export function InstallPrompt() {
       <button
         type="button"
         onClick={close}
-        className="text-ink/40 text-lg w-7 h-7 flex items-center justify-center flex-shrink-0"
+        className="text-ink/30 text-lg w-7 h-7 flex items-center justify-center flex-shrink-0"
         aria-label="关闭"
       >
         ×

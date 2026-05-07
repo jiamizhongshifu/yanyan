@@ -3,7 +3,7 @@
  *
  * 全部 24×24 viewBox monoline 风格,默认 currentColor stroke,
  * 调用方通过 className 控制大小 + 颜色:
- *   <Icon name="meal" className="w-5 h-5 text-ink/60" />
+ *   <Icon name="meal" className="w-5 h-5 text-ink/50" />
  *
  * 风格统一:
  *   - 1.6-1.8 stroke-width

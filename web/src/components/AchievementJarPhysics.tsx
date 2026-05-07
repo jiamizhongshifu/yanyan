@@ -243,7 +243,7 @@ export function AchievementJarPhysics({
     <section className="rounded-3xl bg-white px-5 py-5" data-testid="achievement-jar">
       <div className="flex items-baseline justify-between mb-3">
         <h2 className="text-base font-medium text-ink">{monthLabel} · 勋章瓶</h2>
-        <span className="text-xs text-ink/45">本月 {perfect + great + nice} 枚</span>
+        <span className="text-xs text-ink/50">本月 {perfect + great + nice} 枚</span>
       </div>
       <div ref={containerRef} className="relative mx-auto" style={{ width: 280, height: 360 }}>
         {/* SVG 玻璃瓶轮廓(默认空瓶,只有玻璃 + 金色盖子) */}

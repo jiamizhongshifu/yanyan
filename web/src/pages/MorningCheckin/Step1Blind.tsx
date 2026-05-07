@@ -43,7 +43,7 @@ export function Step1Blind() {
         <img src={asset('checkin-blind.png')} alt="" className="w-32 h-32 object-contain" loading="lazy" />
       </div>
       <h1 className="text-2xl font-semibold text-ink">今早身体感觉怎么样?</h1>
-      <p className="mt-3 text-sm text-ink/60 leading-relaxed">
+      <p className="mt-3 text-sm text-ink/50 leading-relaxed">
         没反应就跳过,不用每项都选。先勾选,再滑动选程度 — 默认不预填,选错了点同一档可以撤销。
       </p>
 
