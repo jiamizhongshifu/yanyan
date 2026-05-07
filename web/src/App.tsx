@@ -6,6 +6,7 @@ import { NotFound } from './pages/NotFound';
 import { RequireAuth } from './components/RequireAuth';
 import { BottomTabs } from './components/BottomTabs';
 import { InstallPrompt } from './components/InstallPrompt';
+import { LoadingView } from './components/StateView';
 
 /**
  * 路由级 code-split:除 Landing / Login / NotFound 外全部懒加载。
@@ -44,11 +45,11 @@ function MaybeBottomTabs() {
   return visible ? <BottomTabs /> : null;
 }
 
-/** 懒加载切换时的过渡占位 — 极简,避免视觉跳动 */
+/** 懒加载切换时的过渡占位 — 用 LoadingView,与其它 loading 状态保持一致 */
 function RouteFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg">
-      <span className="text-xs text-ink/30">加载中…</span>
+    <div className="min-h-screen bg-paper">
+      <LoadingView fullScreen />
     </div>
   );
 }

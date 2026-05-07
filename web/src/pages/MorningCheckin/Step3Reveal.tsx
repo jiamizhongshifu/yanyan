@@ -11,6 +11,7 @@ import { fetchYanScoreToday, type FireLevel } from '../../services/symptoms';
 import { useCheckin } from '../../store/checkin';
 import { track } from '../../services/tracker';
 import { Button } from '../../components/Button';
+import { LoadingView } from '../../components/StateView';
 import { TodaySuggestionCard } from '../../components/TodaySuggestionCard';
 import { asset } from '../../services/assets';
 
@@ -46,8 +47,8 @@ export function Step3Reveal() {
 
   if (!yanScore) {
     return (
-      <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
-        <p className="text-sm text-ink/50">加载中…</p>
+      <main className="min-h-screen bg-paper">
+        <LoadingView fullScreen />
       </main>
     );
   }
