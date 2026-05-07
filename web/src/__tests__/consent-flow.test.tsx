@@ -101,7 +101,7 @@ describe('U3 web Consent page', () => {
 
     fireEvent.click(screen.getByText(/我已阅读并同意/));
 
-    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/'));
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/app'));
 
     // 验证 POST 调用带 JWT + 5 个 scopes + version
     const postCall = fetchMock.mock.calls.find((c: unknown[]) => {

@@ -93,7 +93,7 @@ export function Step3Reveal() {
         </section>
         <button
           type="button"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/app')}
           className="mt-10 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
         >
           回主页
@@ -153,7 +153,7 @@ export function Step3Reveal() {
 
       <button
         type="button"
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/app')}
         className="mt-10 w-full rounded-full bg-ink text-white py-3 text-base font-medium"
       >
         回主页

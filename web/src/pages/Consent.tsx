@@ -66,7 +66,7 @@ export function Consent() {
       setErrorMessage('提交失败,请检查登录状态与网络后重试。');
       return;
     }
-    navigate('/');
+    navigate('/app');
   };
 
   return (
