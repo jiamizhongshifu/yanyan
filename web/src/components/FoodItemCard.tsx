@@ -204,7 +204,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
                         setNewIngredient('');
                       }
                     }}
-                    placeholder="食材名(如:牛肉)"
+                    placeholder="食材名(如：牛肉)"
                     className="flex-1 min-w-[120px] rounded-lg border border-ink/15 bg-paper px-3 py-1.5 text-xs focus:border-ink focus:outline-none"
                     maxLength={32}
                   />
@@ -326,7 +326,7 @@ export function FoodItemCard({ item, onSendFeedback, onSubmitIngredients, isSavi
                     setFeedbackNote('');
                   }
                 }}
-                placeholder="例如:这盘菜其实是 XX,主料应该是 YY"
+                placeholder="例如：这盘菜其实是 XX，主料应该是 YY"
                 maxLength={200}
                 className="flex-1 rounded-lg border border-ink/15 bg-paper px-3 py-1.5 text-xs focus:border-ink focus:outline-none"
               />
