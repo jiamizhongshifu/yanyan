@@ -14,15 +14,12 @@
 import type { FireLevel } from '../services/symptoms';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
 import { palette } from '../theme/palette';
-import { CapybaraScene } from './CapybaraScene';
 
 interface Props {
   /** 后端 fireScore 0-100(0=最好);组件内部翻成抗炎指数 100-fireScore */
   score: number;
   level: FireLevel;
   caption?: string;
-  /** 是否在中心显示 mascot(默认 true) */
-  showLevelIcon?: boolean;
 }
 
 const LEVEL_COLOR: Record<FireLevel, string> = {
@@ -56,7 +53,7 @@ function polar(deg: number, r: number = RADIUS): [number, number] {
   return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
 }
 
-export function InflammationDial({ score, level, caption = '今日抗炎指数', showLevelIcon = true }: Props) {
+export function InflammationDial({ score, level, caption = '今日抗炎指数' }: Props) {
   const fireScore = Math.max(0, Math.min(100, score));
   const antiInflam = 100 - fireScore;
   const stars = LEVEL_TO_STARS[level];
@@ -123,7 +120,7 @@ export function InflammationDial({ score, level, caption = '今日抗炎指数',
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        {showLevelIcon && <CapybaraScene className="w-24 h-24 mb-1" />}
+        {/* 中心 mascot 已移除 — 让大数字 + 等级标签更聚焦 */}
         <p
           className={`text-5xl font-bold leading-none ${LABEL_TEXT_COLOR[level]}`}
           data-testid="dial-anti-inflam"
