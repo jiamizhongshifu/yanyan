@@ -85,8 +85,30 @@ export function Camera() {
     ? 'mascot-thinking.png'
     : 'camera-tabletop.png';
 
+  // 关闭按钮目标 — 优先回到 FAB 触发时的 tab(从底栏拍照),否则 /app
+  const onClose = async () => {
+    if (busy) return; // 处理中禁止关闭
+    const { consumeCameraFromTab } = await import('../components/BottomTabs');
+    navigate(consumeCameraFromTab() ?? '/app');
+  };
+
   return (
     <main className="min-h-screen bg-paper px-7 pt-12 pb-10 max-w-md mx-auto">
+      {/* 关闭按钮 — 左上角 ✕ */}
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={busy}
+        aria-label="关闭"
+        className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-ink/70 active:scale-95 transition disabled:opacity-40"
+        data-testid="camera-close"
+      >
+        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 6 L18 18" />
+          <path d="M6 18 L18 6" />
+        </svg>
+      </button>
+
       <div className="flex justify-center mb-2">
         <img
           src={asset(headerImg)}
