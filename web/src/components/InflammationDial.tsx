@@ -14,7 +14,7 @@
 import type { FireLevel } from '../services/symptoms';
 import { LEVEL_TO_LABEL, LEVEL_TO_STARS } from '../services/score-display';
 import { palette } from '../theme/palette';
-import { asset } from '../services/assets';
+import { CapybaraScene } from './CapybaraScene';
 
 interface Props {
   /** 后端 fireScore 0-100(0=最好);组件内部翻成抗炎指数 100-fireScore */
@@ -37,13 +37,6 @@ const LABEL_TEXT_COLOR: Record<FireLevel, string> = {
   微火: 'text-fire-ping',
   中火: 'text-fire-mild',
   大火: 'text-fire-mid'
-};
-
-const LEVEL_MASCOT: Record<FireLevel, string> = {
-  平: 'mascot-cheer.png',
-  微火: 'mascot-content.png',
-  中火: 'mascot-pensive.png',
-  大火: 'mascot-caring.png'
 };
 
 // 几何参数:240° 弧带,下方开口
@@ -130,14 +123,7 @@ export function InflammationDial({ score, level, caption = '今日抗炎指数',
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        {showLevelIcon && (
-          <img
-            src={asset(LEVEL_MASCOT[level])}
-            alt=""
-            className="w-20 h-20 object-contain mb-1"
-            loading="lazy"
-          />
-        )}
+        {showLevelIcon && <CapybaraScene className="w-24 h-24 mb-1" />}
         <p
           className={`text-5xl font-bold leading-none ${LABEL_TEXT_COLOR[level]}`}
           data-testid="dial-anti-inflam"
