@@ -32,8 +32,8 @@ MASCOTS = [
     'mascot-thinking.png',
 ]
 
-HARD_DIST = 55   # 距背景色 ≤ 此值 → alpha=0(放宽,确保 cream 边角全透明)
-SOFT_DIST = 90   # 55-90 之间 → 线性渐变 alpha
+HARD_DIST = 90   # 距背景色 ≤ 此值 → alpha=0(更激进清干净,避免 cream 边缘 halo)
+SOFT_DIST = 130  # 90-130 之间 → 线性渐变 alpha + 同时做 despill 去残色
 
 def color_dist(p1, p2):
     """欧式距离(RGB 三通道)"""
@@ -63,6 +63,20 @@ def sample_bg(img):
     mid = len(rgbs_sorted[0]) // 2
     return (rgbs_sorted[0][mid], rgbs_sorted[1][mid], rgbs_sorted[2][mid])
 
+def despill(rgb, bg, ratio):
+    """
+    去残色:边缘像素的 RGB 含有 bg 颜色"溢出"。
+    假设 displayed = subject*ratio + bg*(1-ratio),解出 subject ≈ (displayed - bg*(1-ratio)) / ratio。
+    返回截断到 [0, 255] 的 RGB。
+    """
+    if ratio <= 0.05:
+        return rgb
+    out = []
+    for c, bc in zip(rgb, bg):
+        sub = (c - bc * (1 - ratio)) / ratio
+        out.append(max(0, min(255, int(sub))))
+    return tuple(out)
+
 def remove_bg(path: Path):
     img = Image.open(path).convert('RGBA')
     bg = sample_bg(img)
@@ -82,10 +96,11 @@ def remove_bg(path: Path):
                 pixels[x, y] = (r, g, b, 0)
                 changed += 1
             elif d <= SOFT_DIST:
-                # 线性渐变 alpha
+                # 线性渐变 alpha + despill 把残色从边缘 RGB 里减掉
                 ratio = (d - HARD_DIST) / (SOFT_DIST - HARD_DIST)
                 new_a = int(255 * ratio)
-                pixels[x, y] = (r, g, b, min(a, new_a))
+                nr, ng, nb = despill((r, g, b), bg, ratio)
+                pixels[x, y] = (nr, ng, nb, min(a, new_a))
                 changed += 1
     img.save(path, 'PNG', optimize=True)
     return path.stat().st_size, changed, w * h, bg

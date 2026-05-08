@@ -125,15 +125,19 @@ export function MonthCalendarGrid({
               data-testid={`calendar-cell-${dateStr}`}
               aria-label={title}
             >
-              {/* 选中态(今日)放在日期数字上 — 深色圆形背景,不再绕橘子加 ring */}
-              <span
-                className={`text-[11px] flex items-center justify-center ${
-                  c.isToday
-                    ? 'w-5 h-5 rounded-full bg-ink text-paper font-medium'
-                    : 'text-ink/50'
-                }`}
-              >
-                {c.day}
+              {/* 选中态(今日)放在日期数字上 — 深色圆形背景。
+                  外层固定 w-5 h-5 容器,确保所有 cell(无论今日 / 平常)
+                  下方橘子起始 y 完全相同,同行对齐 */}
+              <span className="w-5 h-5 flex items-center justify-center">
+                <span
+                  className={`text-[11px] flex items-center justify-center ${
+                    c.isToday
+                      ? 'w-5 h-5 rounded-full bg-ink text-paper font-medium'
+                      : 'text-ink/50'
+                  }`}
+                >
+                  {c.day}
+                </span>
               </span>
               <div className="w-9 h-9 rounded-full flex items-center justify-center" title={title}>
                 {(() => {

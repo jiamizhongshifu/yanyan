@@ -29,18 +29,27 @@ import { Icon } from '../components/Icon';
 import { track } from '../services/tracker';
 
 function WaterDropIcon({ filled }: { filled: boolean }) {
+  // 蓝色水(常规配色)— 浅蓝顶 → 深蓝底,与"水"语义一致
+  const fill = filled ? 'url(#water-grad)' : '#F7F4EE';
+  const stroke = filled ? '#3B7DB8' : 'rgba(0,0,0,0.18)';
   return (
     <svg viewBox="0 0 24 32" width="22" height="28" aria-hidden="true">
+      <defs>
+        <linearGradient id="water-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#7FB8E6" />
+          <stop offset="100%" stopColor="#3B7DB8" />
+        </linearGradient>
+      </defs>
       <path
         d="M12 2 C 12 2, 4 12, 4 20 a 8 8 0 0 0 16 0 C 20 12, 12 2, 12 2 Z"
-        fill={filled ? '#4A8B6F' : '#F7F4EE'}
-        stroke={filled ? '#4A8B6F' : 'rgba(0,0,0,0.18)'}
+        fill={fill}
+        stroke={stroke}
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
       {filled && (
-        // 内部高光,让"已喝"的水滴更立体
-        <ellipse cx="9" cy="16" rx="1.8" ry="3.5" fill="#fff" fillOpacity="0.35" />
+        // 高光让水滴更立体
+        <ellipse cx="9" cy="16" rx="1.8" ry="3.5" fill="#fff" fillOpacity="0.45" />
       )}
     </svg>
   );

@@ -145,10 +145,7 @@ function OrangeSvgInner({ variant }: { variant: OrangeVariant }) {
         />
       )}
 
-      {/* 底部柔阴影 — 椭圆,与果体分离感 */}
-      <ellipse cx="32" cy="60" rx="18" ry="2.5" fill={s.shadow} />
-
-      {/* 果体 — 多色软渐变,无硬描边 */}
+      {/* 果体 — 多色软渐变,无硬描边(玻璃瓶里多橘子堆叠时,投影会互相撞,取消) */}
       <circle cx="32" cy="36" r="22" fill={`url(#og-body-${id})`} />
 
       {/* 大柔光高光 */}
@@ -258,7 +255,6 @@ export function orangeIconDataUrl(variant: OrangeVariant): string {
       </linearGradient>
     </defs>
     ${halo}
-    <ellipse cx="32" cy="60" rx="18" ry="2.5" fill="${s.shadow}"/>
     <circle cx="32" cy="36" r="22" fill="url(#og-body-${id})"/>
     <ellipse cx="24" cy="24" rx="14" ry="10" fill="url(#og-glow-${id})"/>
     <ellipse cx="20" cy="32" rx="2.4" ry="1.3" fill="#FFFFFF" opacity="0.65"/>
