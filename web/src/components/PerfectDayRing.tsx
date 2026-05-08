@@ -120,30 +120,6 @@ export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
           ))}
         </svg>
 
-        {/* 两侧浮起按钮(信息 / 分享 — 占位,后续接) */}
-        <button
-          type="button"
-          aria-label="说明"
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-ink/50 active:scale-95 transition"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 16v-4" />
-            <circle cx="12" cy="8" r=".5" fill="currentColor" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          aria-label="分享"
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-ink/50 active:scale-95 transition"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 4v12" />
-            <path d="M7 9l5-5 5 5" />
-            <rect x="4" y="16" width="16" height="4" rx="1" />
-          </svg>
-        </button>
-
         {/* 中心:tier 橘子 + 大号百分比 + Perfect Day 副标 */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <OrangeIcon
