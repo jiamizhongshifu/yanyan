@@ -86,21 +86,10 @@ export function Home() {
     return null;
   }, [yanScore, quiz, initialFireLevel]);
 
-  const greeting = useMemo(() => {
-    const h = new Date().getHours();
-    if (h < 6) return '凌晨';
-    if (h < 11) return '早上好';
-    if (h < 14) return '中午好';
-    if (h < 18) return '下午好';
-    if (h < 22) return '晚上好';
-    return '夜深了';
-  }, []);
-
   return (
     <main className="min-h-screen bg-paper px-5 pt-10 pb-28 max-w-md mx-auto" data-testid="home">
       <header className="mb-4">
-        <p className="text-xs text-ink/50">{greeting}</p>
-        <p className="mt-0.5 text-lg font-medium text-ink">Soak</p>
+        <h1 className="text-xl font-medium text-ink">身体</h1>
       </header>
 
       <InappRemindersBanner />
