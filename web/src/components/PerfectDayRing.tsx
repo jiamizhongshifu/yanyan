@@ -1,12 +1,11 @@
 /**
  * 完美一天进度环
  *
- * 270° 弧形(-135° → +135°),fill = doneCount / total
- *
- * 中心层级(从上到下):
- *   1. 灰色小橘子(装饰锚点)
- *   2. 大号百分比(主视觉,按 tier 着色)
- *   3. 完美一天 + 等级标签(副位)
+ * 半圆刻度仪表盘(参考 grow app):
+ *   - 240° 弧形(下方开口),底色刻度环 + 比例填充弧
+ *   - 圆周散布 60 个 tick(每 4° 一刻),fill 比例下加深、未填浅灰
+ *   - 中心:tier 橘子(头像位)+ 大号百分比 + Perfect Day 副标
+ *   - 两侧浮起 ⓘ / ↑ 小图标(占位,先非交互)
  *
  * 环外:一行鼓励语,根据已完成项数动态写文案
  */
@@ -27,75 +26,144 @@ const TIER_COLOR: Record<DayTier, string> = {
   none: '#A8A296'
 };
 
+// 弧形参数:开口在下方,从左下绕过顶部到右下
+const SWEEP = 240;
+const START_ANGLE = 270 - SWEEP / 2; // = 150
+const END_ANGLE = 270 + SWEEP / 2; // = 390 (相对 cx,cy 的极角,12 点 = 270°)
+
+const VIEW = 220;
+const CX = VIEW / 2;
+const CY = VIEW / 2 + 6; // 略下移让顶部空出一点
+const RADIUS = 86;
+const TRACK_W = 10;
+
+const TICK_COUNT = 60;
+const TICK_INNER = RADIUS - TRACK_W / 2 - 4;
+const TICK_OUTER = RADIUS - TRACK_W / 2 - 1;
+
+function polar(deg: number, r: number = RADIUS): [number, number] {
+  // SVG 极角:0° = 右(3 点),90° = 下(6 点),180° = 左(9 点),270° = 上(12 点)
+  const rad = (deg * Math.PI) / 180;
+  return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
+}
+
 export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
   const ratio = Math.max(0, Math.min(1, doneCount / total));
   const pct = Math.round(ratio * 100);
-  const radius = 86;
-  const stroke = 12;
-  const cx = 110;
-  const cy = 110;
+  const tierColor = TIER_COLOR[tier];
 
-  const startAngle = 135;
-  const endAngle = 405;
-  const totalSweep = endAngle - startAngle;
+  // 背景轨迹弧(浅灰)
+  const [bgX1, bgY1] = polar(START_ANGLE);
+  const [bgX2, bgY2] = polar(END_ANGLE);
+  const bgArc = `M ${bgX1.toFixed(2)} ${bgY1.toFixed(2)} A ${RADIUS} ${RADIUS} 0 1 1 ${bgX2.toFixed(2)} ${bgY2.toFixed(2)}`;
 
-  const polar = (deg: number): [number, number] => {
-    const r = ((deg - 90) * Math.PI) / 180;
-    return [cx + radius * Math.cos(r), cy + radius * Math.sin(r)];
-  };
+  // 填充弧
+  const fillEndAngle = START_ANGLE + SWEEP * ratio;
+  const [fX2, fY2] = polar(fillEndAngle);
+  const fillLargeArc = SWEEP * ratio > 180 ? 1 : 0;
+  const fillArc = `M ${bgX1.toFixed(2)} ${bgY1.toFixed(2)} A ${RADIUS} ${RADIUS} 0 ${fillLargeArc} 1 ${fX2.toFixed(2)} ${fY2.toFixed(2)}`;
 
-  const [bgX1, bgY1] = polar(startAngle);
-  const [bgX2, bgY2] = polar(endAngle);
-  const bgArc = `M ${bgX1} ${bgY1} A ${radius} ${radius} 0 1 1 ${bgX2} ${bgY2}`;
-
-  const fillEnd = startAngle + totalSweep * ratio;
-  const [fX2, fY2] = polar(fillEnd);
-  const fillLargeArc = totalSweep * ratio > 180 ? 1 : 0;
-  const fillArc = `M ${bgX1} ${bgY1} A ${radius} ${radius} 0 ${fillLargeArc} 1 ${fX2} ${fY2}`;
+  // 刻度线 — 沿 SWEEP 均匀分布
+  const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => {
+    const angle = START_ANGLE + (SWEEP * i) / TICK_COUNT;
+    const passed = i / TICK_COUNT <= ratio;
+    const [x1, y1] = polar(angle, TICK_INNER);
+    const [x2, y2] = polar(angle, TICK_OUTER);
+    return { x1, y1, x2, y2, passed };
+  });
 
   return (
     <div className="w-full flex flex-col items-center" data-testid="perfect-day-ring">
-      <div className="relative">
-        <svg viewBox="0 0 220 220" className="w-52 h-52">
+      <div className="relative w-56">
+        <svg viewBox={`0 0 ${VIEW} ${VIEW}`} className="w-full h-auto">
           <defs>
             <linearGradient id="pday-grad" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#F0B679" />
-              <stop offset="50%" stopColor="#E8954E" />
-              <stop offset="100%" stopColor="#D9762C" />
+              <stop offset="0%" stopColor="#FFE588" />
+              <stop offset="50%" stopColor="#FFB565" />
+              <stop offset="100%" stopColor="#F0964B" />
             </linearGradient>
           </defs>
-          <path d={bgArc} fill="none" stroke="#F0E8DA" strokeWidth={stroke} strokeLinecap="round" />
+
+          {/* 底色弧(浅灰) */}
+          <path
+            d={bgArc}
+            fill="none"
+            stroke="#F0E8DA"
+            strokeWidth={TRACK_W}
+            strokeLinecap="round"
+          />
+
+          {/* 比例填充弧 */}
           {ratio > 0 && (
             <path
               d={fillArc}
               fill="none"
               stroke="url(#pday-grad)"
-              strokeWidth={stroke}
+              strokeWidth={TRACK_W}
               strokeLinecap="round"
             />
           )}
+
+          {/* 刻度线(在轨迹内圈) */}
+          {ticks.map((t, i) => (
+            <line
+              key={i}
+              x1={t.x1.toFixed(2)}
+              y1={t.y1.toFixed(2)}
+              x2={t.x2.toFixed(2)}
+              y2={t.y2.toFixed(2)}
+              stroke={t.passed ? tierColor : '#D9D2C2'}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              opacity={t.passed ? 0.85 : 0.55}
+            />
+          ))}
         </svg>
 
-        {/* 中心:橘子(按今日 tier 显示金/银/铜,未达成显示灰) + 大号百分比 + 副位标签 */}
+        {/* 两侧浮起按钮(信息 / 分享 — 占位,后续接) */}
+        <button
+          type="button"
+          aria-label="说明"
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-ink/50 active:scale-95 transition"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4" />
+            <circle cx="12" cy="8" r=".5" fill="currentColor" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          aria-label="分享"
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-ink/50 active:scale-95 transition"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 4v12" />
+            <path d="M7 9l5-5 5 5" />
+            <rect x="4" y="16" width="16" height="4" rx="1" />
+          </svg>
+        </button>
+
+        {/* 中心:tier 橘子 + 大号百分比 + Perfect Day 副标 */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <OrangeIcon
             variant={(tier === 'none' ? 'gray' : tier) as OrangeVariant}
-            className="w-8 h-8 mb-0.5"
+            className="w-9 h-9 mb-1"
           />
           <p
-            className="text-5xl font-light leading-none"
-            style={{ color: TIER_COLOR[tier] }}
+            className="text-5xl font-bold leading-none tracking-tight"
+            style={{ color: tierColor }}
             data-testid="pday-pct"
           >
             {pct}
-            <span className="text-xl font-light ml-0.5">%</span>
+            <span className="text-2xl font-bold ml-0.5">%</span>
           </p>
-          <p className="mt-1.5 text-[11px] text-ink/50 tracking-wide">完美一天</p>
+          <p className="mt-1.5 text-[11px] text-ink/50 tracking-wide">Perfect Day</p>
         </div>
       </div>
 
       {/* 环外鼓励语 */}
-      <p className="mt-3 text-xs text-ink/50 leading-relaxed text-center px-4">
+      <p className="mt-4 text-xs text-ink/50 leading-relaxed text-center px-6">
         {encouragement(doneCount, total, tier)}
       </p>
     </div>
