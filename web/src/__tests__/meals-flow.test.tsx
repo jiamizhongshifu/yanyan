@@ -16,11 +16,11 @@ import { MealResult } from '../pages/MealResult';
 import { useLastMeal } from '../store/lastMeal';
 
 // 等 useAuth 的 getSession Promise 解析 + 后续 setState 落地;
-// Camera 在 authLoading 时按钮 data-ready 为 false,加载完后变 true
+// Camera 在 authLoading 时"拍这一餐"按钮 disabled,加载完后启用
 async function waitForAuthReady() {
   await waitFor(() => {
-    const btn = screen.queryByText('拍 / 选这一餐照片')?.closest('button') as HTMLButtonElement | null;
-    expect(btn?.dataset.ready).toBe('true');
+    const btn = screen.queryByTestId('btn-take-photo') as HTMLButtonElement | null;
+    expect(btn?.disabled).toBe(false);
   });
 }
 
@@ -102,7 +102,7 @@ describe('U6 Camera page', () => {
 
     render(<Camera />);
     await waitForAuthReady();
-    fireEvent.change(screen.getByTestId('photo-input'), {
+    fireEvent.change(screen.getByTestId('photo-input-camera'), {
       target: { files: [new File([new Uint8Array([1, 2, 3])], 'meal.jpg', { type: 'image/jpeg' })] }
     });
 
@@ -117,7 +117,7 @@ describe('U6 Camera page', () => {
 
     render(<Camera />);
     await waitForAuthReady();
-    fireEvent.change(screen.getByTestId('photo-input'), {
+    fireEvent.change(screen.getByTestId('photo-input-camera'), {
       target: { files: [new File([new Uint8Array(1)], 'a.jpg', { type: 'image/jpeg' })] }
     });
 
@@ -130,7 +130,7 @@ describe('U6 Camera page', () => {
 
     render(<Camera />);
     await waitForAuthReady();
-    fireEvent.change(screen.getByTestId('photo-input'), {
+    fireEvent.change(screen.getByTestId('photo-input-camera'), {
       target: { files: [new File([new Uint8Array(1)], 'b.jpg', { type: 'image/jpeg' })] }
     });
 

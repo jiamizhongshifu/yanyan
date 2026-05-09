@@ -31,7 +31,13 @@ export function Camera() {
   const [, navigate] = useLocation();
   const { userId, loading: authLoading } = useAuth();
   const setLastMeal = useLastMeal((s) => s.set);
-  const inputRef = useRef<HTMLInputElement>(null);
+  // 两个独立 input:
+  //   - cameraInputRef:capture=environment 直接调摄像头
+  //   - galleryInputRef:不带 capture,触发系统相册选择
+  // iOS Safari / 安卓 Chrome 都会把 capture 属性当作"打开相机的偏好",
+  // 不带则进相册。
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<Stage>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const busy = stage === 'compressing' || stage === 'uploading' || stage === 'recognizing';
@@ -73,8 +79,9 @@ export function Camera() {
       setStage('error');
       setErrorMessage(err instanceof Error ? err.message : '处理失败');
     } finally {
-      // 重置 input 让用户能再选同一文件
-      if (inputRef.current) inputRef.current.value = '';
+      // 重置两个 input 让用户能再选同一文件
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
     }
   };
 
@@ -128,25 +135,65 @@ export function Camera() {
           : 'AI 会估算这一餐的添加糖与碳水,给出当餐抗炎指数(★1-5)。识别后你可以标记错的,我们会修正。'}
       </p>
 
+      {/* 两个隐藏 input — 一个走相机,一个走相册 */}
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
         capture="environment"
         onChange={onPickFile}
         className="hidden"
-        data-testid="photo-input"
+        data-testid="photo-input-camera"
+      />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        onChange={onPickFile}
+        className="hidden"
+        data-testid="photo-input-gallery"
       />
 
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        disabled={authLoading || busy}
-        data-ready={!authLoading && !busy}
-        className="mt-12 w-full rounded-2xl bg-ink text-white py-8 text-lg font-medium disabled:opacity-50"
-      >
-        {authLoading ? '加载中…' : stage === 'idle' || stage === 'done' ? '拍 / 选这一餐照片' : STAGE_HINT[stage]}
-      </button>
+      {/* 处理中显示单一进度按钮(占满宽度);idle 时显示并排两个 CTA */}
+      {busy ? (
+        <button
+          type="button"
+          disabled
+          className="mt-12 w-full rounded-2xl bg-ink text-white py-8 text-lg font-medium opacity-50"
+        >
+          {STAGE_HINT[stage]}
+        </button>
+      ) : (
+        <div className="mt-12 grid grid-cols-2 gap-3" data-testid="photo-actions">
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            disabled={authLoading}
+            className="rounded-2xl bg-ink text-white py-6 px-3 text-base font-medium disabled:opacity-50 active:opacity-80 flex flex-col items-center gap-2"
+            data-testid="btn-take-photo"
+          >
+            <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 8 a 1 1 0 0 1 1 -1 h 4 l 1.5 -2 h 5 l 1.5 2 h 4 a 1 1 0 0 1 1 1 v 10 a 1 1 0 0 1 -1 1 h -16 a 1 1 0 0 1 -1 -1 z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            <span>拍这一餐</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => galleryInputRef.current?.click()}
+            disabled={authLoading}
+            className="rounded-2xl bg-paper text-ink border-2 border-ink/15 py-6 px-3 text-base font-medium disabled:opacity-50 active:bg-ink/5 flex flex-col items-center gap-2"
+            data-testid="btn-pick-gallery"
+          >
+            <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="14" rx="2" />
+              <circle cx="9" cy="10" r="2" />
+              <path d="M3 16 l 5 -5 l 4 4 l 3 -3 l 6 6" />
+            </svg>
+            <span>从相册选</span>
+          </button>
+        </div>
+      )}
 
       {errorMessage && (
         <div role="alert" className="sr-only">
