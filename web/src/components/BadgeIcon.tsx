@@ -17,8 +17,8 @@
  *   - orange-gray    过去/今日 + 无 tier
  *
  * 用法:
- *   <BadgeIcon shape="sun" className="w-7 h-7" />
- *   badgeIconDataUrl('sun')  // matter.js sprite
+ *   <BadgeIcon shape="cake" className="w-7 h-7" />
+ *   badgeIconDataUrl('cake')  // matter.js sprite
  */
 
 import type { BadgeShape } from '../services/badgePicker';
@@ -56,12 +56,12 @@ function BadgeInner({ shape }: { shape: BadgeIconShape }) {
       return <Chocolate />;
     case 'icecream':
       return <Icecream />;
-    case 'sun':
-      return <Sun />;
-    case 'star':
-      return <Star />;
-    case 'crown':
-      return <Crown />;
+    case 'cake':
+      return <Cake />;
+    case 'sushi':
+      return <Sushi />;
+    case 'pizza':
+      return <Pizza />;
   }
 }
 
@@ -270,74 +270,90 @@ function Icecream() {
   );
 }
 
-// ─── perfect 池:太阳 / 星星 / 王冠 ─────────────────
+// ─── perfect 池:蛋糕 / 寿司 / 披萨 ─────────────────
 
-/** 太阳 — 圆 + 8 道光芒 */
-function Sun() {
+/** 蛋糕 — 双层奶油 + 蜡烛火焰 + 顶部草莓 */
+function Cake() {
   return (
     <>
-      <GradientDefs id="sn" c0="#FFFAD6" c40="#FFDA66" c75="#FFA928" c100="#B36A05" />
-      {/* 8 道光芒(三角) */}
-      {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-        <g key={deg} transform={`rotate(${deg} 32 32)`}>
-          <path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940" />
-        </g>
-      ))}
-      {/* 太阳本体 */}
-      <circle cx="32" cy="32" r="16" fill="url(#bg-body-sn)" />
-      {/* 笑脸 */}
-      <circle cx="27" cy="29" r="1.4" fill="#7A4404" />
-      <circle cx="37" cy="29" r="1.4" fill="#7A4404" />
-      <path d="M 26 35 Q 32 41, 38 35" fill="none" stroke="#7A4404" strokeWidth="1.6" strokeLinecap="round" />
+      <GradientDefs id="cake" c0="#FFF1F5" c40="#FFC4D2" c75="#E48AA8" c100="#9D2D55" />
+      {/* 蜡烛火焰 */}
+      <path d="M 32 6 Q 28 10 32 14 Q 36 10 32 6 Z" fill="#FFB347" />
+      <ellipse cx="32" cy="10" rx="1.4" ry="2" fill="#FFEC99" opacity="0.85" />
+      {/* 蜡烛 */}
+      <rect x="31" y="14" width="2" height="6" fill="#3D6EB0" />
+      <rect x="31" y="14" width="0.8" height="6" fill="#FFFFFF" opacity="0.5" />
+      {/* 上层蛋糕(小)— 奶油渐变 */}
+      <rect x="22" y="20" width="20" height="10" rx="2" fill="url(#bg-body-cake)" />
+      {/* 上层奶油挤花(波浪)*/}
+      <path d="M 22 20 Q 24 17 26 20 T 30 20 T 34 20 T 38 20 T 42 20" fill="none" stroke="#FFFFFF" strokeWidth="1.4" opacity="0.6" />
+      {/* 下层蛋糕(大)*/}
+      <rect x="14" y="30" width="36" height="20" rx="2.5" fill="url(#bg-body-cake)" />
+      {/* 下层奶油波浪 */}
+      <path d="M 14 30 Q 16 27 18 30 T 22 30 T 26 30 T 30 30 T 34 30 T 38 30 T 42 30 T 46 30 T 50 30" fill="none" stroke="#FFFFFF" strokeWidth="1.4" opacity="0.6" />
+      {/* 草莓装饰(中部条带)*/}
+      <circle cx="20" cy="40" r="2.4" fill="#E63946" />
+      <circle cx="32" cy="40" r="2.4" fill="#E63946" />
+      <circle cx="44" cy="40" r="2.4" fill="#E63946" />
       {/* 高光 */}
-      <ellipse cx="26" cy="25" rx="5" ry="3" fill="url(#bg-glow-sn)" />
+      <ellipse cx="22" cy="34" rx="6" ry="3" fill="#FFFFFF" opacity="0.35" />
     </>
   );
 }
 
-/** 星星 — 5 角星 */
-function Star() {
+/** 寿司 — 椭圆米饭 + 三文鱼鱼片 + 海苔条 */
+function Sushi() {
   return (
     <>
-      <GradientDefs id="st" c0="#FFFAD6" c40="#FFE066" c75="#E89B0F" c100="#7A4F02" />
-      {/* 5 角星 path */}
-      <path
-        d="M 32 6 L 39 24 L 58 26 L 43 38 L 48 56 L 32 46 L 16 56 L 21 38 L 6 26 L 25 24 Z"
-        fill="url(#bg-body-st)"
-      />
-      {/* 内部小星(高光) */}
-      <path
-        d="M 32 16 L 35 26 L 45 27 L 37 33 L 40 43 L 32 38 L 24 43 L 27 33 L 19 27 L 29 26 Z"
-        fill="#FFFFFF"
-        opacity="0.25"
-      />
-      {/* 顶部小亮点 */}
-      <ellipse cx="28" cy="22" rx="3" ry="1.6" fill="#FFFFFF" opacity="0.65" />
+      <GradientDefs id="sushi" c0="#FFFFFF" c40="#FAF6EE" c75="#D8CFB8" c100="#8E8169" />
+      {/* 米饭基底(椭圆) */}
+      <ellipse cx="32" cy="38" rx="22" ry="14" fill="url(#bg-body-sushi)" />
+      {/* 米粒纹理(白点点)*/}
+      <circle cx="22" cy="38" r="0.9" fill="#FFFFFF" opacity="0.85" />
+      <circle cx="28" cy="34" r="0.8" fill="#FFFFFF" opacity="0.85" />
+      <circle cx="36" cy="36" r="0.9" fill="#FFFFFF" opacity="0.85" />
+      <circle cx="42" cy="34" r="0.8" fill="#FFFFFF" opacity="0.85" />
+      <circle cx="32" cy="42" r="0.9" fill="#FFFFFF" opacity="0.85" />
+      {/* 海苔条(底部黑色条带)*/}
+      <rect x="10" y="44" width="44" height="6" rx="0.5" fill="#1A1A1A" />
+      <rect x="10" y="44" width="44" height="1.5" fill="#FFFFFF" opacity="0.15" />
+      {/* 三文鱼片(顶部橙色椭圆)*/}
+      <ellipse cx="32" cy="22" rx="20" ry="9" fill="#F8895C" />
+      {/* 三文鱼白色筋纹 */}
+      <path d="M 14 22 Q 22 19 32 22 Q 42 25 50 22" fill="none" stroke="#FFFFFF" strokeWidth="1.6" opacity="0.7" strokeLinecap="round" />
+      <path d="M 14 24 Q 22 22 32 24 Q 42 26 50 24" fill="none" stroke="#FFFFFF" strokeWidth="1" opacity="0.55" strokeLinecap="round" />
+      {/* 高光 */}
+      <ellipse cx="24" cy="20" rx="6" ry="2.5" fill="#FFFFFF" opacity="0.4" />
     </>
   );
 }
 
-/** 王冠 — 三尖齿 + 红宝石 */
-function Crown() {
+/** 披萨 — 三角扇形切片 + 奶酪 + 红肠 */
+function Pizza() {
   return (
     <>
-      <GradientDefs id="cw" c0="#FFFAD6" c40="#FFD945" c75="#C9970A" c100="#7A5A04" />
-      {/* 3 尖齿外形 */}
-      <path
-        d="M 8 50 L 8 28 L 18 38 L 24 18 L 32 36 L 40 18 L 46 38 L 56 28 L 56 50 Z"
-        fill="url(#bg-body-cw)"
-      />
-      {/* 底带 */}
-      <rect x="8" y="46" width="48" height="6" fill="#C9970A" />
-      <rect x="8" y="46" width="48" height="2" fill="#FFFFFF" opacity="0.4" />
-      {/* 红宝石 (中) */}
-      <circle cx="32" cy="32" r="3.5" fill="#D32424" stroke="#7A1A1A" strokeWidth="1" />
-      <ellipse cx="31" cy="31" rx="1.2" ry="0.8" fill="#FFFFFF" opacity="0.6" />
-      {/* 蓝宝石 (左/右) */}
-      <circle cx="18" cy="34" r="2.2" fill="#1F6BB0" stroke="#0F3D6E" strokeWidth="0.8" />
-      <circle cx="46" cy="34" r="2.2" fill="#1F6BB0" stroke="#0F3D6E" strokeWidth="0.8" />
-      {/* 顶部高光 */}
-      <ellipse cx="22" cy="28" rx="4" ry="2" fill="#FFFFFF" opacity="0.35" />
+      <GradientDefs id="pizza" c0="#FFE9B5" c40="#FFC066" c75="#D9842A" c100="#8B4D0F" />
+      {/* 披萨三角形(尖端朝下)*/}
+      <path d="M 32 58 L 8 18 Q 32 8 56 18 Z" fill="url(#bg-body-pizza)" />
+      {/* 边缘面饼厚边(深一点)*/}
+      <path d="M 8 18 Q 32 8 56 18 L 54 22 Q 32 13 10 22 Z" fill="#A66220" />
+      {/* 奶酪滴(顶部黄色椭圆 / 不规则)*/}
+      <ellipse cx="20" cy="28" rx="6" ry="3" fill="#FFD66B" opacity="0.85" />
+      <ellipse cx="40" cy="26" rx="7" ry="3.5" fill="#FFD66B" opacity="0.85" />
+      <ellipse cx="32" cy="40" rx="5" ry="2.5" fill="#FFD66B" opacity="0.85" />
+      {/* 红肠片 */}
+      <circle cx="22" cy="32" r="3.5" fill="#C0392B" />
+      <circle cx="22" cy="32" r="1" fill="#7A1818" opacity="0.6" />
+      <circle cx="40" cy="32" r="3.5" fill="#C0392B" />
+      <circle cx="40" cy="32" r="1" fill="#7A1818" opacity="0.6" />
+      <circle cx="30" cy="46" r="3" fill="#C0392B" />
+      <circle cx="30" cy="46" r="0.8" fill="#7A1818" opacity="0.6" />
+      {/* 绿色蔬菜小点 */}
+      <circle cx="14" cy="22" r="1.2" fill="#5DB55A" />
+      <circle cx="48" cy="24" r="1.4" fill="#5DB55A" />
+      <circle cx="34" cy="34" r="1.2" fill="#5DB55A" />
+      {/* 高光 */}
+      <ellipse cx="22" cy="20" rx="6" ry="2.5" fill="#FFFFFF" opacity="0.35" />
     </>
   );
 }
@@ -362,9 +378,9 @@ const SVG_STRINGS: Record<BadgeIconShape, string> = {
   soda: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#D4F0FF"/><stop offset="40%" stop-color="#7CC8F2"/><stop offset="75%" stop-color="#3286C0"/><stop offset="100%" stop-color="#0F4A7A"/></radialGradient></defs><path d="M 24 14 L 24 18 Q 22 20 22 24 L 22 54 Q 22 58 26 58 L 38 58 Q 42 58 42 54 L 42 24 Q 42 20 40 18 L 40 14 Z" fill="url(#b)"/><rect x="24" y="10" width="16" height="6" rx="1.5" fill="#C0392B"/><rect x="24" y="34" width="16" height="10" fill="#FFD66B"/><circle cx="28" cy="48" r="1.5" fill="#fff" opacity="0.7"/><circle cx="36" cy="50" r="1.2" fill="#fff" opacity="0.6"/><rect x="25" y="22" width="2.5" height="28" rx="1.2" fill="#fff" opacity="0.4"/>`,
   chocolate: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#A1693E"/><stop offset="40%" stop-color="#6B3E18"/><stop offset="75%" stop-color="#3D2008"/><stop offset="100%" stop-color="#1F1004"/></radialGradient></defs><rect x="8" y="14" width="48" height="36" rx="3" fill="url(#b)"/><line x1="20" y1="14" x2="20" y2="50" stroke="#1F1004" stroke-width="1.2"/><line x1="32" y1="14" x2="32" y2="50" stroke="#1F1004" stroke-width="1.2"/><line x1="44" y1="14" x2="44" y2="50" stroke="#1F1004" stroke-width="1.2"/><line x1="8" y1="32" x2="56" y2="32" stroke="#1F1004" stroke-width="1.2"/><rect x="8" y="14" width="48" height="3" rx="3" fill="#fff" opacity="0.18"/><ellipse cx="20" cy="22" rx="6" ry="3" fill="#fff" opacity="0.18"/>`,
   icecream: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#FFF1F5"/><stop offset="40%" stop-color="#FFB7C9"/><stop offset="75%" stop-color="#E875A0"/><stop offset="100%" stop-color="#9D2D55"/></radialGradient><radialGradient id="g" cx="35%" cy="22%" r="55%"><stop offset="0%" stop-color="#fff" stop-opacity="0.95"/><stop offset="55%" stop-color="#fff" stop-opacity="0.25"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><path d="M 18 32 L 32 60 L 46 32 Z" fill="#D69552"/><circle cx="32" cy="26" r="14" fill="url(#b)"/><circle cx="32" cy="14" r="3" fill="#FFB7C9"/><circle cx="28" cy="20" r="1.4" fill="#3D1E0A"/><circle cx="36" cy="22" r="1.2" fill="#3D1E0A"/><circle cx="32" cy="26" r="1.3" fill="#3D1E0A"/><ellipse cx="26" cy="20" rx="6" ry="3.5" fill="url(#g)"/>`,
-  sun: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#FFFAD6"/><stop offset="40%" stop-color="#FFDA66"/><stop offset="75%" stop-color="#FFA928"/><stop offset="100%" stop-color="#B36A05"/></radialGradient><radialGradient id="g" cx="35%" cy="22%" r="55%"><stop offset="0%" stop-color="#fff" stop-opacity="0.95"/><stop offset="55%" stop-color="#fff" stop-opacity="0.25"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><g transform="rotate(0 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><g transform="rotate(45 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><g transform="rotate(90 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><g transform="rotate(135 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><g transform="rotate(180 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><g transform="rotate(225 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><g transform="rotate(270 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><g transform="rotate(315 32 32)"><path d="M 32 4 L 30 14 L 34 14 Z" fill="#FFC940"/></g><circle cx="32" cy="32" r="16" fill="url(#b)"/><circle cx="27" cy="29" r="1.4" fill="#7A4404"/><circle cx="37" cy="29" r="1.4" fill="#7A4404"/><path d="M 26 35 Q 32 41, 38 35" fill="none" stroke="#7A4404" stroke-width="1.6" stroke-linecap="round"/>`,
-  star: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#FFFAD6"/><stop offset="40%" stop-color="#FFE066"/><stop offset="75%" stop-color="#E89B0F"/><stop offset="100%" stop-color="#7A4F02"/></radialGradient></defs><path d="M 32 6 L 39 24 L 58 26 L 43 38 L 48 56 L 32 46 L 16 56 L 21 38 L 6 26 L 25 24 Z" fill="url(#b)"/><path d="M 32 16 L 35 26 L 45 27 L 37 33 L 40 43 L 32 38 L 24 43 L 27 33 L 19 27 L 29 26 Z" fill="#fff" opacity="0.25"/><ellipse cx="28" cy="22" rx="3" ry="1.6" fill="#fff" opacity="0.65"/>`,
-  crown: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#FFFAD6"/><stop offset="40%" stop-color="#FFD945"/><stop offset="75%" stop-color="#C9970A"/><stop offset="100%" stop-color="#7A5A04"/></radialGradient></defs><path d="M 8 50 L 8 28 L 18 38 L 24 18 L 32 36 L 40 18 L 46 38 L 56 28 L 56 50 Z" fill="url(#b)"/><rect x="8" y="46" width="48" height="6" fill="#C9970A"/><circle cx="32" cy="32" r="3.5" fill="#D32424"/><circle cx="18" cy="34" r="2.2" fill="#1F6BB0"/><circle cx="46" cy="34" r="2.2" fill="#1F6BB0"/><ellipse cx="22" cy="28" rx="4" ry="2" fill="#fff" opacity="0.35"/>`
+  cake: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#FFF1F5"/><stop offset="40%" stop-color="#FFC4D2"/><stop offset="75%" stop-color="#E48AA8"/><stop offset="100%" stop-color="#9D2D55"/></radialGradient></defs><path d="M 32 6 Q 28 10 32 14 Q 36 10 32 6 Z" fill="#FFB347"/><ellipse cx="32" cy="10" rx="1.4" ry="2" fill="#FFEC99" opacity="0.85"/><rect x="31" y="14" width="2" height="6" fill="#3D6EB0"/><rect x="22" y="20" width="20" height="10" rx="2" fill="url(#b)"/><path d="M 22 20 Q 24 17 26 20 T 30 20 T 34 20 T 38 20 T 42 20" fill="none" stroke="#fff" stroke-width="1.4" opacity="0.6"/><rect x="14" y="30" width="36" height="20" rx="2.5" fill="url(#b)"/><path d="M 14 30 Q 16 27 18 30 T 22 30 T 26 30 T 30 30 T 34 30 T 38 30 T 42 30 T 46 30 T 50 30" fill="none" stroke="#fff" stroke-width="1.4" opacity="0.6"/><circle cx="20" cy="40" r="2.4" fill="#E63946"/><circle cx="32" cy="40" r="2.4" fill="#E63946"/><circle cx="44" cy="40" r="2.4" fill="#E63946"/><ellipse cx="22" cy="34" rx="6" ry="3" fill="#fff" opacity="0.35"/>`,
+  sushi: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="40%" stop-color="#FAF6EE"/><stop offset="75%" stop-color="#D8CFB8"/><stop offset="100%" stop-color="#8E8169"/></radialGradient></defs><ellipse cx="32" cy="38" rx="22" ry="14" fill="url(#b)"/><circle cx="22" cy="38" r="0.9" fill="#fff" opacity="0.85"/><circle cx="28" cy="34" r="0.8" fill="#fff" opacity="0.85"/><circle cx="36" cy="36" r="0.9" fill="#fff" opacity="0.85"/><circle cx="42" cy="34" r="0.8" fill="#fff" opacity="0.85"/><rect x="10" y="44" width="44" height="6" rx="0.5" fill="#1A1A1A"/><ellipse cx="32" cy="22" rx="20" ry="9" fill="#F8895C"/><path d="M 14 22 Q 22 19 32 22 Q 42 25 50 22" fill="none" stroke="#fff" stroke-width="1.6" opacity="0.7" stroke-linecap="round"/><path d="M 14 24 Q 22 22 32 24 Q 42 26 50 24" fill="none" stroke="#fff" stroke-width="1" opacity="0.55" stroke-linecap="round"/><ellipse cx="24" cy="20" rx="6" ry="2.5" fill="#fff" opacity="0.4"/>`,
+  pizza: `<defs><radialGradient id="b" cx="38%" cy="32%" r="78%"><stop offset="0%" stop-color="#FFE9B5"/><stop offset="40%" stop-color="#FFC066"/><stop offset="75%" stop-color="#D9842A"/><stop offset="100%" stop-color="#8B4D0F"/></radialGradient></defs><path d="M 32 58 L 8 18 Q 32 8 56 18 Z" fill="url(#b)"/><path d="M 8 18 Q 32 8 56 18 L 54 22 Q 32 13 10 22 Z" fill="#A66220"/><ellipse cx="20" cy="28" rx="6" ry="3" fill="#FFD66B" opacity="0.85"/><ellipse cx="40" cy="26" rx="7" ry="3.5" fill="#FFD66B" opacity="0.85"/><ellipse cx="32" cy="40" rx="5" ry="2.5" fill="#FFD66B" opacity="0.85"/><circle cx="22" cy="32" r="3.5" fill="#C0392B"/><circle cx="40" cy="32" r="3.5" fill="#C0392B"/><circle cx="30" cy="46" r="3" fill="#C0392B"/><circle cx="14" cy="22" r="1.2" fill="#5DB55A"/><circle cx="48" cy="24" r="1.4" fill="#5DB55A"/><circle cx="34" cy="34" r="1.2" fill="#5DB55A"/><ellipse cx="22" cy="20" rx="6" ry="2.5" fill="#fff" opacity="0.35"/>`
 };
 
 export function badgeIconDataUrl(shape: BadgeIconShape): string {

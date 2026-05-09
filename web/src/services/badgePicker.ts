@@ -15,23 +15,23 @@
 export type Tier = 'nice' | 'great' | 'perfect';
 
 export type BadgeShape =
-  // nice 池
+  // nice 池(小奖励 — 小零食)
   | 'candy'
   | 'lollipop'
   | 'cookie'
-  // great 池
+  // great 池(中奖励 — 饮品 / 甜点)
   | 'soda'
   | 'chocolate'
   | 'icecream'
-  // perfect 池
-  | 'sun'
-  | 'star'
-  | 'crown';
+  // perfect 池(大奖励 — 庆祝餐 / 大份食物)
+  | 'cake'
+  | 'sushi'
+  | 'pizza';
 
 export const POOL: Record<Tier, readonly BadgeShape[]> = {
   nice: ['candy', 'lollipop', 'cookie'] as const,
   great: ['soda', 'chocolate', 'icecream'] as const,
-  perfect: ['sun', 'star', 'crown'] as const
+  perfect: ['cake', 'sushi', 'pizza'] as const
 };
 
 /**

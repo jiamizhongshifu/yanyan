@@ -41,7 +41,8 @@ describe('tierOfShape', () => {
     expect(tierOfShape('lollipop')).toBe('nice');
     expect(tierOfShape('soda')).toBe('great');
     expect(tierOfShape('chocolate')).toBe('great');
-    expect(tierOfShape('sun')).toBe('perfect');
-    expect(tierOfShape('crown')).toBe('perfect');
+    expect(tierOfShape('cake')).toBe('perfect');
+    expect(tierOfShape('sushi')).toBe('perfect');
+    expect(tierOfShape('pizza')).toBe('perfect');
   });
 });
