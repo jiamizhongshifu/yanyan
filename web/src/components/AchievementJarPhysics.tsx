@@ -12,14 +12,26 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Matter from 'matter-js';
-import { orangeIconDataUrl } from './OrangeIcon';
+import { badgeIconDataUrl } from './BadgeIcon';
+import { pickShape, tierOfShape, type Tier } from '../services/badgePicker';
+
+interface DayEntry {
+  date: string; // YYYY-MM-DD
+  tier: Tier;   // 'nice' | 'great' | 'perfect'(none 由调用方过滤掉)
+}
 
 interface Props {
   monthLabel: string;
-  perfect: number;
-  great: number;
-  nice: number;
+  /** 当月达成 tier ≠ none 的所有日子(包含乐观今日)— 每条决定一枚勋章的形状 */
+  days: DayEntry[];
 }
+
+/** 按 tier 决定 sprite 大小,perfect 最大、nice 最小 */
+const SIZE_BY_TIER: Record<Tier, number> = {
+  perfect: 64,
+  great: 56,
+  nice: 50
+};
 
 interface BadgeSpec {
   iconUrl: string;
@@ -82,12 +94,7 @@ function markJarSeen(sig: string) {
   }
 }
 
-export function AchievementJarPhysics({
-  monthLabel,
-  perfect,
-  great,
-  nice
-}: Props) {
+export function AchievementJarPhysics({ monthLabel, days }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
@@ -99,15 +106,14 @@ export function AchievementJarPhysics({
   const dropTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [needsPerm, setNeedsPerm] = useState(false);
 
-  // 全部要进瓶子的勋章 specs(图片 url + 大小)
-  // 都用 SVG dataURL(64×64 viewBox)。sprite scale = size / 64
+  // 每个 day → 一枚 badge sprite(形状由 pickShape 决定,大小按 tier)
   const badges = useMemo<BadgeSpec[]>(() => {
-    const list: BadgeSpec[] = [];
-    for (let i = 0; i < perfect; i++) list.push({ iconUrl: orangeIconDataUrl('perfect'), size: 64 });
-    for (let i = 0; i < great; i++) list.push({ iconUrl: orangeIconDataUrl('great'), size: 56 });
-    for (let i = 0; i < nice; i++) list.push({ iconUrl: orangeIconDataUrl('nice'), size: 50 });
-    return list.slice(0, 24);
-  }, [perfect, great, nice]);
+    return days.slice(0, 24).map((d) => {
+      const shape = pickShape(d.date, d.tier);
+      const size = SIZE_BY_TIER[tierOfShape(shape)];
+      return { iconUrl: badgeIconDataUrl(shape), size };
+    });
+  }, [days]);
 
   // ─── Effect A:引擎 / 瓶壁 / runner 只在挂载时 setup 一次 ───
   // 之前 deps=[badges],导致每次月份切换 / 数据 fetch 完成都把引擎销毁重建,
@@ -236,7 +242,7 @@ export function AchievementJarPhysics({
 
     // 同会话内同样的瓶子状态见过 → 跳过掉落动画,直接放到瓶底
     // 状态变化(用户拿到新勋章 / 切月)→ 还是会播一次 cascade,celebrate 新进展
-    const sig = `${monthLabel}|${perfect}|${great}|${nice}`;
+    const sig = `${monthLabel}|${days.map((d) => `${d.date}:${d.tier}`).join(',')}`;
     const skipAnim = shouldSkipDropAnimation(sig);
     const STAGGER_MS = skipAnim ? 0 : 25;
 
@@ -273,7 +279,7 @@ export function AchievementJarPhysics({
 
     // 标记本会话已见过这个状态;再进同月 + 同 tier 计数 → 跳过动画
     markJarSeen(sig);
-  }, [badges, monthLabel, perfect, great, nice]);
+  }, [badges, monthLabel, days]);
 
   const askPermission = async () => {
     const ok = await requestOrientPermission();
@@ -290,7 +296,7 @@ export function AchievementJarPhysics({
     <section className="rounded-3xl bg-white px-5 py-5" data-testid="achievement-jar">
       <div className="flex items-baseline justify-between mb-3">
         <h2 className="text-base font-medium text-ink">{monthLabel} · 勋章瓶</h2>
-        <span className="text-xs text-ink/50">本月 {perfect + great + nice} 枚</span>
+        <span className="text-xs text-ink/50">本月 {days.length} 枚</span>
       </div>
       <div ref={containerRef} className="relative mx-auto" style={{ width: 280, height: 360 }}>
         {/* SVG 玻璃瓶轮廓(默认空瓶,只有玻璃 + 金色盖子) */}

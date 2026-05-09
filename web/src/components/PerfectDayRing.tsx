@@ -11,7 +11,8 @@
  */
 
 import type { DayTier } from '../services/challenges';
-import { OrangeIcon, type OrangeVariant } from './OrangeIcon';
+import { BadgeIcon, type BadgeIconShape } from './BadgeIcon';
+import { pickShape } from '../services/badgePicker';
 
 interface Props {
   doneCount: number; // 0-5
@@ -120,10 +121,18 @@ export function PerfectDayRing({ doneCount, total = 5, tier }: Props) {
           ))}
         </svg>
 
-        {/* 中心:tier 橘子 + 大号百分比 + Perfect Day 副标 */}
+        {/* 中心:tier 形状池橘子 + 大号百分比 + Perfect Day 副标 */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <OrangeIcon
-            variant={(tier === 'none' ? 'gray' : tier) as OrangeVariant}
+          <BadgeIcon
+            shape={
+              ((): BadgeIconShape => {
+                if (tier === 'none') return 'orange-gray';
+                // 用今日日期作为 seed,跨天会换形状
+                const today = new Date();
+                const dateISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                return pickShape(dateISO, tier);
+              })()
+            }
             className="w-9 h-9 mb-1"
           />
           <p

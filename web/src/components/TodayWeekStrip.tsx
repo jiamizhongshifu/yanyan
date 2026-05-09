@@ -8,7 +8,8 @@
 
 import { useMemo } from 'react';
 import type { DayTier } from '../services/challenges';
-import { OrangeIcon, type OrangeVariant } from './OrangeIcon';
+import { BadgeIcon, type BadgeIconShape } from './BadgeIcon';
+import { pickShape } from '../services/badgePicker';
 
 interface DayInfo {
   date: string;
@@ -20,12 +21,6 @@ interface Props {
   todayTier?: DayTier;
   todayDate?: Date;
 }
-
-const TIER_TO_VARIANT: Record<Exclude<DayTier, 'none'>, OrangeVariant> = {
-  perfect: 'perfect',
-  great: 'great',
-  nice: 'nice'
-};
 
 export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = new Date() }: Props) {
   const histByDate = useMemo(
@@ -53,13 +48,13 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
   return (
     <div className="grid grid-cols-7 gap-1" data-testid="today-week-strip">
       {cells.map((c) => {
-        // tier 决定金/银/铜;无 tier 时:过去 + 今日 → gray(灰填充);未来 → outline(空心)
-        const variant: OrangeVariant =
+        // 有 tier → 形状池按日期 hash 选;无 tier 时:过去/今日 → orange-gray;未来 → orange-outline
+        const shape: BadgeIconShape =
           c.tier !== 'none'
-            ? TIER_TO_VARIANT[c.tier as keyof typeof TIER_TO_VARIANT]
+            ? pickShape(c.date, c.tier)
             : c.isPast || c.isToday
-            ? 'gray'
-            : 'outline';
+            ? 'orange-gray'
+            : 'orange-outline';
         return (
           <div key={c.date} className="flex flex-col items-center gap-1.5">
             {/* 日期 — 固定 24×24 高度,所有 cell 视觉等高 */}
@@ -70,8 +65,8 @@ export function TodayWeekStrip({ daysHistory, todayTier = 'none', todayDate = ne
             >
               {c.day}
             </div>
-            {/* 橘子徽标 */}
-            <OrangeIcon variant={variant} className="w-7 h-7" />
+            {/* 勋章徽标(多形状) */}
+            <BadgeIcon shape={shape} className="w-7 h-7" />
           </div>
         );
       })}

@@ -13,20 +13,14 @@
 
 import { useMemo } from 'react';
 import type { FireLevel } from '../services/symptoms';
-import { OrangeIcon, type OrangeVariant } from './OrangeIcon';
+import { BadgeIcon, type BadgeIconShape } from './BadgeIcon';
+import { pickShape } from '../services/badgePicker';
 
 interface DayInfo {
   date: string; // YYYY-MM-DD
   tier: 'perfect' | 'great' | 'nice' | 'none';
   fireLevel: FireLevel | null;
 }
-
-const TIER_TO_VARIANT: Record<DayInfo['tier'], OrangeVariant | null> = {
-  perfect: 'perfect',
-  great: 'great',
-  nice: 'nice',
-  none: null
-};
 
 interface Props {
   /** 当月内已打卡的累计天数(粗略 fallback,在 server 历史拿到前用) */
@@ -141,13 +135,13 @@ export function MonthCalendarGrid({
               </span>
               <div className="w-9 h-9 rounded-full flex items-center justify-center" title={title}>
                 {(() => {
-                  // 未来 → outline 空心;过去/今日 + 有 tier → 金/银/铜;过去/今日无 tier → gray
-                  const variant: OrangeVariant = c.isFuture
-                    ? 'outline'
-                    : isLit
-                    ? (hist && TIER_TO_VARIANT[hist.tier]) || 'great'
-                    : 'gray';
-                  return <OrangeIcon variant={variant} className="w-7 h-7" />;
+                  // 未来 → orange-outline 空心;有 tier → 形状池按日期 hash 选;过去/今日无 tier → orange-gray
+                  const shape: BadgeIconShape = c.isFuture
+                    ? 'orange-outline'
+                    : isLit && hist && hist.tier !== 'none'
+                    ? pickShape(dateStr, hist.tier)
+                    : 'orange-gray';
+                  return <BadgeIcon shape={shape} className="w-7 h-7" />;
                 })()}
               </div>
             </button>

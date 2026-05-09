@@ -235,9 +235,17 @@ export function Insights() {
         >
           <AchievementJar
             monthLabel={monthLabel}
-            perfect={perfect}
-            great={great}
-            nice={nice}
+            days={(() => {
+              // 把 monthCh.days 里 tier ≠ 'none' 的转成 jar 输入
+              const base = (monthCh?.days ?? [])
+                .filter((d) => d.tier !== 'none')
+                .map((d) => ({ date: d.date, tier: d.tier as 'nice' | 'great' | 'perfect' }));
+              // 浏览当月 + 今日有 tier + server 还没回写时,把今日乐观加入 jar
+              if (isCurrentMonth && !todayInServer && todayTier !== 'none') {
+                base.push({ date: dateKey, tier: todayTier as 'nice' | 'great' | 'perfect' });
+              }
+              return base;
+            })()}
           />
         </Suspense>
       )}
